@@ -351,7 +351,7 @@ function renderPage() {
   const winnerHTML = (isDone && m.winner) ? `
     <div class="winner-banner">
       <div class="winner-label">🏆 ผลการแข่งขัน</div>
-      <div class="winner-name">${m.winner === 'red' ? (m.name_a || 'เจ้าบ้าน') : (m.name_b || 'ทีมเยือน')} ชนะ!</div>
+      <div class="winner-name">${m.winner} ชนะ!</div>
     </div>` : '';
 
   // แสดง bet panel ตาม status
@@ -455,12 +455,12 @@ function betFormHTML(m) {
     <div class="side-btn" id="btn-red" onclick="selectSide('red')">
       <div style="font-size:24px;">🐂</div>
       <div class="side-name" style="color:#ff9090;">${m.name_a || 'เจ้าบ้าน'}</div>
-      <div class="side-sub">ฝั่งแดง</div>
+      
     </div>
     <div class="side-btn" id="btn-blue" onclick="selectSide('blue')">
       <div style="font-size:24px;">🐂</div>
       <div class="side-name" style="color:#90b4ff;">${m.name_b || 'ทีมเยือน'}</div>
-      <div class="side-sub">ฝั่งน้ำเงิน</div>
+      
     </div>
   </div>
   <div class="input-row">

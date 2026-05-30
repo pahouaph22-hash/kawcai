@@ -814,7 +814,7 @@ function filterMatches_() {
           ${streamBadge}
           <button class="btn btn-gold" style="margin-top:4px;font-size:11px;" onclick="editStreamUrl('${m.id}','${(m.stream_url||'').replace(/'/g,'')}')">✏️ URL</button>
         </td>
-        <td>${m.winner?`<span class="badge badge-approved">🏆 ${m.winner==='red'?(m.name_a||'เจ้าบ้าน'):(m.name_b||'ทีมเยือน')}</span>`:'—'}</td>
+        <td>${m.winner?`<span class="badge badge-approved">🏆 ${m.winner||'—'}</span>`:'—'}</td>
         <td style="display:flex;gap:4px;flex-wrap:wrap;">
           <button class="btn btn-red" onclick="deleteMatch('${m.id}')">ลบ</button>
         </td>
@@ -903,8 +903,8 @@ function renderVerdictPending(rows) {
         </div>
       </div>
       <div style="display:flex;gap:8px;">
-        <button class="btn btn-red" style="flex:1;" onclick="doVerdict('${m.id}','red','${(m.name_a||'เจ้าบ้าน').replace(/'/g,"\\'")}')">🏆 ${m.name_a||'เจ้าบ้าน'} ชนะ</button>
-        <button class="btn btn-primary" style="flex:1;" onclick="doVerdict('${m.id}','blue','${(m.name_b||'ทีมเยือน').replace(/'/g,"\\'")}')">🏆 ${m.name_b||'ทีมเยือน'} ชนะ</button>
+        <button class="btn btn-red" style="flex:1;" onclick="doVerdict('${m.id}','${(m.name_a||'เจ้าบ้าน').replace(/'/g,"\\'")}','${(m.name_a||'เจ้าบ้าน').replace(/'/g,"\\'")}')">🏆 ${m.name_a||'เจ้าบ้าน'} ชนะ</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="doVerdict('${m.id}','${(m.name_b||'ทีมเยือน').replace(/'/g,"\\'")}','${(m.name_b||'ทีมเยือน').replace(/'/g,"\\'")}')">🏆 ${m.name_b||'ทีมเยือน'} ชนะ</button>
       </div>
     </div>`).join('');
 }
@@ -916,7 +916,7 @@ function renderVerdictDone(rows) {
     rows.map(m => `<tr>
       <td>${m.code?`<span class="match-code">${m.code}</span>`:'—'}</td>
       <td>${m.round||'—'}</td>
-      <td><span class="badge badge-approved">🏆 ${m.winner==='red'?(m.name_a||'เจ้าบ้าน'):(m.name_b||'ทีมเยือน')}</span></td>
+      <td><span class="badge badge-approved">🏆 ${m.winner||'—'}</span></td>
       <td>${Number(m.prize||0).toLocaleString()} ฿</td>
       <td><button class="btn btn-gold" onclick="resetVerdict('${m.id}')">รีเซ็ต</button></td>
     </tr>`).join('') + '</tbody></table>';
@@ -944,15 +944,15 @@ async function loadFeeRate() {
 async function payoutBets(matchId, winner, FEE_RATE = 0.07) {
   const { data: bets } = await sb.from('bets').select('*').eq('match_id', matchId).in('status', ['matched', 'waiting']);
   if (!bets?.length) return { totalPool: 0, fee: 0, totalPaid: 0 };
-  const winnerBets = bets.filter(b => b.side === winner);
-  const loserBets  = bets.filter(b => b.side !== winner);
+  const winnerBets = bets.filter(b => b.side_name === winner);
+  const loserBets  = bets.filter(b => b.side_name !== winner);
   const winnerPool = winnerBets.reduce((s, b) => s + Number(b.amount), 0);
   const loserPool  = loserBets.reduce((s, b) => s + Number(b.amount), 0);
   const totalPool  = winnerPool + loserPool;
   const fee        = Math.floor(totalPool * FEE_RATE);
   let totalPaid    = 0;
   for (const bet of bets) {
-    await sb.from('bets').update({ status: bet.side === winner ? 'won' : 'lost' }).eq('id', bet.id);
+    await sb.from('bets').update({ status: bet.side_name === winner ? 'won' : 'lost' }).eq('id', bet.id);
   }
   if (winnerPool > 0 && winnerBets.length > 0) {
     const payMap = new Map();
