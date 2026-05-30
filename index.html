@@ -435,244 +435,221 @@ fns.forEach(function(fn){
     gap: 16px;
   }
 
-  /* MATCH CARD */
+  /* ======= MATCH CARD — Redesign ======= */
   .match-card-fe {
     background: var(--dark2);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
     overflow: hidden;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
     animation: fadeUp 0.5s ease both;
+    position: relative;
   }
   .match-card-fe:hover {
-    transform: translateY(-3px);
-    border-color: rgba(245,200,66,0.35);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+    transform: translateY(-4px);
+    border-color: rgba(245,200,66,0.4);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(245,200,66,0.1);
   }
   .match-card-fe.live {
     border-color: rgba(239,68,68,0.5);
-    box-shadow: 0 0 20px rgba(239,68,68,0.15);
+    box-shadow: 0 0 24px rgba(239,68,68,0.2);
   }
 
-  /* MATCH HEADER */
+  /* ======= MATCH HEADER ======= */
   .match-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 18px;
-    background: rgba(0,0,0,0.2);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 12px 18px;
+    background: rgba(0,0,0,0.25);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
   }
   .match-round {
     font-family: 'Kanit', sans-serif;
-    font-weight: 700;
-    font-size: 12px;
+    font-weight: 900;
+    font-size: 13px;
     color: var(--gold);
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
   .match-meta {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 10px;
     font-size: 11px;
-    color: rgba(240,255,232,0.45);
+    color: rgba(240,255,232,0.4);
     font-family: 'Kanit', sans-serif;
+    flex-wrap: wrap;
   }
-  .match-meta span { display: flex; align-items: center; gap: 4px; }
+  .match-meta span { display: flex; align-items: center; gap: 3px; }
   .match-status-badge {
     font-family: 'Kanit', sans-serif;
     font-weight: 700;
     font-size: 10px;
     padding: 3px 10px;
     border-radius: 999px;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
   }
-  .status-upcoming { background: rgba(245,200,66,0.12); color: var(--gold); border: 1px solid rgba(245,200,66,0.25); }
-  .status-live { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.35); animation: pulse-badge 1.5s infinite; }
-  .status-done { background: rgba(74,222,128,0.1); color: var(--accent); border: 1px solid rgba(74,222,128,0.2); }
+  .status-upcoming { background: rgba(245,200,66,0.12); color: var(--gold); border: 1px solid rgba(245,200,66,0.3); }
+  .status-live { background: rgba(239,68,68,0.18); color: #f87171; border: 1px solid rgba(239,68,68,0.4); animation: pulse-badge 1.5s infinite; }
+  .status-done { background: rgba(74,222,128,0.12); color: var(--accent); border: 1px solid rgba(74,222,128,0.25); }
 
-  /* MATCH BODY — VS layout */
+  /* ======= MATCH BODY — แสดงวัว 2 ฝ่ายชัดเจน ======= */
   .match-body {
     display: grid;
-    grid-template-columns: 1fr 100px 1fr;
+    grid-template-columns: 1fr 80px 1fr;
     align-items: stretch;
-    min-height: 120px;
+    min-height: 140px;
   }
 
   /* TEAM SIDE */
   .team-side {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 14px;
-    padding: 18px 20px;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px 16px;
+    text-align: center;
     transition: background 0.2s;
   }
   .team-side.red-side {
-    background: linear-gradient(135deg, rgba(239,68,68,0.08) 0%, transparent 60%);
-    border-right: 1px solid rgba(255,255,255,0.04);
+    background: linear-gradient(160deg, rgba(239,68,68,0.12) 0%, rgba(239,68,68,0.03) 100%);
+    border-right: 1px solid rgba(239,68,68,0.12);
   }
   .team-side.blue-side {
-    background: linear-gradient(225deg, rgba(59,130,246,0.08) 0%, transparent 60%);
-    border-left: 1px solid rgba(255,255,255,0.04);
-    flex-direction: row-reverse;
+    background: linear-gradient(200deg, rgba(59,130,246,0.12) 0%, rgba(59,130,246,0.03) 100%);
+    border-left: 1px solid rgba(59,130,246,0.12);
   }
 
-  /* TEAM PHOTO */
+  /* TEAM PHOTO — ใหญ่ขึ้นเพื่อเห็นวัวชัด */
   .team-photo {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     overflow: hidden;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
-    border: 3px solid rgba(255,255,255,0.08);
+    font-size: 40px;
+    transition: transform 0.2s;
   }
-  .team-photo.red-photo { border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.08); }
-  .team-photo.blue-photo { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.08); }
-  .team-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .team-photo.red-photo {
+    border: 3px solid rgba(239,68,68,0.5);
+    background: radial-gradient(circle, rgba(239,68,68,0.15), rgba(239,68,68,0.05));
+    box-shadow: 0 0 16px rgba(239,68,68,0.2);
+  }
+  .team-photo.blue-photo {
+    border: 3px solid rgba(59,130,246,0.5);
+    background: radial-gradient(circle, rgba(59,130,246,0.15), rgba(59,130,246,0.05));
+    box-shadow: 0 0 16px rgba(59,130,246,0.2);
+  }
+  .team-photo img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .match-card-fe:hover .team-photo { transform: scale(1.06); }
 
   /* TEAM INFO */
-  .team-info { flex: 1; }
-  .team-side.blue-side .team-info { text-align: right; }
-  .team-label {
-    font-size: 10px;
-    font-family: 'Kanit', sans-serif;
-    font-weight: 700;
-    letter-spacing: 2px;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-  }
-  .team-label.red { color: rgba(239,68,68,0.7); }
-  .team-label.blue { color: rgba(59,130,246,0.7); }
+  .team-info { text-align: center; }
   .team-name {
     font-family: 'Kanit', sans-serif;
     font-weight: 900;
-    font-size: 18px;
+    font-size: 16px;
     color: var(--cream);
     line-height: 1.2;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
   }
-  .team-name.winner-name { color: var(--gold); }
+  .team-name.winner-name {
+    color: var(--gold);
+    text-shadow: 0 0 12px rgba(245,200,66,0.4);
+  }
   .team-owner {
-    font-size: 12px;
-    color: rgba(240,255,232,0.45);
-    margin-bottom: 5px;
+    font-size: 11px;
+    color: rgba(240,255,232,0.4);
+    margin-bottom: 3px;
   }
-  .team-stats {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-  .team-side.blue-side .team-stats { justify-content: flex-end; }
-  .team-stat-tag {
+  .team-weight {
+    display: inline-block;
     font-family: 'Kanit', sans-serif;
     font-size: 10px;
     font-weight: 700;
     padding: 2px 8px;
     border-radius: 4px;
     background: rgba(255,255,255,0.06);
-    color: rgba(240,255,232,0.5);
-    border: 1px solid rgba(255,255,255,0.07);
+    color: rgba(240,255,232,0.45);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .winner-crown {
+    font-size: 18px;
+    margin-bottom: 2px;
+    filter: drop-shadow(0 0 6px rgba(245,200,66,0.6));
   }
 
   /* VS CENTER */
-  .match-vs-center {
+  .match-center {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 12px 8px;
-    background: rgba(0,0,0,0.15);
+    gap: 5px;
+    padding: 10px 4px;
+    background: rgba(0,0,0,0.18);
     border-left: 1px solid rgba(255,255,255,0.04);
     border-right: 1px solid rgba(255,255,255,0.04);
   }
   .vs-text {
     font-family: 'Kanit', sans-serif;
     font-weight: 900;
-    font-size: 20px;
-    color: rgba(240,255,232,0.2);
+    font-size: 18px;
+    color: rgba(240,255,232,0.18);
     letter-spacing: 2px;
   }
-  .match-time-center {
+
+  /* WINNER BAR */
+  .match-footer-done {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, rgba(245,200,66,0.1), rgba(245,200,66,0.05));
+    border-top: 1px solid rgba(245,200,66,0.2);
     font-family: 'Kanit', sans-serif;
     font-size: 13px;
     font-weight: 700;
-    color: var(--cream);
-    text-align: center;
-  }
-  .match-date-center {
-    font-size: 10px;
-    color: rgba(240,255,232,0.35);
-    text-align: center;
-    font-family: 'Kanit', sans-serif;
-  }
-  .prize-badge {
-    background: rgba(245,200,66,0.1);
-    border: 1px solid rgba(245,200,66,0.2);
-    border-radius: 6px;
-    padding: 3px 8px;
-    font-family: 'Kanit', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
     color: var(--gold);
-    text-align: center;
-    line-height: 1.4;
   }
+  .match-footer-done strong { color: var(--cream); }
 
-  /* MATCH FOOTER */
-  .match-footer {
+  /* FOOTER ACTIONS */
+  .match-actions {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 18px;
-    border-top: 1px solid rgba(255,255,255,0.05);
-    background: rgba(0,0,0,0.1);
-    flex-wrap: wrap;
     gap: 8px;
-  }
-  .match-location {
-    font-size: 12px;
-    color: rgba(240,255,232,0.4);
-    font-family: 'Kanit', sans-serif;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .match-winner-bar {
-    font-family: 'Kanit', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--gold);
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    padding: 10px 14px;
+    background: rgba(0,0,0,0.12);
+    border-top: 1px solid rgba(255,255,255,0.05);
   }
   .match-detail-btn {
+    flex: 1;
     font-family: 'Kanit', sans-serif;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
-    padding: 5px 14px;
-    border-radius: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
     border: 1px solid rgba(245,200,66,0.25);
     background: transparent;
     color: var(--gold);
     cursor: pointer;
     transition: all 0.15s;
-    letter-spacing: 0.5px;
+    text-align: center;
+    white-space: nowrap;
   }
   .match-detail-btn:hover { background: rgba(245,200,66,0.1); }
   .live-dot {
     display: inline-block;
-    width: 7px;
-    height: 7px;
+    width: 7px; height: 7px;
     border-radius: 50%;
     background: #f87171;
     animation: pulse-badge 1s infinite;
@@ -999,16 +976,16 @@ fns.forEach(function(fn){
     font-family: 'Sarabun', sans-serif;
   }
 
-  /* EVENTS */
+  /* EVENTS — Mobile */
   .events-section {
-    padding: 60px 40px;
+    padding: 40px 16px;
     max-width: 1100px;
     margin: 0 auto;
   }
   .section-title {
     font-family: 'Kanit', sans-serif;
     font-weight: 900;
-    font-size: 36px;
+    font-size: 28px;
     color: var(--gold);
     text-align: center;
     margin-bottom: 8px;
@@ -1018,14 +995,17 @@ fns.forEach(function(fn){
     width: 60px;
     height: 4px;
     background: var(--red);
-    margin: 0 auto 40px;
+    margin: 0 auto 32px;
     border-radius: 2px;
   }
   .event-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 24px;
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
+  .match-body { grid-template-columns: 1fr 60px 1fr; min-height: 120px; }
+  .team-photo { width: 60px; height: 60px; font-size: 30px; }
+  .team-name { font-size: 14px; }
   .event-card {
     background: var(--dark2);
     border: 1px solid rgba(245,168,0,0.2);
@@ -2359,9 +2339,13 @@ fns.forEach(function(fn){
   .account-back{display:inline-flex;align-items:center;gap:8px;font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;color:rgba(240,255,232,0.5);cursor:pointer;margin-bottom:28px;background:none;border:none;padding:0;transition:color .2s;}
   .account-back:hover{color:var(--gold);}
   .account-banner{background:linear-gradient(135deg,var(--green3),var(--dark3));border:1px solid rgba(39,148,63,0.3);border-radius:16px;padding:24px 28px;display:flex;align-items:center;gap:20px;margin-bottom:20px;flex-wrap:wrap;}
-  .account-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green2));display:flex;align-items:center;justify-content:center;font-family:'Kanit',sans-serif;font-weight:900;font-size:26px;color:#fff;flex-shrink:0;border:3px solid rgba(245,200,66,0.4);}
+  .account-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green2));display:flex;align-items:center;justify-content:center;font-family:'Kanit',sans-serif;font-weight:900;font-size:32px;color:#fff;flex-shrink:0;border:3px solid rgba(245,200,66,0.5);cursor:pointer;position:relative;overflow:hidden;transition:all .2s;box-shadow:0 0 0 0 rgba(245,200,66,0.3);}
+  .account-avatar:hover{border-color:var(--gold);box-shadow:0 0 0 4px rgba(245,200,66,0.2);}
+  .account-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+  .account-avatar-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:20px;}
+  .account-avatar:hover .account-avatar-overlay{opacity:1;}
   .account-info{flex:1;}
-  .account-nick{font-family:'Kanit',sans-serif;font-weight:900;font-size:22px;color:var(--gold);}
+  .account-nick{font-family:'Kanit',sans-serif;font-weight:900;font-size:26px;color:var(--gold);letter-spacing:0.5px;text-shadow:0 2px 12px rgba(245,200,66,0.3);}
   .account-detail{font-size:13px;color:rgba(240,255,232,0.5);margin-top:4px;}
   .account-id{display:inline-block;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.25);border-radius:6px;padding:3px 10px;font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;color:var(--gold);margin-top:6px;}
   .account-balance-box{text-align:right;flex-shrink:0;}
@@ -2475,6 +2459,22 @@ fns.forEach(function(fn){
     font-size: 12px;
     color: rgba(255,248,236,0.3);
   }
+
+  /* EVENTS — Desktop (tablet+) */
+  @media (min-width: 640px) {
+    .events-section { padding: 60px 32px; }
+    .event-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .section-title { font-size: 36px; }
+    .match-body { grid-template-columns: 1fr 80px 1fr; min-height: 140px; }
+    .team-photo { width: 80px; height: 80px; font-size: 40px; }
+    .team-name { font-size: 16px; }
+  }
+  @media (min-width: 1024px) {
+    .events-section { padding: 70px 40px; }
+    .event-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .section-title { font-size: 40px; }
+  }
+
 </style>
 </head>
 <body>
@@ -2665,6 +2665,33 @@ fns.forEach(function(fn){
   </div>
 </div>
 
+
+<!-- Avatar Picker Modal -->
+<div id="avatar-picker-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--dark2);border:1px solid rgba(39,148,63,0.3);border-radius:20px;padding:24px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:var(--gold);">🖼️ เปลี่ยนรูปโปรไฟล์</div>
+      <button onclick="closeAvatarPicker()" style="background:none;border:none;color:rgba(240,255,232,0.5);font-size:22px;cursor:pointer;line-height:1;">×</button>
+    </div>
+
+    <!-- ตัวเลือก -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+      <button onclick="document.getElementById('avatar-file-input').click();closeAvatarPicker();"
+        style="font-family:'Kanit',sans-serif;font-weight:700;font-size:14px;padding:14px;border-radius:12px;border:1px solid rgba(39,148,63,0.4);background:rgba(39,148,63,0.1);color:var(--cream);cursor:pointer;">
+        📷 อัพโหลดรูป
+      </button>
+      <button onclick="setAutoAvatar()" 
+        style="font-family:'Kanit',sans-serif;font-weight:700;font-size:14px;padding:14px;border-radius:12px;border:1px solid rgba(245,200,66,0.3);background:rgba(245,200,66,0.07);color:var(--gold);cursor:pointer;">
+        ✨ Auto (ตัวอักษร)
+      </button>
+    </div>
+
+    <!-- Emoji presets -->
+    <div style="font-family:'Kanit',sans-serif;font-size:13px;color:rgba(240,255,232,0.5);margin-bottom:10px;">หรือเลือก Emoji:</div>
+    <div id="emoji-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;">
+    </div>
+  </div>
+</div>
 </div><!-- end main-content -->
 
 <!-- REGISTER PAGE -->
@@ -3015,7 +3042,13 @@ fns.forEach(function(fn){
         🔔<span id="notif-count" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-family:'Kanit',sans-serif;font-size:9px;font-weight:900;padding:1px 5px;border-radius:999px;min-width:16px;text-align:center;">0</span>
       </button>
 
-      <div class="account-avatar" id="acc-avatar">ส</div>
+      <!-- Avatar: คลิกเปลี่ยนรูปได้ -->
+      <div class="account-avatar" id="acc-avatar" onclick="openAvatarPicker()" title="เปลี่ยนรูปโปรไฟล์">
+        <span id="acc-avatar-text">ส</span>
+        <div class="account-avatar-overlay">✏️</div>
+      </div>
+      <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="handleAvatarUpload(this)">
+
       <div class="account-info">
         <div class="account-nick" id="acc-nick">—</div>
         <div class="account-detail" id="acc-fullname">—</div>
@@ -3755,41 +3788,65 @@ fns.forEach(function(fn){
           prize: `${prizeNum.toLocaleString()} บาท`,
           winner: m.winner||'', photoA: m.photo_a||'', photoB: m.photo_b||''
         });
+        const winA = isDone && m.winner === m.name_a;
+        const winB = isDone && m.winner === m.name_b;
         card.innerHTML = `
+          <!-- Header -->
           <div class="match-header">
             <div class="match-round">🏆 ${m.round||'รายการแข่งขัน'}</div>
             <div class="match-meta">
-              <span>📅 ${m.date||'—'}</span>
+              ${m.date?`<span>📅 ${m.date}</span>`:''}
               ${m.time?`<span>⏰ ${m.time}</span>`:''}
+              ${m.location?`<span>📍 ${m.location}</span>`:''}
               ${prizeNum?`<span>💰 ${prizeNum.toLocaleString()} ฿</span>`:''}
             </div>
             <span class="match-status-badge ${statusClass}">${isLive?'<span class="live-dot"></span>':''}${statusLabel}</span>
           </div>
+
+          <!-- Body: วัว 2 ฝ่าย -->
           <div class="match-body">
+
+            <!-- ฝั่งแดง -->
             <div class="team-side red-side">
-              <div class="team-photo red-photo">${m.photo_a?`<img src="${m.photo_a}" alt="${m.name_a}">`:'🐂'}</div>
+              ${winA?'<div class="winner-crown">🏆</div>':''}
+              <div class="team-photo red-photo">
+                ${m.photo_a?`<img src="${m.photo_a}" alt="${m.name_a||''}">`:'🐂'}
+              </div>
               <div class="team-info">
-                <div class="team-name${isDone&&m.winner===m.name_a?' winner-name':''}">${m.name_a||'—'}${isDone&&m.winner===m.name_a?' 🏆':''}</div>
-                ${m.owner_a?`<div class="team-owner">เจ้าของ: ${m.owner_a}</div>`:''}
-                ${m.weight_a?`<div class="team-weight">${m.weight_a}</div>`:''}
+                <div class="team-name${winA?' winner-name':''}">${m.name_a||'—'}</div>
+                ${m.owner_a?`<div class="team-owner">${m.owner_a}</div>`:''}
+                ${m.weight_a?`<div class="team-weight">⚖️ ${m.weight_a}</div>`:''}
               </div>
             </div>
+
+            <!-- กลาง VS -->
             <div class="match-center">
               <div class="vs-text">VS</div>
-              ${m.code?`<div style="font-size:10px;color:rgba(245,200,66,0.5);letter-spacing:2px;font-family:Kanit,sans-serif;">#${m.code}</div>`:''}
+              ${m.code?`<div style="font-size:9px;color:rgba(245,200,66,0.35);letter-spacing:2px;font-family:Kanit,sans-serif;margin-top:4px;">#${m.code}</div>`:''}
             </div>
+
+            <!-- ฝั่งน้ำเงิน -->
             <div class="team-side blue-side">
-              <div class="team-photo blue-photo">${m.photo_b?`<img src="${m.photo_b}" alt="${m.name_b}">`:'🐃'}</div>
+              ${winB?'<div class="winner-crown">🏆</div>':''}
+              <div class="team-photo blue-photo">
+                ${m.photo_b?`<img src="${m.photo_b}" alt="${m.name_b||''}">`:'🐃'}
+              </div>
               <div class="team-info">
-                <div class="team-name${isDone&&m.winner===m.name_b?' winner-name':''}">${m.name_b||'—'}${isDone&&m.winner===m.name_b?' 🏆':''}</div>
-                ${m.owner_b?`<div class="team-owner">เจ้าของ: ${m.owner_b}</div>`:''}
-                ${m.weight_b?`<div class="team-weight">${m.weight_b}</div>`:''}
+                <div class="team-name${winB?' winner-name':''}">${m.name_b||'—'}</div>
+                ${m.owner_b?`<div class="team-owner">${m.owner_b}</div>`:''}
+                ${m.weight_b?`<div class="team-weight">⚖️ ${m.weight_b}</div>`:''}
               </div>
             </div>
           </div>
-          ${isDone&&m.winner?`<div class="match-footer-done">🏆 ผู้ชนะ: <strong>${m.winner}</strong></div>`:''}
-          <button class="match-detail-btn" onclick="event.stopPropagation();openModal({round:'${(m.round||'').replace(/'/g,"\'")}',bullA:'${(m.name_a||'').replace(/'/g,"\'")}',ownerA:'${(m.owner_a||'').replace(/'/g,"\'")}',weightA:'${m.weight_a||''}',bullB:'${(m.name_b||'').replace(/'/g,"\'")}',ownerB:'${(m.owner_b||'').replace(/'/g,"\'")}',weightB:'${m.weight_b||''}',date:'${m.date||''}',time:'${m.time||''}',loc:'${(m.location||'').replace(/'/g,"\'")}',prize:'${prizeNum.toLocaleString()} บาท',winner:'${m.winner||''}',photoA:'${m.photo_a||''}',photoB:'${m.photo_b||''}'})">ดูรายละเอียด →</button>
-          ${!isDone ? `<a href="wuachon-match.html?id=${m.id}" class="match-detail-btn" style="background:var(--green2);color:#fff;text-decoration:none;text-align:center;">🎯 วางเดิมพัน</a>` : ''}`;
+
+          <!-- Winner bar -->
+          ${isDone&&m.winner?`<div class="match-footer-done">🏆 ผู้ชนะ: <strong>${m.winner}</strong>${m.location?` &nbsp;·&nbsp; 📍 ${m.location}`:''}</div>`:''}
+
+          <!-- Actions -->
+          <div class="match-actions">
+            <button class="match-detail-btn" onclick="event.stopPropagation();openModal({round:'${(m.round||'').replace(/'/g,"\'")}',bullA:'${(m.name_a||'').replace(/'/g,"\'")}',ownerA:'${(m.owner_a||'').replace(/'/g,"\'")}',weightA:'${m.weight_a||''}',bullB:'${(m.name_b||'').replace(/'/g,"\'")}',ownerB:'${(m.owner_b||'').replace(/'/g,"\'")}',weightB:'${m.weight_b||''}',date:'${m.date||''}',time:'${m.time||''}',loc:'${(m.location||'').replace(/'/g,"\'")}',prize:'${prizeNum.toLocaleString()} บาท',winner:'${m.winner||''}',photoA:'${m.photo_a||''}',photoB:'${m.photo_b||''}'})">🔍 รายละเอียด</button>
+            ${!isDone?`<a href="wuachon-match.html?id=${m.id}" class="match-detail-btn" style="background:var(--green2);color:#fff;text-decoration:none;display:block;line-height:2.2;" onclick="event.stopPropagation();">🎯 วางเดิมพัน</a>`:''}
+          </div>`;
         evGrid.appendChild(card);
       });
     }
@@ -4647,7 +4704,8 @@ fns.forEach(function(fn){
     }
 
     const nick = currentUser.nick || '';
-    document.getElementById('acc-avatar').textContent        = nick.charAt(0).toUpperCase() || '?';
+    // แสดง avatar
+    renderAvatar(currentUser);
     document.getElementById('acc-nick').textContent          = nick;
     document.getElementById('acc-fullname').textContent      = `${currentUser.fname||''} ${currentUser.lname||''} · ${currentUser.phone||''}`;
     document.getElementById('acc-id').textContent            = currentUser.id || '—';
@@ -4993,6 +5051,121 @@ fns.forEach(function(fn){
     const url = document.getElementById('my-ref-link')?.textContent || '';
     if (!url || url === '—') return;
     navigator.clipboard?.writeText(url).then(() => showFEToast('✅ คัดลอกลิงก์แล้วครับ'));
+  }
+
+  // ===== AVATAR FUNCTIONS =====
+  const AVATAR_EMOJIS = ['🐂','🐃','🦬','🐮','🤠','⚡','🔥','🏆','💪','🦁','🐯','🐻','🦊','🐺','🦅','🐉','⚔️','🛡️','💎','🌟','👑','🎯','🎪','🎭'];
+
+  window.openAvatarPicker = function openAvatarPicker() {
+    const modal = document.getElementById('avatar-picker-modal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    // render emoji grid
+    const grid = document.getElementById('emoji-grid');
+    if (grid) {
+      grid.innerHTML = AVATAR_EMOJIS.map(e =>
+        `<button onclick="setEmojiAvatar('${e}')" style="font-size:28px;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);cursor:pointer;transition:all .15s;" onmouseover="this.style.background='rgba(245,200,66,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">${e}</button>`
+      ).join('');
+    }
+  }
+
+  window.closeAvatarPicker = function closeAvatarPicker() {
+    const modal = document.getElementById('avatar-picker-modal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  window.setEmojiAvatar = async function setEmojiAvatar(emoji) {
+    closeAvatarPicker();
+    const avatarEl = document.getElementById('acc-avatar');
+    const textEl = document.getElementById('acc-avatar-text');
+    if (textEl) textEl.textContent = emoji;
+    if (avatarEl) {
+      // ลบรูป image ออกถ้ามี
+      const img = avatarEl.querySelector('img');
+      if (img) img.remove();
+      avatarEl.style.background = 'linear-gradient(135deg,var(--green),var(--green2))';
+    }
+    if (!currentUser) return;
+    await sb.from('members').update({ avatar_type: 'emoji', avatar_value: emoji }).eq('nick', currentUser.nick);
+    currentUser.avatar_type = 'emoji';
+    currentUser.avatar_value = emoji;
+    sessionStorage.setItem('bw_user', JSON.stringify(currentUser));
+    showFEToast('✅ เปลี่ยนรูปโปรไฟล์แล้วครับ');
+  }
+
+  window.setAutoAvatar = async function setAutoAvatar() {
+    closeAvatarPicker();
+    if (!currentUser) return;
+    const letter = (currentUser.nick || '?').charAt(0).toUpperCase();
+    const textEl = document.getElementById('acc-avatar-text');
+    if (textEl) textEl.textContent = letter;
+    const avatarEl = document.getElementById('acc-avatar');
+    if (avatarEl) {
+      const img = avatarEl.querySelector('img');
+      if (img) img.remove();
+      avatarEl.style.background = 'linear-gradient(135deg,var(--green),var(--green2))';
+    }
+    await sb.from('members').update({ avatar_type: 'auto', avatar_value: letter }).eq('nick', currentUser.nick);
+    currentUser.avatar_type = 'auto';
+    currentUser.avatar_value = letter;
+    sessionStorage.setItem('bw_user', JSON.stringify(currentUser));
+    showFEToast('✅ ตั้งรูปโปรไฟล์อัตโนมัติแล้วครับ');
+  }
+
+  window.handleAvatarUpload = async function handleAvatarUpload(input) {
+    const file = input.files[0];
+    if (!file || !currentUser) return;
+    if (file.size > 2 * 1024 * 1024) { showFEToast('⚠️ รูปต้องไม่เกิน 2MB ครับ'); return; }
+    showFEToast('⏳ กำลังอัพโหลด...');
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const base64 = e.target.result;
+      // แสดงรูปทันที
+      const avatarEl = document.getElementById('acc-avatar');
+      const textEl = document.getElementById('acc-avatar-text');
+      if (textEl) textEl.textContent = '';
+      if (avatarEl) {
+        avatarEl.style.background = 'transparent';
+        let img = avatarEl.querySelector('img');
+        if (!img) { img = document.createElement('img'); avatarEl.insertBefore(img, avatarEl.firstChild); }
+        img.src = base64;
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+      }
+      // บันทึกลง Supabase (base64 — ถ้า avatar_value column รองรับ TEXT ขนาดใหญ่)
+      const { error } = await sb.from('members').update({ avatar_type: 'image', avatar_value: base64 }).eq('nick', currentUser.nick);
+      if (error) {
+        showFEToast('⚠️ บันทึกรูปไม่สำเร็จ: ' + error.message);
+      } else {
+        currentUser.avatar_type = 'image';
+        currentUser.avatar_value = base64;
+        sessionStorage.setItem('bw_user', JSON.stringify(currentUser));
+        showFEToast('✅ เปลี่ยนรูปโปรไฟล์แล้วครับ');
+      }
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  // ฟังก์ชันแสดง avatar จาก currentUser
+  function renderAvatar(user) {
+    const avatarEl = document.getElementById('acc-avatar');
+    const textEl   = document.getElementById('acc-avatar-text');
+    if (!avatarEl || !user) return;
+    const type = user.avatar_type || 'auto';
+    const val  = user.avatar_value || (user.nick||'?').charAt(0).toUpperCase();
+    if (type === 'image' && val.startsWith('data:')) {
+      if (textEl) textEl.textContent = '';
+      avatarEl.style.background = 'transparent';
+      let img = avatarEl.querySelector('img');
+      if (!img) { img = document.createElement('img'); avatarEl.insertBefore(img, avatarEl.firstChild); }
+      img.src = val;
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+    } else {
+      const img = avatarEl.querySelector('img');
+      if (img) img.remove();
+      avatarEl.style.background = 'linear-gradient(135deg,var(--green),var(--green2))';
+      if (textEl) textEl.textContent = val;
+    }
   }
 
   window.switchAccTab = window._real_switchAccTab = function switchAccTab(id, el) {
