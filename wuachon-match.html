@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>รายละเอียดการแข่งขัน — วัวชนไทย</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700;900&family=Sarabun:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --red:#C8102E;--gold:#F5A800;--dark:#0d1a0f;--card:#1a2e1c;
+  --cream:#FFF8EC;--green:#1B6B2F;--green2:#27943F;
+  --border:rgba(245,168,0,0.18);
+}
+body{font-family:'Sarabun',sans-serif;background:var(--dark);color:var(--cream);min-height:100vh;}
+nav{display:flex;align-items:center;justify-content:space-between;padding:13px 24px;background:rgba(13,26,15,0.97);border-bottom:2px solid var(--gold);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px);}
+.nav-logo{font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:var(--gold);cursor:pointer;}
+.nav-logo em{color:var(--red);font-style:normal;}
+.nav-back{color:rgba(255,248,236,.55);font-family:'Kanit',sans-serif;font-size:13px;cursor:pointer;text-decoration:none;}
+.nav-back:hover{color:var(--gold);}
+.nav-user{font-family:'Kanit',sans-serif;font-size:13px;color:var(--gold);}
+
+/* MATCH HEADER */
+.match-hero{
+  background:linear-gradient(180deg,rgba(200,16,46,.1) 0%,transparent 100%);
+  padding:32px 20px 24px;text-align:center;
+}
+.match-round{font-family:'Kanit',sans-serif;font-weight:900;font-size:22px;color:var(--cream);margin-bottom:6px;}
+.match-meta{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:10px;}
+.match-meta span{font-size:13px;color:rgba(255,248,236,.5);}
+.match-meta b{color:rgba(255,248,236,.75);}
+.match-code{display:inline-block;background:var(--green);color:#fff;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;padding:3px 12px;border-radius:6px;letter-spacing:3px;margin-bottom:8px;}
+.status-badge{font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:4px 14px;border-radius:20px;display:inline-block;}
+.s-upcoming{background:rgba(245,168,0,.15);color:var(--gold);border:1px solid rgba(245,168,0,.3);}
+.s-live{background:rgba(200,16,46,.2);color:#ff7c7c;border:1px solid rgba(200,16,46,.4);animation:pulse 1.4s infinite;}
+.s-done{background:rgba(27,107,47,.2);color:#7ddc8e;border:1px solid rgba(27,107,47,.3);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+
+/* VS SECTION */
+.vs-section{max-width:700px;margin:0 auto;padding:0 16px 24px;}
+.vs-grid{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;}
+.bull{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.bull-ico{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;}
+.bull-red{background:rgba(200,16,46,.15);border:3px solid rgba(200,16,46,.4);}
+.bull-blue{background:rgba(30,80,200,.15);border:3px solid rgba(30,80,200,.4);}
+.bull-name{font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;text-align:center;}
+.bull-owner{font-size:12px;color:rgba(255,248,236,.45);text-align:center;}
+.bull-wt{background:rgba(255,255,255,.06);padding:4px 12px;border-radius:20px;font-size:12px;color:rgba(255,248,236,.6);}
+.vs-mid{text-align:center;}
+.vs-txt{font-family:'Kanit',sans-serif;font-weight:900;font-size:24px;color:var(--gold);}
+.prize-big{font-family:'Kanit',sans-serif;font-weight:700;font-size:16px;color:var(--gold);margin-top:8px;}
+
+/* BET PANEL */
+.container{max-width:700px;margin:0 auto;padding:0 16px 60px;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:16px;overflow:hidden;}
+.panel-head{padding:14px 18px;border-bottom:1px solid var(--border);font-family:'Kanit',sans-serif;font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px;}
+.panel-body{padding:18px;}
+
+/* ===== LIVE PLAYER ===== */
+.live-player-wrap{
+  background:#000;border-radius:12px;overflow:hidden;
+  position:relative;margin-bottom:16px;
+  box-shadow:0 0 0 2px rgba(200,16,46,.5),0 8px 32px rgba(0,0,0,.5);
+  animation:playerGlow 2s ease-in-out infinite;
+}
+@keyframes playerGlow{
+  0%,100%{box-shadow:0 0 0 2px rgba(200,16,46,.4),0 8px 32px rgba(0,0,0,.5);}
+  50%{box-shadow:0 0 0 3px rgba(200,16,46,.8),0 8px 40px rgba(200,16,46,.2);}
+}
+.live-player-wrap iframe{width:100%;aspect-ratio:16/9;border:none;display:block;}
+.live-badge{
+  position:absolute;top:10px;left:10px;z-index:10;
+  background:var(--red);color:#fff;
+  font-family:'Kanit',sans-serif;font-weight:900;font-size:12px;
+  padding:3px 10px;border-radius:20px;letter-spacing:.5px;
+}
+.live-badge::before{content:'● ';animation:liveDot 1.2s ease-in-out infinite;}
+@keyframes liveDot{0%,100%{opacity:1;}50%{opacity:.2;}}
+.no-stream-notice{
+  background:rgba(200,16,46,.06);border:1px dashed rgba(200,16,46,.2);
+  border-radius:10px;padding:16px;text-align:center;margin-bottom:16px;
+}
+.no-stream-notice p{font-size:13px;color:rgba(255,248,236,.45);margin-top:4px;}
+
+/* SIDE SELECT */
+.side-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.side-btn{
+  padding:14px;border-radius:10px;border:2px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.04);cursor:pointer;transition:all .2s;text-align:center;
+}
+.side-btn:hover{border-color:rgba(255,255,255,.25);}
+.side-btn.active-red{border-color:rgba(200,16,46,.6);background:rgba(200,16,46,.1);}
+.side-btn.active-blue{border-color:rgba(30,80,200,.6);background:rgba(30,80,200,.1);}
+.side-btn .side-name{font-family:'Kanit',sans-serif;font-weight:700;font-size:14px;margin-top:4px;}
+.side-btn .side-sub{font-size:11px;color:rgba(255,248,236,.4);margin-top:2px;}
+
+/* ODDS + AMOUNT */
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.form-group label{display:block;font-family:'Kanit',sans-serif;font-size:12px;color:rgba(255,248,236,.5);margin-bottom:5px;}
+.form-group input{
+  width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:7px;padding:10px 12px;color:var(--cream);font-family:'Sarabun',sans-serif;
+  font-size:14px;outline:none;
+}
+.form-group input:focus{border-color:var(--gold);}
+.bet-preview{
+  background:rgba(245,168,0,.06);border:1px solid rgba(245,168,0,.15);
+  border-radius:8px;padding:12px;margin-bottom:14px;
+  font-family:'Kanit',sans-serif;font-size:13px;color:rgba(255,248,236,.7);
+}
+.bet-preview b{color:var(--gold);}
+.btn-bet-submit{
+  width:100%;background:var(--green2);color:#fff;font-family:'Kanit',sans-serif;
+  font-weight:700;font-size:15px;padding:13px;border-radius:8px;border:none;cursor:pointer;
+  transition:background .2s;
+}
+.btn-bet-submit:hover{background:#2fa848;}
+.btn-bet-submit:disabled{background:#2a3a2a;color:rgba(255,255,255,.3);cursor:not-allowed;}
+
+/* BETS LIST */
+.bet-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);
+  gap:8px;flex-wrap:wrap;
+}
+.bet-row:last-child{border-bottom:none;}
+.bet-nick{font-family:'Kanit',sans-serif;font-size:14px;font-weight:600;}
+.bet-side-r{color:#ff9090;}
+.bet-side-b{color:#90b4ff;}
+.bet-amount{font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;color:var(--gold);}
+.bet-odds{font-size:11px;color:rgba(255,248,236,.4);}
+.bet-status{font-size:11px;padding:2px 8px;border-radius:10px;}
+.bs-waiting{background:rgba(245,168,0,.1);color:var(--gold);}
+.bs-matched{background:rgba(27,107,47,.15);color:#7ddc8e;}
+.btn-join{font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:5px 12px;border-radius:6px;background:var(--red);color:#fff;border:none;cursor:pointer;}
+
+/* WINNER */
+.winner-banner{
+  background:linear-gradient(135deg,rgba(27,107,47,.3),rgba(245,168,0,.1));
+  border:1px solid rgba(245,168,0,.3);border-radius:12px;
+  padding:20px;text-align:center;margin-bottom:16px;
+}
+.winner-label{font-family:'Kanit',sans-serif;font-weight:900;font-size:20px;color:var(--gold);}
+.winner-name{font-family:'Kanit',sans-serif;font-weight:700;font-size:16px;margin-top:4px;}
+
+/* SKELETON / EMPTY */
+.skeleton{background:linear-gradient(90deg,var(--card) 25%,rgba(255,255,255,.04) 50%,var(--card) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:14px;height:160px;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.empty{text-align:center;padding:30px;color:rgba(255,248,236,.3);font-family:'Kanit',sans-serif;}
+
+/* LOGIN NOTICE */
+.login-notice{background:rgba(200,16,46,.08);border:1px solid rgba(200,16,46,.2);border-radius:10px;padding:16px;text-align:center;font-family:'Kanit',sans-serif;font-size:14px;color:rgba(255,248,236,.6);}
+.login-notice a{color:var(--gold);cursor:pointer;text-decoration:underline;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:#1e3a1e;border:1px solid var(--green2);color:#fff;font-family:'Kanit',sans-serif;font-size:14px;padding:12px 20px;border-radius:10px;z-index:999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;max-width:300px;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+@media(max-width:600px){
+  .vs-grid{gap:8px;}
+  .bull-ico{width:60px;height:60px;font-size:28px;}
+  .bull-name{font-size:15px;}
+  .input-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-back" href="wuachon-schedule.html">← กลับ</a>
+  <div class="nav-logo">🐂 <em>วัวชน</em>ไทย</div>
+  <div class="nav-user" id="nav-user">—</div>
+</nav>
+
+<div id="page-content">
+  <div style="text-align:center;padding:80px 20px;">
+    <div class="skeleton" style="max-width:600px;margin:0 auto;"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPA_URL = 'https://xzlpdeqlfczjkospfqqi.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6bHBkZXFsZmN6amtvc3BmcXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NzgyMjAsImV4cCI6MjA5NTI1NDIyMH0.W0pDFJy3lFeO4ht9DpNzeDgVdGvSz94p0KWGfzc0Igw';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+const matchId = new URLSearchParams(location.search).get('id');
+if (!matchId) {
+  // ถ้าไม่มี id ให้แสดง error แทน redirect (กันกรณีเปิด local)
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('page-content').innerHTML = `
+      <div style="text-align:center;padding:80px 20px;font-family:'Kanit',sans-serif;color:rgba(255,248,236,.5);">
+        <div style="font-size:48px;margin-bottom:16px;">⚠️</div>
+        <div style="font-size:18px;margin-bottom:8px;">ไม่พบรหัสการแข่งขัน</div>
+        <div style="font-size:13px;margin-bottom:20px;color:rgba(255,248,236,.3);">กรุณาเข้าผ่านหน้าตารางแข่งขันครับ</div>
+        <a href="wuachon-schedule.html" style="background:var(--green2);color:#fff;font-family:'Kanit',sans-serif;font-weight:700;padding:10px 24px;border-radius:8px;text-decoration:none;">กลับหน้าตาราง</a>
+      </div>`;
+  });
+}
+
+let matchData = null;
+let allBets = [];
+let selectedSide = null;
+let currentUser = null;
+
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded', async () => {
+  if (!matchId) return; // แสดง error message แทน (handle ด้านบนแล้ว)
+  try {
+    const raw = sessionStorage.getItem('bw_user');
+    if (raw) { currentUser = JSON.parse(raw); }
+  } catch(e) {}
+
+  renderNavUser();
+  await loadMatch();
+  subscribeRealtime();
+});
+
+function renderNavUser() {
+  const el = document.getElementById('nav-user');
+  el.textContent = currentUser ? `👤 ${currentUser.nick}` : 'ยังไม่ได้ Login';
+  el.style.color = currentUser ? 'var(--gold)' : 'rgba(255,248,236,.35)';
+}
+
+// ===== LOAD MATCH =====
+async function loadMatch() {
+  const { data, error } = await sb.from('matches').select('*').eq('id', matchId).maybeSingle();
+  if (error || !data) {
+    document.getElementById('page-content').innerHTML =
+      `<div style="text-align:center;padding:80px 20px;font-family:'Kanit',sans-serif;color:rgba(255,248,236,.4);">ไม่พบรายการแข่งขัน <a href="wuachon-schedule.html" style="color:var(--gold);">กลับ</a></div>`;
+    return;
+  }
+  matchData = data;
+  await loadBets();
+  renderPage();
+}
+
+// ===== LOAD BETS =====
+async function loadBets() {
+  const { data } = await sb.from('bets').select('*').eq('match_id', matchId).order('created_at', { ascending: false });
+  allBets = data || [];
+}
+
+// ===== REALTIME =====
+function subscribeRealtime() {
+  sb.channel('match-rt-' + matchId)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'bets', filter: `match_id=eq.${matchId}` }, async () => {
+      await loadBets();
+      renderBetsList();
+    })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'matches', filter: `id=eq.${matchId}` }, async (payload) => {
+      matchData = { ...matchData, ...payload.new };
+      renderPage();
+    })
+    .subscribe(s => console.log('Match RT:', s));
+}
+
+// ===== NORMALIZE STATUS =====
+function normalizeStatus(raw) {
+  const s = (raw || '').toLowerCase().trim();
+  if (s === 'live' || s === 'กำลังแข่ง') return 'live';
+  if (s === 'done' || s === 'จบแล้ว' || s === 'finish') return 'done';
+  return 'upcoming';
+}
+
+function formatDate(d) {
+  if (!d) return '';
+  const m = d.match(/^(\d{1,2})[.\/](\d{1,2})[.\/](\d{2,4})$/);
+  if (m) {
+    const months = ['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    return `${parseInt(m[1])} ${months[parseInt(m[2])] || m[2]} ${m[3]}`;
+  }
+  return d;
+}
+
+// ===== RENDER PAGE =====
+// ===== STREAM EMBED =====
+function buildStreamEmbed(url) {
+  if (!url) return '';
+  let embedUrl = '';
+  let originalUrl = url;
+  let platform = '';
+
+  try {
+    // YouTube: youtube.com/watch?v=ID หรือ youtu.be/ID
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (ytMatch) {
+      // เพิ่ม origin เพื่อช่วย embed permission
+      embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0&origin=${encodeURIComponent(location.origin)}`;
+      platform = 'youtube';
+    }
+    // YouTube Live (/live/)
+    const ytLive = url.match(/youtube\.com\/live\/([a-zA-Z0-9_-]{11})/);
+    if (ytLive) {
+      embedUrl = `https://www.youtube.com/embed/${ytLive[1]}?autoplay=1&rel=0&origin=${encodeURIComponent(location.origin)}`;
+      platform = 'youtube';
+    }
+    // Facebook
+    if (!embedUrl && (url.includes('facebook.com') || url.includes('fb.gg') || url.includes('fb.watch'))) {
+      const encodedUrl = encodeURIComponent(url);
+      embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodedUrl}&show_text=false&autoplay=true&width=560`;
+      platform = 'facebook';
+    }
+  } catch(_) {}
+
+  if (!embedUrl) return '';
+
+  const tip = platform === 'youtube'
+    ? `<div style="padding:8px 12px;background:rgba(255,255,255,.04);border-top:1px solid var(--border);font-size:11px;color:rgba(255,248,236,.4);text-align:center;">
+        ถ้า player ไม่ทำงาน → ไปที่ YouTube Studio → เปิด "Allow embedding" ให้วิดีโอนี้ครับ
+        <a href="${originalUrl}" target="_blank" style="color:var(--gold);margin-left:8px;">▶ เปิดดูใน YouTube</a>
+      </div>`
+    : `<div style="padding:8px 12px;background:rgba(255,255,255,.04);border-top:1px solid var(--border);font-size:11px;color:rgba(255,248,236,.4);text-align:center;">
+        <a href="${originalUrl}" target="_blank" style="color:var(--gold);">▶ เปิดดูใน Facebook</a>
+      </div>`;
+
+  return `
+  <div class="live-player-wrap">
+    <span class="live-badge">LIVE</span>
+    <iframe src="${embedUrl}"
+      allow="autoplay; fullscreen; picture-in-picture"
+      allowfullscreen
+      onerror="this.parentElement.querySelector('.embed-err').style.display='block';this.style.display='none';">
+    </iframe>
+    <div class="embed-err" style="display:none;padding:32px;text-align:center;">
+      <div style="font-size:36px;margin-bottom:10px;">📡</div>
+      <div style="font-family:'Kanit',sans-serif;font-weight:700;color:#fff;margin-bottom:6px;">ไม่สามารถแสดงผลได้</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:14px;">วิดีโอนี้ไม่อนุญาตให้ embed</div>
+      <a href="${originalUrl}" target="_blank"
+        style="background:var(--red);color:#fff;font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none;">
+        ▶ ดูไลฟ์สดที่นี่
+      </a>
+    </div>
+  </div>
+  ${tip}`;
+}
+
+function renderPage() {
+  const m = matchData;
+  const status = normalizeStatus(m.status);
+  const isUpcoming = status === 'upcoming';
+  const isLive = status === 'live';
+  const isDone = status === 'done';
+
+  const sLabel = isLive ? '🔴 กำลังแข่ง' : isDone ? '✅ จบแล้ว' : '⏳ รอแข่ง';
+  const sCls = isLive ? 's-live' : isDone ? 's-done' : 's-upcoming';
+  const prize = m.prize ? Number(m.prize).toLocaleString('th-TH') + ' ฿' : '—';
+
+  const winnerHTML = (isDone && m.winner) ? `
+    <div class="winner-banner">
+      <div class="winner-label">🏆 ผลการแข่งขัน</div>
+      <div class="winner-name">${m.winner === 'red' ? (m.name_a || 'เจ้าบ้าน') : (m.name_b || 'ทีมเยือน')} ชนะ!</div>
+    </div>` : '';
+
+  // แสดง bet panel ตาม status
+  const streamEmbed = buildStreamEmbed(m.stream_url);
+  let betPanelHTML = '';
+  if (isDone) {
+    betPanelHTML = '';
+  } else if (isLive) {
+    // ไลฟ์สด — แสดง player + lock notice
+    betPanelHTML = `
+  <div class="panel">
+    <div class="panel-head">🔴 ถ่ายทอดสด</div>
+    <div class="panel-body" style="padding:12px;">
+      ${streamEmbed || `
+        <div class="no-stream-notice">
+          <div style="font-size:28px;">📡</div>
+          <p>กำลังเตรียมสัญญาณถ่ายทอดสด...</p>
+          <p style="font-size:11px;margin-top:4px;">Admin กำลังตั้งค่า Stream URL ครับ</p>
+        </div>`}
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-head">🎯 วางเดิมพัน P2P</div>
+    <div class="panel-body">
+      <div style="background:rgba(200,16,46,.08);border:1px solid rgba(200,16,46,.25);border-radius:10px;padding:20px;text-align:center;">
+        <div style="font-size:32px;margin-bottom:8px;">🔴</div>
+        <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:15px;color:#ff7c7c;margin-bottom:4px;">กำลังแข่งขันอยู่</div>
+        <div style="font-size:13px;color:rgba(255,248,236,.45);">ปิดรับเดิมพันแล้ว — รอผลการแข่งขัน</div>
+      </div>
+    </div>
+  </div>`;
+  } else {
+    // upcoming — เปิดรับเดิมพัน (ถ้ามี stream URL ให้แสดง preview ด้วย)
+    betPanelHTML = `
+  <div class="panel">
+    <div class="panel-head">🎯 วางเดิมพัน P2P</div>
+    <div class="panel-body" id="bet-form-area">
+      ${currentUser ? betFormHTML(m) : `
+        <div class="login-notice">
+          กรุณา <a onclick="location.href='index.html'">เข้าสู่ระบบ</a> ก่อนวางเดิมพัน
+        </div>`}
+    </div>
+  </div>`;
+  }
+
+  document.getElementById('page-content').innerHTML = `
+  <!-- MATCH HERO -->
+  <div class="match-hero">
+    ${m.code ? `<div class="match-code">${m.code}</div><br>` : ''}
+    <div class="match-round">${m.round || 'รุ่นทั่วไป'}</div>
+    <div class="match-meta">
+      ${m.date ? `<span>📅 <b>${formatDate(m.date)}</b></span>` : ''}
+      ${m.time ? `<span>🕐 <b>${m.time}</b></span>` : ''}
+      ${m.location ? `<span>📍 <b>${m.location}</b></span>` : ''}
+    </div>
+    <span class="status-badge ${sCls}">${sLabel}</span>
+  </div>
+
+  <!-- VS -->
+  <div class="vs-section">
+    <div class="vs-grid">
+      <div class="bull">
+        <div class="bull-ico bull-red">🐂</div>
+        <div class="bull-name" style="color:#ff9090;">${m.name_a || 'เจ้าบ้าน'}</div>
+        ${m.owner_a ? `<div class="bull-owner">${m.owner_a}</div>` : ''}
+        ${m.weight_a ? `<div class="bull-wt">⚖️ ${m.weight_a} กก.</div>` : ''}
+      </div>
+      <div class="vs-mid">
+        <div class="vs-txt">VS</div>
+        <div class="prize-big">🏆 ${prize}</div>
+      </div>
+      <div class="bull">
+        <div class="bull-ico bull-blue">🐂</div>
+        <div class="bull-name" style="color:#90b4ff;">${m.name_b || 'ทีมเยือน'}</div>
+        ${m.owner_b ? `<div class="bull-owner">${m.owner_b}</div>` : ''}
+        ${m.weight_b ? `<div class="bull-wt">⚖️ ${m.weight_b} กก.</div>` : ''}
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    ${winnerHTML}
+    ${betPanelHTML}
+
+    <!-- BETS LIST -->
+    <div class="panel">
+      <div class="panel-head">📋 รายการเดิมพัน (<span id="bets-count">0</span>)</div>
+      <div class="panel-body" id="bets-list-area">
+        <div class="empty">กำลังโหลด...</div>
+      </div>
+    </div>
+  </div>`;
+
+  renderBetsList();
+}
+
+// ===== BET FORM HTML =====
+function betFormHTML(m) {
+  return `
+  <div class="side-btns">
+    <div class="side-btn" id="btn-red" onclick="selectSide('red')">
+      <div style="font-size:24px;">🐂</div>
+      <div class="side-name" style="color:#ff9090;">${m.name_a || 'เจ้าบ้าน'}</div>
+      <div class="side-sub">ฝั่งแดง</div>
+    </div>
+    <div class="side-btn" id="btn-blue" onclick="selectSide('blue')">
+      <div style="font-size:24px;">🐂</div>
+      <div class="side-name" style="color:#90b4ff;">${m.name_b || 'ทีมเยือน'}</div>
+      <div class="side-sub">ฝั่งน้ำเงิน</div>
+    </div>
+  </div>
+  <div class="input-row">
+    <div class="form-group">
+      <label>จำนวนเงิน (฿)</label>
+      <input type="number" id="bet-amount" placeholder="เช่น 1000" min="10" oninput="updatePreview()">
+    </div>
+    <div class="form-group">
+      <label>อัตราต่อรอง (x)</label>
+      <input type="number" id="bet-odds" placeholder="เช่น 1.9" step="0.1" min="1.1" value="1.9" oninput="updatePreview()">
+    </div>
+  </div>
+  <div class="bet-preview" id="bet-preview">เลือกฝั่ง + ใส่จำนวนเงิน เพื่อดูตัวอย่าง</div>
+  <button class="btn-bet-submit" id="btn-submit" onclick="placeBet()">วางเดิมพัน</button>`;
+}
+
+function selectSide(side) {
+  selectedSide = side;
+  document.getElementById('btn-red')?.classList.remove('active-red', 'active-blue');
+  document.getElementById('btn-blue')?.classList.remove('active-red', 'active-blue');
+  document.getElementById('btn-' + side)?.classList.add(side === 'red' ? 'active-red' : 'active-blue');
+  updatePreview();
+}
+
+function updatePreview() {
+  const amount = parseFloat(document.getElementById('bet-amount')?.value) || 0;
+  const odds = parseFloat(document.getElementById('bet-odds')?.value) || 1.9;
+  const el = document.getElementById('bet-preview');
+  if (!el) return;
+  if (!selectedSide || !amount) { el.innerHTML = 'เลือกฝั่ง + ใส่จำนวนเงิน เพื่อดูตัวอย่าง'; return; }
+  const sideName = selectedSide === 'red' ? (matchData?.name_a || 'เจ้าบ้าน') : (matchData?.name_b || 'ทีมเยือน');
+  const win = (amount * odds).toFixed(0);
+  el.innerHTML = `เดิมพัน <b>${sideName}</b> จำนวน <b>${amount.toLocaleString('th-TH')} ฿</b> × ${odds} = ถ้าชนะได้รับ <b style="color:var(--gold);">${Number(win).toLocaleString('th-TH')} ฿</b>`;
+}
+
+// ===== PLACE BET =====
+async function placeBet() {
+  if (!currentUser) { showToast('กรุณาเข้าสู่ระบบก่อนครับ'); return; }
+
+  // ตรวจสอบ status ปัจจุบัน
+  const currentStatus = normalizeStatus(matchData?.status);
+  if (currentStatus === 'live') {
+    showToast('🔴 ปิดรับเดิมพันแล้ว — การแข่งขันเริ่มขึ้นแล้วครับ'); return;
+  }
+  if (currentStatus === 'done') {
+    showToast('✅ การแข่งขันจบแล้วครับ'); return;
+  }
+
+  if (!selectedSide) { showToast('กรุณาเลือกฝั่งก่อนครับ'); return; }
+  const amount = parseFloat(document.getElementById('bet-amount')?.value);
+  const odds = parseFloat(document.getElementById('bet-odds')?.value) || 1.9;
+  if (!amount || amount < 10) { showToast('จำนวนเงินขั้นต่ำ 10 บาทครับ'); return; }
+  if (currentUser.balance < amount) { showToast('ยอดเงินไม่พอครับ'); return; }
+
+  const btn = document.getElementById('btn-submit');
+  if (btn) { btn.disabled = true; btn.textContent = 'กำลังส่ง...'; }
+
+  const sideName = selectedSide === 'red' ? (matchData?.name_a || 'เจ้าบ้าน') : (matchData?.name_b || 'ทีมเยือน');
+  const txn = 'BET-' + Date.now() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
+
+  const { error } = await sb.from('bets').insert({
+    match_id: matchId,
+    nick: currentUser.nick,
+    side: selectedSide,
+    side_name: sideName,
+    amount,
+    odds,
+    txn,
+    status: 'waiting'
+  });
+
+  if (error) {
+    showToast('เกิดข้อผิดพลาด: ' + error.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'วางเดิมพัน'; }
+    return;
+  }
+
+  // หักยอดเงิน
+  const newBalance = (currentUser.balance || 0) - amount;
+  await sb.from('members').update({ balance: newBalance }).eq('nick', currentUser.nick);
+  currentUser.balance = newBalance;
+  sessionStorage.setItem('bw_user', JSON.stringify(currentUser));
+
+  showToast('✅ วางเดิมพันสำเร็จ!');
+  selectedSide = null;
+  if (document.getElementById('bet-amount')) document.getElementById('bet-amount').value = '';
+  await loadBets();
+  renderBetsList();
+  if (btn) { btn.disabled = false; btn.textContent = 'วางเดิมพัน'; }
+}
+
+// ===== JOIN BET =====
+async function joinBet(betId, oppNick, oppSide, oppAmount, oppOdds) {
+  if (!currentUser) { showToast('กรุณาเข้าสู่ระบบก่อนครับ'); return; }
+
+  // ตรวจสอบ status ปัจจุบัน
+  const currentStatus = normalizeStatus(matchData?.status);
+  if (currentStatus === 'live') {
+    showToast('🔴 ปิดรับเดิมพันแล้ว — การแข่งขันเริ่มขึ้นแล้วครับ'); return;
+  }
+  if (currentStatus === 'done') {
+    showToast('✅ การแข่งขันจบแล้วครับ'); return;
+  }
+
+  if (currentUser.nick === oppNick) { showToast('ไม่สามารถรับคู่ของตัวเองได้ครับ'); return; }
+
+  const mySide = oppSide === 'red' ? 'blue' : 'red';
+  const mySideName = mySide === 'red' ? (matchData?.name_a || 'เจ้าบ้าน') : (matchData?.name_b || 'ทีมเยือน');
+  const myAmount = oppAmount / oppOdds;
+
+  if (currentUser.balance < myAmount) { showToast(`ต้องการ ${myAmount.toFixed(0)} ฿ (ยอดไม่พอ)`); return; }
+
+  // อัปเดต bet เก่า → matched
+  const { error } = await sb.from('bets').update({ status: 'matched', matched_with: currentUser.nick }).eq('id', betId);
+  if (error) { showToast('เกิดข้อผิดพลาด'); return; }
+
+  // สร้าง bet ของตัวเอง
+  const txn = 'BET-' + Date.now() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
+  await sb.from('bets').insert({
+    match_id: matchId, nick: currentUser.nick, side: mySide, side_name: mySideName,
+    amount: myAmount, odds: oppOdds, txn, status: 'matched', matched_with: oppNick
+  });
+
+  const newBal = (currentUser.balance || 0) - myAmount;
+  await sb.from('members').update({ balance: newBal }).eq('nick', currentUser.nick);
+  currentUser.balance = newBal;
+  sessionStorage.setItem('bw_user', JSON.stringify(currentUser));
+
+  showToast('✅ จับคู่เดิมพันสำเร็จ!');
+  await loadBets(); renderBetsList();
+}
+
+// ===== RENDER BETS LIST =====
+function renderBetsList() {
+  const el = document.getElementById('bets-list-area');
+  const countEl = document.getElementById('bets-count');
+  if (!el) return;
+  if (countEl) countEl.textContent = allBets.length;
+
+  if (!allBets.length) { el.innerHTML = '<div class="empty">ยังไม่มีรายการเดิมพัน</div>'; return; }
+
+  el.innerHTML = allBets.map(b => {
+    const sideClass = b.side === 'red' ? 'bet-side-r' : 'bet-side-b';
+    const statusClass = b.status === 'matched' ? 'bs-matched' : b.status === 'won' ? 'bs-matched' : b.status === 'lost' ? '' : 'bs-waiting';
+    const statusLabel = b.status === 'matched' ? '🟢 จับคู่แล้ว' : b.status === 'won' ? '🏆 ชนะ' : b.status === 'lost' ? '❌ แพ้' : '⏳ รอคู่';
+    const canJoin = b.status === 'waiting'
+      && currentUser
+      && currentUser.nick !== b.nick
+      && normalizeStatus(matchData?.status) === 'upcoming'; // รับได้เฉพาะตอน upcoming
+    const myAmount = (b.amount / b.odds).toFixed(0);
+
+    return `
+    <div class="bet-row">
+      <div>
+        <div class="bet-nick ${sideClass}">${b.nick} <span style="font-size:11px;opacity:.6;">(${b.side_name || b.side})</span></div>
+        <div class="bet-odds">อัตรา ${b.odds}x · เมื่อ ${new Date(b.created_at).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}</div>
+      </div>
+      <div style="text-align:right;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+        <div>
+          <div class="bet-amount">${Number(b.amount).toLocaleString('th-TH')} ฿</div>
+          <span class="bet-status ${statusClass}">${statusLabel}</span>
+        </div>
+        ${canJoin ? `<button class="btn-join" onclick="joinBet('${b.id}','${b.nick}','${b.side}',${b.amount},${b.odds})">รับ ${Number(myAmount).toLocaleString()} ฿</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
