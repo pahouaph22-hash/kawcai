@@ -77,6 +77,32 @@ body{font-family:'Sarabun',sans-serif;background:#f4f4f0;color:#1a1a1a;min-heigh
 .chart-stat-mini .csm-lbl{font-size:11px;color:#aaa;margin-top:2px;}
 .chart-stat-mini .csm-delta{font-size:11px;font-family:'Kanit',sans-serif;font-weight:700;margin-top:4px;}
 .csm-up{color:#16a34a;}.csm-down{color:#dc2626;}.csm-flat{color:#888;}
+
+/* VIP BADGES */
+.vip-badge{display:inline-flex;align-items:center;gap:3px;font-family:'Kanit',sans-serif;font-weight:700;font-size:11px;padding:2px 9px;border-radius:999px;white-space:nowrap;letter-spacing:.3px;}
+.vip-0{background:#f3f4f6;color:#6b7280;border:1px solid #e5e7eb;}
+.vip-1{background:#fdf2e9;color:#92400e;border:1px solid #fcd9a8;}
+.vip-2{background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;}
+.vip-3{background:#fefce8;color:#854d0e;border:1px solid #fde68a;}
+.vip-4{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;}
+.vip-5{background:linear-gradient(135deg,#fdf4ff,#eff6ff);color:#6b21a8;border:1px solid #d8b4fe;}
+.vip-6{background:linear-gradient(135deg,#fff7ed,#fefce8);color:#b45309;border:1px solid #fcd34d;box-shadow:0 0 0 1px #fcd34d40;}
+.vip-progress-wrap{background:#e5e5e0;border-radius:999px;height:5px;width:100%;overflow:hidden;margin-top:5px;}
+.vip-progress-bar{height:100%;border-radius:999px;transition:width .4s ease;}
+
+/* FLAG / BAN BADGES */
+.flag-badge{display:inline-flex;align-items:center;gap:3px;font-family:'Kanit',sans-serif;font-weight:700;font-size:10px;padding:2px 8px;border-radius:4px;white-space:nowrap;letter-spacing:.2px;border:1px solid;}
+.flag-no_game{background:#fff0f0;color:#b91c1c;border-color:#fca5a5;}
+.flag-no_reward{background:#fff7ed;color:#c2410c;border-color:#fdba74;}
+.flag-no_withdraw{background:#fefce8;color:#92400e;border-color:#fde68a;}
+.flag-no_deposit{background:#f0fdf4;color:#166534;border-color:#86efac;}
+.flag-blacklist{background:#1a1a1a;color:#fff;border-color:#333;}
+.flag-watch{background:#eff6ff;color:#1d4ed8;border-color:#93c5fd;}
+.flag-cheater{background:#fdf2f8;color:#86198f;border-color:#f0abfc;}
+.flag-chg_pass{background:#f5f3ff;color:#5b21b6;border-color:#c4b5fd;}
+.flag-chg_bank{background:#ecfdf5;color:#065f46;border-color:#6ee7b7;}
+
+.flags-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
 .card{background:#fff;border-radius:12px;padding:20px;border:1px solid #e5e5e0;margin-bottom:16px;}
 .card-title{font-family:'Kanit',sans-serif;font-weight:700;font-size:15px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
 
@@ -185,6 +211,7 @@ tr:hover td{background:#fafafa;}
       <div class="sb-item" data-panel="bets" onclick="switchPanel('bets')">🎯 P2P</div>
       <div class="sb-section">|</div>
       <div class="sb-item" data-panel="referral" onclick="switchPanel('referral');loadReferralPanel();">🎁 แนะนำสมาชิก</div>
+      <div class="sb-item" data-panel="activity" onclick="switchPanel('activity');loadActivityPanel();">🎉 กิจกรรม</div>
       <div class="sb-item" data-panel="news" onclick="switchPanel('news')">📰 ข่าวสาร</div>
       <div class="sb-item" data-panel="settings" onclick="switchPanel('settings')">⚙️ ตั้งค่า</div>
     </div>
@@ -382,14 +409,24 @@ tr:hover td{background:#fafafa;}
           </div>
           <div class="search-bar">
             <input class="search-input" id="mem-search" placeholder="ค้นหาชื่อ Nick / เบอร์..." oninput="filterMembers()">
+            <select class="filter-select" id="mem-vip-filter" onchange="filterMembers()">
+              <option value="">ทุกระดับ VIP</option>
+              <option value="0">🪨 ทั่วไป</option>
+              <option value="1">🥉 Bronze</option>
+              <option value="2">🥈 Silver</option>
+              <option value="3">🥇 Gold</option>
+              <option value="4">💎 Platinum</option>
+              <option value="5">💠 Diamond</option>
+              <option value="6">👑 Crown</option>
+            </select>
           </div>
           <div style="overflow-x:auto;">
             <table>
               <thead><tr>
-                <th>Nick</th><th>ชื่อ-นามสกุล</th><th>เบอร์</th>
-                <th>ยอดเงิน</th><th>สมัครเมื่อ</th><th>จัดการ</th>
+                <th>Nick</th><th>VIP</th><th>ชื่อ-นามสกุล</th><th>เบอร์</th>
+                <th>ยอดเงิน</th><th>เติมสะสม</th><th>สมัครเมื่อ</th><th>จัดการ</th>
               </tr></thead>
-              <tbody id="members-tbody"><tr class="loading-row"><td colspan="6" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
+              <tbody id="members-tbody"><tr class="loading-row"><td colspan="8" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -638,6 +675,78 @@ tr:hover td{background:#fafafa;}
         </div>
       </div>
 
+      <!-- ACTIVITY -->
+      <div class="panel" id="panel-activity">
+
+        <!-- สร้างกิจกรรมใหม่ -->
+        <div class="card" style="border-left:4px solid #f59e0b;">
+          <div class="card-title">🎉 สร้างกิจกรรมแจกรางวัล</div>
+          <div style="font-size:12px;color:#888;margin-bottom:18px;">ตั้งชื่อกิจกรรม กำหนดเงินรางวัลแต่ละระดับ VIP แล้วกดส่ง — ยอดเงินจะเข้าบัญชีสมาชิกทันที</div>
+
+          <!-- ชื่อกิจกรรม -->
+          <div class="fg" style="margin-bottom:14px;">
+            <label>📌 ชื่อกิจกรรม</label>
+            <input id="act-name" placeholder="เช่น โบนัสประจำเดือน พฤษภาคม 68" style="width:100%;padding:11px 14px;border:1px solid #e0e0e0;border-radius:9px;font-family:'Sarabun',sans-serif;font-size:14px;">
+          </div>
+
+          <!-- ตาราง VIP rewards -->
+          <div style="margin-bottom:16px;">
+            <div style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;color:#666;margin-bottom:10px;">💰 กำหนดเงินรางวัลแต่ละระดับ VIP</div>
+            <div style="display:grid;gap:8px;" id="act-vip-rows">
+              <!-- render ด้วย JS -->
+            </div>
+          </div>
+
+          <!-- ตัวเลือกส่ง -->
+          <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+            <div style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:#92400e;margin-bottom:10px;">🎯 เลือกกลุ่มที่จะรับรางวัล</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;padding:7px 14px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;transition:all .15s;" id="act-target-all-lbl">
+                <input type="radio" name="act-target" value="all" id="act-target-all" checked onchange="updateActPreview()"> ทุกระดับ
+              </label>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;padding:7px 14px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;" id="act-target-vip-lbl">
+                <input type="radio" name="act-target" value="vip_only" id="act-target-vip" onchange="updateActPreview()"> เฉพาะ VIP ขึ้นไป (Bronze+)
+              </label>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;padding:7px 14px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;">
+                <input type="radio" name="act-target" value="custom" id="act-target-custom" onchange="updateActPreview()"> เลือกระดับ
+              </label>
+            </div>
+            <!-- เลือกระดับ (แสดงเมื่อ custom) -->
+            <div id="act-custom-tiers" style="display:none;margin-top:10px;display:none;flex-wrap:wrap;gap:7px;">
+              <!-- render ด้วย JS -->
+            </div>
+          </div>
+
+          <!-- Preview สรุปก่อนส่ง -->
+          <div id="act-preview-box" style="display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+            <div style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:#15803d;margin-bottom:8px;">📋 สรุปก่อนส่ง</div>
+            <div id="act-preview-content" style="font-size:13px;color:#555;"></div>
+          </div>
+
+          <button onclick="sendActivity()" id="act-send-btn"
+            style="width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-family:'Kanit',sans-serif;font-weight:900;font-size:15px;padding:14px;border:none;border-radius:10px;cursor:pointer;transition:opacity .2s;letter-spacing:.5px;">
+            🚀 ส่งรางวัลให้สมาชิกทันที
+          </button>
+        </div>
+
+        <!-- ประวัติกิจกรรม -->
+        <div class="card">
+          <div class="card-title">📋 ประวัติกิจกรรมที่ผ่านมา
+            <button class="btn btn-primary" onclick="loadActivityLogs()">🔄 รีเฟรช</button>
+          </div>
+          <!-- สถิติรวม -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;" id="act-stats-row">
+            <div class="stat-card"><div class="ico">🎉</div><div class="val" id="act-stat-total">—</div><div class="lbl">กิจกรรมทั้งหมด</div></div>
+            <div class="stat-card"><div class="ico">👥</div><div class="val" id="act-stat-members">—</div><div class="lbl">สมาชิกที่ได้รับ</div></div>
+            <div class="stat-card"><div class="ico">💰</div><div class="val" id="act-stat-amount">—</div><div class="lbl">รางวัลรวม (฿)</div></div>
+          </div>
+          <div id="act-logs-list">
+            <div style="text-align:center;padding:32px;color:#aaa;font-family:'Kanit',sans-serif;">กำลังโหลด...</div>
+          </div>
+        </div>
+
+      </div>
+
       <!-- NEWS -->
       <div class="panel" id="panel-news">
         <div class="card">
@@ -807,7 +916,31 @@ tr:hover td{background:#fafafa;}
           </div>
           <button class="save-btn" onclick="saveSettings('contact')">💾 บันทึกข้อมูลติดต่อ</button>
         </div>
-        <div class="card">
+        <div class="card" style="border-left:4px solid #8b5cf6;">
+          <div class="card-title">👑 ระดับ VIP สมาชิก</div>
+          <div style="font-size:12px;color:#888;margin-bottom:16px;">กำหนดเกณฑ์ยอดเติมเงินสะสม (฿) เพื่อขึ้นระดับ VIP — ระดับสูงขึ้นต้องมียอดมากกว่า</div>
+
+          <!-- Preview badges -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;padding:12px;background:#f9f9f7;border-radius:8px;border:1px solid #e5e5e0;">
+            <span class="vip-badge vip-0">🪨 ทั่วไป</span>
+            <span class="vip-badge vip-1">🥉 Bronze</span>
+            <span class="vip-badge vip-2">🥈 Silver</span>
+            <span class="vip-badge vip-3">🥇 Gold</span>
+            <span class="vip-badge vip-4">💎 Platinum</span>
+            <span class="vip-badge vip-5">💠 Diamond</span>
+            <span class="vip-badge vip-6">👑 Crown</span>
+          </div>
+
+          <!-- VIP level inputs -->
+          <div id="vip-settings-rows" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;"></div>
+
+          <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:12px;color:#92400e;margin-bottom:14px;">
+            💡 ระดับ <b>ทั่วไป</b> = สมาชิกที่เติมน้อยกว่าเกณฑ์ Bronze · ระดับขึ้นอัตโนมัติเมื่อยอดสะสมถึงเกณฑ์
+          </div>
+          <button class="save-btn" onclick="saveVipSettings()" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);">💾 บันทึกระดับ VIP</button>
+        </div>
+
+        <div class="card" style="border-left:4px solid #1a1a1a;">
           <div class="card-title">🔑 เปลี่ยนรหัสผ่าน Admin</div>
           <div class="form-row">
             <div class="fg"><label>รหัสผ่านใหม่</label><input type="password" id="new-pass" placeholder="อย่างน้อย 6 ตัวอักษร"></div>
@@ -1001,6 +1134,8 @@ function loadAll() {
   loadBets();
   loadNews();
   loadSettings();
+  loadVipSettings();
+  ensureFlagColumns();
   subscribeNotifications();
   scheduleAutoRefresh();
 }
@@ -1316,36 +1451,390 @@ function renderOvDetail() {
   }
 }
 
+// ===== VIP ENGINE =====
+const VIP_DEFAULTS = [
+  { tier:1, name:'Bronze',   icon:'🥉', min:500,    color:'#92400e' },
+  { tier:2, name:'Silver',   icon:'🥈', min:2000,   color:'#475569' },
+  { tier:3, name:'Gold',     icon:'🥇', min:5000,   color:'#854d0e' },
+  { tier:4, name:'Platinum', icon:'💎', min:15000,  color:'#1e40af' },
+  { tier:5, name:'Diamond',  icon:'💠', min:50000,  color:'#6b21a8' },
+  { tier:6, name:'Crown',    icon:'👑', min:150000, color:'#b45309' },
+];
+let _vipLevels = [...VIP_DEFAULTS]; // โหลดจาก settings ทับทีหลัง
+
+function getVipLevel(totalDep) {
+  let result = { tier:0, name:'ทั่วไป', icon:'🪨', min:0, color:'#9ca3af' };
+  for (const lv of _vipLevels) {
+    if (totalDep >= lv.min) result = lv;
+  }
+  return result;
+}
+
+function getVipNext(totalDep) {
+  for (const lv of _vipLevels) {
+    if (totalDep < lv.min) return lv.min;
+  }
+  return null; // Crown ถึงสูงสุดแล้ว
+}
+
+async function loadVipSettings() {
+  const { data } = await sb.from('settings').select('value').eq('key','vipLevels').maybeSingle();
+  if (data?.value?.levels?.length) {
+    _vipLevels = data.value.levels;
+  }
+  renderVipSettingsUI();
+}
+
+function renderVipSettingsUI() {
+  const wrap = document.getElementById('vip-settings-rows');
+  if (!wrap) return;
+  const levels = _vipLevels.length ? _vipLevels : VIP_DEFAULTS;
+  wrap.innerHTML = levels.map((lv,i) => `
+    <div style="display:grid;grid-template-columns:110px 1fr 100px;align-items:center;gap:10px;padding:10px 14px;background:#fafaf8;border:1px solid #e5e5e0;border-radius:8px;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span class="vip-badge vip-${lv.tier}">${lv.icon} ${lv.name}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <label style="font-size:12px;color:#888;white-space:nowrap;font-family:'Kanit',sans-serif;">เติมสะสมขั้นต่ำ</label>
+        <input type="number" id="vip-min-${lv.tier}" value="${lv.min}"
+          min="0" step="100"
+          style="flex:1;padding:7px 10px;border:1px solid #e0e0e0;border-radius:7px;font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:#1a1a1a;">
+      </div>
+      <div style="font-size:11px;color:#aaa;text-align:right;">${Number(lv.min).toLocaleString()} ฿</div>
+    </div>`).join('');
+
+  // live preview ตัวเลข
+  levels.forEach(lv => {
+    const inp = document.getElementById(`vip-min-${lv.tier}`);
+    if (inp) inp.addEventListener('input', function() {
+      const next = this.closest('div[style]').querySelector('div:last-child');
+      if (next) next.textContent = Number(this.value||0).toLocaleString() + ' ฿';
+    });
+  });
+}
+
+async function saveVipSettings() {
+  const levels = _vipLevels.map(lv => {
+    const inp = document.getElementById(`vip-min-${lv.tier}`);
+    return { ...lv, min: parseFloat(inp?.value||lv.min)||lv.min };
+  });
+
+  // validate: ต้องเรียงน้อยไปมาก
+  for (let i = 1; i < levels.length; i++) {
+    if (levels[i].min <= levels[i-1].min) {
+      showToast(`⚠️ ${levels[i].icon} ${levels[i].name} ต้องมีเกณฑ์มากกว่า ${levels[i-1].icon} ${levels[i-1].name} ครับ`, 'error');
+      return;
+    }
+  }
+
+  await safeUpsertSettings('vipLevels', { levels });
+  _vipLevels = levels;
+  showToast('✅ บันทึกระดับ VIP แล้วครับ! สมาชิกจะได้รับการอัปเดตทันที');
+  filterMembers(); // re-render ตาราง
+}
+
+// ===== FLAG / BAN SYSTEM =====
+const FLAG_DEFS = {
+  no_game:    { icon:'🚫', label:'ห้ามเข้าเกม',           cls:'flag-no_game'    },
+  no_reward:  { icon:'🎁', label:'ห้ามรับรางวัล',          cls:'flag-no_reward'  },
+  no_withdraw:{ icon:'🏧', label:'ห้ามถอนเงิน',            cls:'flag-no_withdraw'},
+  no_deposit: { icon:'💰', label:'ห้ามเติมเงิน',           cls:'flag-no_deposit' },
+  blacklist:  { icon:'⛔', label:'บัญชีดำ',               cls:'flag-blacklist'  },
+  watch:      { icon:'👁️', label:'ต้องระวัง',              cls:'flag-watch'      },
+  cheater:    { icon:'🎭', label:'ขี้โกง',                 cls:'flag-cheater'    },
+  chg_pass:   { icon:'🔑', label:'เปลี่ยนรหัสผ่าน',        cls:'flag-chg_pass'   },
+  chg_bank:   { icon:'🏦', label:'เปลี่ยนบัญชีธนาคาร',     cls:'flag-chg_bank'   },
+};
+
+function buildFlagBadgeHtml(key) {
+  const d = FLAG_DEFS[key];
+  if (!d) return '';
+  return `<span class="flag-badge ${d.cls}">${d.icon} ${d.label}</span>`;
+}
+
+// ===== FLAG COLUMN AUTO-INIT =====
+// เรียกครั้งเดียวตอน login เพื่อสร้าง column flags + admin_note ถ้ายังไม่มี
+// ===== FLAG COLUMN AUTO-INIT (v2 — REST schema check) =====
+// ใช้ REST API เพื่อเช็ค column จริง ไม่ใช่ update dummy
+async function ensureFlagColumns() {
+  try {
+    // ดึง schema ผ่าน OPTIONS request
+    const res = await fetch(`${SUPA_URL}/rest/v1/members`, {
+      method: 'HEAD',
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+    });
+    // ลอง select flags จาก 1 row แทน
+    const { data, error } = await sb.from('members').select('flags,admin_note').limit(1);
+    if (error && (error.code === '42703' || (error.message||'').toLowerCase().includes('column'))) {
+      window._flagColumnMissing = true;
+      showFlagSqlModal(); // เปิด modal SQL ทันที
+    } else {
+      window._flagColumnMissing = false;
+    }
+  } catch(e) {
+    window._flagColumnMissing = false; // network error — assume ok
+  }
+}
+
+// เปิด modal SQL อัตโนมัติ
+function showFlagSqlModal() {
+  if (document.getElementById('flag-sql-modal')) return; // ไม่เปิดซ้ำ
+  const sql = `ALTER TABLE members ADD COLUMN IF NOT EXISTS flags jsonb DEFAULT '[]'::jsonb;\nALTER TABLE members ADD COLUMN IF NOT EXISTS admin_note text DEFAULT '';`;
+  const el = document.createElement('div');
+  el.id = 'flag-sql-modal';
+  el.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid #F5A800;border-radius:12px;padding:18px 22px;z-index:9998;width:560px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.5);';
+  el.innerHTML = `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;">
+      <div>
+        <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:14px;color:#F5A800;">⚠️ ต้องรัน SQL ใน Supabase ก่อนใช้ป้ายเตือน</div>
+        <div style="font-size:12px;color:#aaa;margin-top:3px;">Column <code style="color:#4ade80;">flags</code> และ <code style="color:#4ade80;">admin_note</code> ยังไม่มีใน table members</div>
+      </div>
+      <button onclick="this.closest('#flag-sql-modal').remove()" style="background:none;border:none;color:#aaa;font-size:18px;cursor:pointer;flex-shrink:0;line-height:1;">✕</button>
+    </div>
+    <textarea readonly style="width:100%;height:62px;background:#0d0d0d;color:#4ade80;border:1px solid #333;border-radius:6px;padding:8px;font-family:monospace;font-size:12px;resize:none;">${sql}</textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#flag-sql-modal textarea').value).then(()=>{this.textContent='✅ คัดลอกแล้ว!';setTimeout(()=>this.textContent='📋 คัดลอก SQL',2000)})"
+        style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:8px 18px;border-radius:7px;border:none;background:#F5A800;color:#1a1a1a;cursor:pointer;">📋 คัดลอก SQL</button>
+      <button onclick="window.open('https://supabase.com/dashboard/project/xzlpdeqlfczjkospfqqi/sql/new','_blank')"
+        style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:8px 18px;border-radius:7px;border:1px solid #555;background:transparent;color:#aaa;cursor:pointer;">🔗 เปิด SQL Editor</button>
+      <button onclick="ensureFlagColumns();this.closest('#flag-sql-modal').remove()"
+        style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:8px 18px;border-radius:7px;border:1px solid #4ade80;background:transparent;color:#4ade80;cursor:pointer;">🔄 ตรวจสอบอีกครั้ง</button>
+    </div>`;
+  document.body.appendChild(el);
+}
+
+async function toggleFlag(nick, flagKey, btn) {
+  btn.disabled = true;
+  btn.textContent = '⏳';
+
+  try {
+    // ดึง flags ปัจจุบัน
+    const { data: mem, error: fetchErr } = await sb
+      .from('members').select('flags,admin_note').eq('nick', nick).maybeSingle();
+
+    if (fetchErr) {
+      // column ไม่มี — แสดง SQL modal
+      const code = fetchErr.code || '';
+      const msg  = fetchErr.message || '';
+      if (code === '42703' || msg.toLowerCase().includes('column') || msg.includes('schema cache')) {
+        window._flagColumnMissing = true;
+        showFlagSqlModal();
+        showToast('⚠️ กรุณารัน SQL เพิ่ม column flags ก่อนครับ', 'error');
+        btn.disabled = false; btn.textContent = '+ ติดป้าย';
+        return;
+      }
+      showToast('❌ โหลดข้อมูลไม่ได้: ' + msg, 'error');
+      btn.disabled = false; btn.textContent = '+ ติดป้าย';
+      return;
+    }
+
+    if (!mem) { btn.disabled = false; btn.textContent = '+ ติดป้าย'; return; }
+
+    let flags = Array.isArray(mem.flags) ? [...mem.flags] : [];
+    const isActive = flags.includes(flagKey);
+    flags = isActive ? flags.filter(f => f !== flagKey) : [...flags, flagKey];
+
+    const { error: updErr } = await sb
+      .from('members').update({ flags }).eq('nick', nick);
+
+    if (updErr) {
+      const code = updErr.code || '';
+      const msg  = updErr.message || '';
+      if (code === '42703' || msg.toLowerCase().includes('column') || msg.includes('schema cache')) {
+        window._flagColumnMissing = true;
+        showFlagSqlModal();
+        showToast('⚠️ Column flags ไม่มี — กรุณารัน SQL ครับ', 'error');
+      } else if (code === '42501' || msg.includes('permission') || msg.includes('policy') || msg.includes('RLS')) {
+        // RLS block — แสดง RLS helper
+        showRlsHelper();
+        showToast('❌ RLS block: ไม่มีสิทธิ์ update — กรุณาเพิ่ม Policy ใน Supabase ครับ', 'error');
+      } else {
+        showToast('❌ บันทึกไม่สำเร็จ: ' + msg, 'error');
+      }
+      btn.disabled = false; btn.textContent = isActive ? '✕ ถอดป้าย' : '+ ติดป้าย';
+      return;
+    }
+
+    // ─── อัปเดต UI ───
+    const row = document.getElementById(`flag-row-${flagKey}`);
+    if (row) {
+      const nowActive = !isActive;
+      row.style.background   = nowActive ? '#fff5f5' : '#fafaf8';
+      row.style.borderColor  = nowActive ? '#fca5a5' : '#e5e5e0';
+      btn.style.background   = nowActive ? '#fee2e2' : '#f5f5f2';
+      btn.style.color        = nowActive ? '#b91c1c' : '#555';
+      btn.style.borderColor  = nowActive ? '#fca5a5' : '#e0e0e0';
+      btn.textContent        = nowActive ? '✕ ถอดป้าย' : '+ ติดป้าย';
+      const title = row.querySelector('[data-flag-title]');
+      if (title) title.style.color = nowActive ? '#b91c1c' : '#1a1a1a';
+    }
+
+    // summary bar
+    const activeEl = document.getElementById('mdt-active-flags');
+    if (activeEl) {
+      activeEl.innerHTML = flags.length
+        ? '<div class="flags-row">' + flags.map(f => buildFlagBadgeHtml(f)).join('') + '</div>'
+        : '<div style="font-size:13px;color:#aaa;font-family:\'Kanit\',sans-serif;padding:4px;">— ไม่มีป้ายเตือน —</div>';
+    }
+
+    // cache + re-render ตาราง
+    const idx = allMembers.findIndex(m => m.nick === nick);
+    if (idx !== -1) allMembers[idx] = { ...allMembers[idx], flags };
+    filterMembers();
+
+    btn.disabled = false;
+    showToast(!isActive
+      ? `🚩 ติดป้าย "${FLAG_DEFS[flagKey]?.label}" ให้ ${nick} แล้วครับ`
+      : `✅ ถอดป้าย "${FLAG_DEFS[flagKey]?.label}" ของ ${nick} แล้วครับ`
+    );
+
+  } catch(e) {
+    showToast('❌ Error: ' + (e?.message||e), 'error');
+    btn.disabled = false; btn.textContent = '+ ติดป้าย';
+  }
+}
+
+// RLS policy helper
+function showRlsHelper() {
+  if (document.getElementById('rls-sql-modal')) return;
+  const sql = `-- เพิ่ม Policy อนุญาต anon update members\nCREATE POLICY IF NOT EXISTS "allow_anon_update"\nON members FOR UPDATE TO anon\nUSING (true) WITH CHECK (true);\n\n-- หรือถ้าต้องการแบบง่ายที่สุด:\nALTER TABLE members DISABLE ROW LEVEL SECURITY;`;
+  const el = document.createElement('div');
+  el.id = 'rls-sql-modal';
+  el.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a0a00;border:1px solid #C8102E;border-radius:12px;padding:18px 22px;z-index:9998;width:560px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.5);';
+  el.innerHTML = `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;">
+      <div>
+        <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:14px;color:#f87171;">🔒 RLS (Row Level Security) Block</div>
+        <div style="font-size:12px;color:#aaa;margin-top:3px;">anon role ไม่มีสิทธิ์ update table members — ต้องเพิ่ม Policy ครับ</div>
+      </div>
+      <button onclick="this.closest('#rls-sql-modal').remove()" style="background:none;border:none;color:#aaa;font-size:18px;cursor:pointer;flex-shrink:0;line-height:1;">✕</button>
+    </div>
+    <textarea readonly style="width:100%;height:100px;background:#0d0d0d;color:#f87171;border:1px solid #333;border-radius:6px;padding:8px;font-family:monospace;font-size:12px;resize:none;">${sql}</textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#rls-sql-modal textarea').value).then(()=>{this.textContent='✅ คัดลอกแล้ว!';setTimeout(()=>this.textContent='📋 คัดลอก',2000)})"
+        style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:8px 18px;border-radius:7px;border:none;background:#C8102E;color:#fff;cursor:pointer;">📋 คัดลอก</button>
+      <button onclick="window.open('https://supabase.com/dashboard/project/xzlpdeqlfczjkospfqqi/sql/new','_blank')"
+        style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:8px 18px;border-radius:7px;border:1px solid #555;background:transparent;color:#aaa;cursor:pointer;">🔗 SQL Editor</button>
+      <button onclick="this.closest('#rls-sql-modal').remove()"
+        style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:8px 18px;border-radius:7px;border:1px solid #555;background:transparent;color:#aaa;cursor:pointer;">ปิด</button>
+    </div>`;
+  document.body.appendChild(el);
+}
+
+async function saveAdminNote(nick) {
+  const note = document.getElementById('me-admin-note')?.value.trim() || '';
+  try {
+    const { error } = await sb.from('members').update({ admin_note: note }).eq('nick', nick);
+    if (error) {
+      const msg = error.message || '';
+      if (msg.toLowerCase().includes('column') || error.code === '42703') {
+        showFlagSqlModal();
+        showToast('⚠️ Column admin_note ไม่มี — กรุณารัน SQL ครับ', 'error');
+      } else if (error.code === '42501' || msg.includes('RLS') || msg.includes('policy')) {
+        showRlsHelper();
+        showToast('❌ RLS block — กรุณาเพิ่ม Policy ครับ', 'error');
+      } else {
+        showToast('❌ บันทึกไม่สำเร็จ: ' + msg, 'error');
+      }
+      return;
+    }
+    const idx = allMembers.findIndex(m => m.nick === nick);
+    if (idx !== -1) allMembers[idx] = { ...allMembers[idx], admin_note: note };
+    filterMembers();
+    showToast('✅ บันทึกหมายเหตุแล้วครับ');
+  } catch(e) {
+    showToast('❌ Error: ' + (e?.message||e), 'error');
+  }
+}
+
+// ─── ตรวจสอบป้ายเตือนก่อน approveDeposit ───
+async function checkFlagBeforeDeposit(nick) {
+  const mem = allMembers.find(m => m.nick === nick);
+  const flags = mem?.flags || [];
+  if (flags.includes('no_deposit') || flags.includes('blacklist')) {
+    const f = flags.includes('blacklist') ? 'บัญชีดำ' : 'ห้ามเติมเงิน';
+    showToast(`⛔ ${nick} มีป้ายเตือน "${f}" — ไม่สามารถอนุมัติได้ครับ`, 'error');
+    return false;
+  }
+  return true;
+}
+
+// ─── ตรวจสอบป้ายเตือนก่อน confirmSlipUpload (ถอนเงิน) ───
+async function checkFlagBeforeWithdraw(nick) {
+  const mem = allMembers.find(m => m.nick === nick);
+  const flags = mem?.flags || [];
+  if (flags.includes('no_withdraw') || flags.includes('blacklist')) {
+    const f = flags.includes('blacklist') ? 'บัญชีดำ' : 'ห้ามถอนเงิน';
+    showToast(`⛔ ${nick} มีป้ายเตือน "${f}" — ไม่สามารถโอนเงินได้ครับ`, 'error');
+    return false;
+  }
+  return true;
+}
+
+// ─── SQL Helper แสดงคำสั่ง SQL ที่ต้องรัน ───
+function showFlagSqlHelper() { showFlagSqlModal(); }
+
 // ===== MEMBERS =====
 async function loadMembers() {
-  const {data} = await sb.from('members').select('*').order('created_at',{ascending:false});
-  allMembers = data || [];
+  // โหลดสมาชิก + ยอดเติมเงินสะสม (approved) ทุกคน
+  const [memRes, depRes] = await Promise.all([
+    sb.from('members').select('*').order('created_at',{ascending:false}),
+    sb.from('deposits').select('nick,amount').eq('status','approved'),
+  ]);
+  allMembers = memRes.data || [];
+
+  // รวมยอดเติมสะสมต่อ nick
+  const depMap = {};
+  (depRes.data||[]).forEach(d => {
+    depMap[d.nick] = (depMap[d.nick]||0) + Number(d.amount||0);
+  });
+  // แนบ total_deposit เข้าแต่ละสมาชิก
+  allMembers = allMembers.map(m => ({ ...m, _totalDep: depMap[m.nick]||0 }));
+
   document.getElementById('members-count').textContent = `(${allMembers.length} คน)`;
   filterMembers();
 }
 
 function filterMembers() {
-  const q = document.getElementById('mem-search')?.value.toLowerCase() || '';
+  const q       = document.getElementById('mem-search')?.value.toLowerCase() || '';
+  const vipFilt = document.getElementById('mem-vip-filter')?.value || '';
   let rows = allMembers.filter(m => {
-    const matchQ = !q || m.nick?.toLowerCase().includes(q) || m.fname?.toLowerCase().includes(q) || m.phone?.includes(q);
-    return matchQ && inDateRange(m, 'mem', 'created_at');
+    const matchQ   = !q || m.nick?.toLowerCase().includes(q) || m.fname?.toLowerCase().includes(q) || m.phone?.includes(q);
+    const vipLevel = getVipLevel(m._totalDep||0);
+    const matchVip = !vipFilt || String(vipLevel.tier) === vipFilt;
+    return matchQ && matchVip && inDateRange(m, 'mem', 'created_at');
   });
   updateDateTag('mem');
   document.getElementById('members-count').textContent = `(${rows.length} คน)`;
   const tb = document.getElementById('members-tbody');
-  if (!rows.length) { tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#aaa;">ไม่พบข้อมูล</td></tr>'; return; }
-  tb.innerHTML = rows.map(m => `
-    <tr>
-      <td><strong style="cursor:pointer;color:var(--green);text-decoration:underline;" onclick="openMember('${m.nick}')">${m.nick||'—'}</strong></td>
+  if (!rows.length) { tb.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:#aaa;">ไม่พบข้อมูล</td></tr>'; return; }
+  tb.innerHTML = rows.map(m => {
+    const vip  = getVipLevel(m._totalDep||0);
+    const next = getVipNext(m._totalDep||0);
+    const pct  = next ? Math.min(100, Math.round((m._totalDep - vip.min) / (next - vip.min) * 100)) : 100;
+    return `<tr>
+      <td>
+        <strong style="cursor:pointer;color:var(--green);text-decoration:underline;" onclick="openMember('${m.nick}')">${m.nick||'—'}</strong>
+        ${(m.flags||[]).length ? `<div class="flags-row">${(m.flags||[]).map(f=>buildFlagBadgeHtml(f)).join('')}</div>` : ''}
+        ${m.admin_note ? `<div style="font-size:10px;color:#aaa;margin-top:2px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${m.admin_note}">📝 ${m.admin_note}</div>` : ''}
+      </td>
+      <td>
+        <span class="vip-badge vip-${vip.tier}">${vip.icon} ${vip.name}</span>
+        <div class="vip-progress-wrap" title="${pct}% ถึงระดับถัดไป">
+          <div class="vip-progress-bar" style="width:${pct}%;background:${vip.color};"></div>
+        </div>
+      </td>
       <td>${m.fname||''} ${m.lname||''}</td>
       <td>${m.phone||'—'}</td>
       <td style="font-family:'Kanit',sans-serif;font-weight:700;color:var(--green);">${Number(m.balance||0).toLocaleString()} ฿</td>
+      <td style="font-family:'Kanit',sans-serif;font-weight:700;color:#854d0e;">${Number(m._totalDep||0).toLocaleString()} ฿</td>
       <td style="font-size:12px;color:#aaa;">${fmtDate(m.created_at)}</td>
       <td style="display:flex;gap:4px;">
         <button class="btn btn-gold" onclick="openMember('${m.nick}')">👁 ดูข้อมูล</button>
         <button class="btn btn-red" onclick="deleteMember('${m.id}','${m.nick}')">ลบ</button>
       </td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 }
 
 async function deleteMember(id, nick) {
@@ -1707,6 +2196,8 @@ function renderDepositsRejected(rows) {
 
 async function approveDeposit(id, nick, amount) {
   if (!confirm(`อนุมัติเติมเงิน ${Number(amount).toLocaleString()} ฿ ให้ ${nick} ใช่ไหมครับ?`)) return;
+  // เช็คป้ายเตือนก่อน
+  if (!(await checkFlagBeforeDeposit(nick))) return;
 
   const {data:mem} = await sb.from('members').select('balance').eq('nick',nick).maybeSingle();
   if (!mem) { showToast('❌ ไม่พบสมาชิกครับ','error'); return; }
@@ -1895,7 +2386,8 @@ async function confirmSlipUpload() {
     return;
   }
 
-  const btn = document.getElementById('slip-confirm-btn');
+  // เช็คป้ายเตือนก่อนโอน
+  if (!(await checkFlagBeforeWithdraw(nick))) return;
   btn.disabled = true;
   btn.textContent = '⏳ กำลังดำเนินการ...';
   errEl.style.display = 'none';
@@ -2496,18 +2988,37 @@ async function openMember(nick) {
   document.getElementById('md-loading').style.display = 'none';
   document.getElementById('md-content').style.display = 'block';
 
+  // VIP คำนวณ
+  const vip     = getVipLevel(totalDep);
+  const vipNext = getVipNext(totalDep);
+  const vipPct  = vipNext ? Math.min(100, Math.round((totalDep - vip.min) / (vipNext - vip.min) * 100)) : 100;
+  const vipNextFmt = vipNext ? `${vipNext.toLocaleString()} ฿` : 'ระดับสูงสุด';
+
   document.getElementById('md-content').innerHTML = `
     <!-- HEADER -->
     <div style="display:flex;align-items:center;gap:14px;padding:20px 22px;background:linear-gradient(135deg,#1B6B2F,#27943F);color:#fff;position:relative;">
       <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-family:'Kanit',sans-serif;font-weight:900;font-size:22px;flex-shrink:0;">${(m.nick||'?')[0].toUpperCase()}</div>
       <div style="flex:1;min-width:0;">
-        <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;">${m.nick}</div>
-        <div style="font-size:12px;opacity:.8;">${m.fname||''} ${m.lname||''} · ${m.phone||'—'}</div>
-        <div style="font-size:11px;opacity:.6;margin-top:2px;">สมัคร ${fmtDate(m.created_at)}</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;">${m.nick}</span>
+          <span style="font-family:'Kanit',sans-serif;font-weight:700;font-size:11px;padding:2px 9px;border-radius:999px;background:rgba(255,255,255,.25);color:#fff;border:1px solid rgba(255,255,255,.4);">${vip.icon} ${vip.name}</span>
+        </div>
+        ${(m.flags||[]).length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;">${(m.flags||[]).map(f=>buildFlagBadgeHtml(f)).join('')}</div>` : ''}
+        <div style="font-size:12px;opacity:.8;margin-top:2px;">${m.fname||''} ${m.lname||''} · ${m.phone||'—'}</div>
+        <div style="margin-top:6px;">
+          <div style="display:flex;justify-content:space-between;font-size:10px;opacity:.65;margin-bottom:3px;">
+            <span>เติมสะสม ${totalDep.toLocaleString()} ฿</span>
+            <span>${vipNext ? `ถัดไป ${vipNextFmt}` : '👑 Crown — ระดับสูงสุด'}</span>
+          </div>
+          <div style="background:rgba(255,255,255,.2);border-radius:999px;height:5px;width:100%;overflow:hidden;">
+            <div style="width:${vipPct}%;height:100%;background:#fff;border-radius:999px;transition:width .5s;"></div>
+          </div>
+        </div>
       </div>
       <div style="text-align:right;flex-shrink:0;">
         <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:22px;">${Number(m.balance||0).toLocaleString()} ฿</div>
         <div style="font-size:11px;opacity:.7;">ยอดคงเหลือ</div>
+        <div style="font-size:11px;opacity:.5;margin-top:2px;">สมัคร ${fmtDate(m.created_at)}</div>
       </div>
       <button onclick="closeMember()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:28px;height:28px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
     </div>
@@ -2533,11 +3044,12 @@ async function openMember(nick) {
     </div>
 
     <!-- TABS -->
-    <div style="display:flex;border-bottom:2px solid #e5e5e0;background:#fff;">
+    <div style="display:flex;border-bottom:2px solid #e5e5e0;background:#fff;overflow-x:auto;">
       <button class="md-tab active" onclick="switchMdTab('dep',this)">💰 เติมเงิน (${deps.length})</button>
       <button class="md-tab" onclick="switchMdTab('with',this)">🏧 ถอนเงิน (${withs.length})</button>
       <button class="md-tab" onclick="switchMdTab('bet',this)">🎯 เดิมพัน (${bets.length})</button>
       <button class="md-tab" onclick="switchMdTab('info',this)">👤 ข้อมูล</button>
+      <button class="md-tab" onclick="switchMdTab('flag',this)" style="color:#dc2626;">🚩 ติดป้ายเตือน</button>
     </div>
 
     <!-- TAB CONTENT -->
@@ -2693,6 +3205,77 @@ async function openMember(nick) {
           <div>🕐 แก้ไขล่าสุด: <span style="color:#bbb;">${fmtDate(m.updated_at)}</span></div>
         </div>
       </div>
+
+      <!-- FLAG TAB -->
+      <div id="mdt-flag" class="md-panel" style="display:none;padding:18px 20px;">
+
+        <!-- ป้ายที่ติดอยู่แล้ว -->
+        <div style="margin-bottom:18px;">
+          <div class="me-section-title" style="border-color:#dc2626;color:#dc2626;background:#fff5f5;">🚩 ป้ายเตือนที่ติดอยู่ในขณะนี้</div>
+          <div id="mdt-active-flags" style="margin-top:10px;min-height:36px;">
+            ${(()=>{
+              const flags = m.flags || [];
+              if(!flags.length) return '<div style="font-size:13px;color:#aaa;font-family:\'Kanit\',sans-serif;padding:4px;">— ไม่มีป้ายเตือน —</div>';
+              return '<div class="flags-row">' + flags.map(f => buildFlagBadgeHtml(f)).join('') + '</div>';
+            })()}
+          </div>
+        </div>
+
+        <!-- เพิ่มป้ายใหม่ -->
+        <div class="me-section-title" style="border-color:#f59e0b;color:#92400e;background:#fffbeb;">➕ เพิ่ม / ลบ ป้ายเตือน</div>
+
+        <div style="display:grid;gap:8px;margin-top:12px;">
+          ${[
+            { key:'no_game',    icon:'🚫', label:'ห้ามเข้าเกม',          desc:'ลูกค้าไม่สามารถเข้าเล่นเกมได้' },
+            { key:'no_reward',  icon:'🎁', label:'ห้ามรับรางวัลทุกอย่าง', desc:'ลูกค้าไม่สามารถรับรางวัลใดๆ ได้' },
+            { key:'no_withdraw',icon:'🏧', label:'ห้ามถอนเงิน',           desc:'ลูกค้าไม่สามารถทำรายการถอนได้' },
+            { key:'no_deposit', icon:'💰', label:'ห้ามเติมเงิน',          desc:'ลูกค้าไม่สามารถทำรายการเติมได้' },
+            { key:'blacklist',  icon:'⛔', label:'บัญชีดำ',              desc:'บล็อกการเข้าใช้งานทุกอย่าง' },
+            { key:'watch',      icon:'👁️', label:'ต้องระวัง',             desc:'สมาชิกที่ต้องติดตามพฤติกรรม' },
+            { key:'cheater',    icon:'🎭', label:'ลูกค้าขี้โกง',          desc:'ตรวจพบพฤติกรรมโกง' },
+            { key:'chg_pass',   icon:'🔑', label:'เปลี่ยนรหัสผ่าน',       desc:'บังคับเปลี่ยนรหัสผ่านครั้งถัดไป' },
+            { key:'chg_bank',   icon:'🏦', label:'เปลี่ยนบัญชีธนาคาร',    desc:'ต้องยืนยันบัญชีธนาคารใหม่' },
+          ].map(f => {
+            const isActive = (m.flags||[]).includes(f.key);
+            return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border:1px solid ${isActive?'#fca5a5':'#e5e5e0'};border-radius:9px;background:${isActive?'#fff5f5':'#fafaf8'};" id="flag-row-${f.key}">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:20px;">${f.icon}</span>
+                <div>
+                  <div data-flag-title style="font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;color:${isActive?'#b91c1c':'#1a1a1a'};">${f.label}</div>
+                  <div style="font-size:11px;color:#aaa;margin-top:1px;">${f.desc}</div>
+                </div>
+              </div>
+              <button onclick="toggleFlag('${m.nick}','${f.key}',this)"
+                id="flag-btn-${f.key}"
+                style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:6px 14px;border-radius:7px;cursor:pointer;transition:all .15s;
+                  ${isActive
+                    ? 'background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;'
+                    : 'background:#f5f5f2;color:#555;border:1px solid #e0e0e0;'}">
+                ${isActive ? '✕ ถอดป้าย' : '+ ติดป้าย'}
+              </button>
+            </div>`;
+          }).join('')}
+        </div>
+
+        <!-- SQL Helper button (แสดงเฉพาะถ้า column ไม่มี) -->
+        <div id="flag-sql-helper-hint" style="display:none;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;margin-top:4px;margin-bottom:4px;">
+          <div style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;color:#c2410c;margin-bottom:6px;">⚠️ ต้องรัน SQL ก่อนใช้งาน</div>
+          <div style="font-size:12px;color:#92400e;margin-bottom:8px;">Column <code>flags</code> ยังไม่มีใน Supabase — กดปุ่มด้านล่างเพื่อดู SQL ที่ต้องรันครับ</div>
+          <button onclick="showFlagSqlHelper()" style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:7px 16px;border-radius:7px;border:none;background:#c2410c;color:#fff;cursor:pointer;">📋 ดู SQL และคัดลอก</button>
+        </div>
+        <!-- หมายเหตุ Admin -->
+        <div style="margin-top:16px;">
+          <div class="me-section-title">📝 หมายเหตุ Admin (ภายใน — ลูกค้าไม่เห็น)</div>
+          <textarea id="me-admin-note" rows="3"
+            style="width:100%;margin-top:8px;padding:10px 12px;border:1px solid #e0e0e0;border-radius:8px;font-family:'Sarabun',sans-serif;font-size:13px;resize:vertical;"
+            placeholder="บันทึกเหตุผลหรือรายละเอียดสำหรับ Admin...">${m.admin_note||''}</textarea>
+          <button onclick="saveAdminNote('${m.nick}')"
+            style="margin-top:8px;font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:8px 18px;border-radius:7px;border:none;background:var(--green);color:#fff;cursor:pointer;">
+            💾 บันทึกหมายเหตุ
+          </button>
+        </div>
+
+      </div>
     </div>`;
 }
 
@@ -2706,6 +3289,11 @@ function switchMdTab(id, btn) {
   const panel = document.getElementById('mdt-' + id);
   if (panel) panel.style.display = 'block';
   btn?.classList.add('active');
+  // แสดง SQL hint ถ้า column ยังไม่มี
+  if (id === 'flag') {
+    const hint = document.getElementById('flag-sql-helper-hint');
+    if (hint) hint.style.display = window._flagColumnMissing ? 'block' : 'none';
+  }
 }
 
 async function saveMemberEdit(nick, id) {
@@ -3107,6 +3695,340 @@ function renderGrowthChart() {
 }
 
 // เรียก loadChartData หลังจาก dashboard โหลดครบ
+// ===== ACTIVITY / EVENT ENGINE =====
+
+const ACT_VIP_LIST = [
+  { tier:0, name:'ทั่วไป',   icon:'🪨', color:'#6b7280' },
+  { tier:1, name:'Bronze',   icon:'🥉', color:'#92400e' },
+  { tier:2, name:'Silver',   icon:'🥈', color:'#475569' },
+  { tier:3, name:'Gold',     icon:'🥇', color:'#854d0e' },
+  { tier:4, name:'Platinum', icon:'💎', color:'#1e40af' },
+  { tier:5, name:'Diamond',  icon:'💠', color:'#6b21a8' },
+  { tier:6, name:'Crown',    icon:'👑', color:'#b45309' },
+];
+
+function loadActivityPanel() {
+  renderActVipRows();
+  renderActCustomTiers();
+  loadActivityLogs();
+}
+
+// สร้าง input rows ของแต่ละ VIP
+function renderActVipRows() {
+  const wrap = document.getElementById('act-vip-rows');
+  if (!wrap) return;
+  wrap.innerHTML = ACT_VIP_LIST.map(v => `
+    <div style="display:grid;grid-template-columns:140px 1fr 130px;align-items:center;gap:10px;padding:10px 14px;border:1px solid #e5e5e0;border-radius:9px;background:#fafaf8;" id="act-row-${v.tier}">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <span class="vip-badge vip-${v.tier}">${v.icon} ${v.name}</span>
+      </div>
+      <div style="position:relative;">
+        <input type="number" id="act-amt-${v.tier}" min="0" step="1" placeholder="0"
+          value="0"
+          oninput="updateActPreview()"
+          style="width:100%;padding:9px 42px 9px 12px;border:1px solid #e0e0e0;border-radius:8px;font-family:'Kanit',sans-serif;font-size:14px;font-weight:700;color:#1a1a1a;text-align:right;">
+        <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:#aaa;pointer-events:none;">฿</span>
+      </div>
+      <div style="font-size:11px;color:#aaa;font-family:'Kanit',sans-serif;" id="act-count-${v.tier}">— สมาชิก</div>
+    </div>`).join('');
+  // โหลดจำนวนสมาชิกแต่ละ tier
+  updateActMemberCounts();
+}
+
+// Checkbox เลือก tier (custom mode)
+function renderActCustomTiers() {
+  const wrap = document.getElementById('act-custom-tiers');
+  if (!wrap) return;
+  wrap.innerHTML = ACT_VIP_LIST.map(v => `
+    <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-size:13px;padding:5px 12px;border:1px solid #e0e0e0;border-radius:6px;background:#fff;">
+      <input type="checkbox" name="act-tier-check" value="${v.tier}" onchange="updateActPreview()" checked>
+      <span class="vip-badge vip-${v.tier}" style="font-size:10px;">${v.icon} ${v.name}</span>
+    </label>`).join('');
+}
+
+// แสดง/ซ่อน custom tiers + อัปเดต preview
+function updateActPreview() {
+  const target = document.querySelector('input[name="act-target"]:checked')?.value || 'all';
+  const customWrap = document.getElementById('act-custom-tiers');
+  if (customWrap) customWrap.style.display = target === 'custom' ? 'flex' : 'none';
+
+  // คำนวณสรุป
+  const actName = document.getElementById('act-name')?.value.trim() || '(ยังไม่ได้ตั้งชื่อ)';
+  let totalAmt = 0, totalMem = 0;
+  const lines = [];
+
+  ACT_VIP_LIST.forEach(v => {
+    const amt = parseFloat(document.getElementById(`act-amt-${v.tier}`)?.value) || 0;
+    if (amt <= 0) return;
+    // เช็คว่า tier นี้รับรางวัลไหม
+    let included = false;
+    if (target === 'all') included = true;
+    else if (target === 'vip_only') included = v.tier >= 1;
+    else { // custom
+      const cb = document.querySelector(`input[name="act-tier-check"][value="${v.tier}"]`);
+      included = cb?.checked || false;
+    }
+    if (!included) return;
+    const countEl = document.getElementById(`act-count-${v.tier}`);
+    const memCount = parseInt(countEl?.dataset.count || '0');
+    const subtotal = amt * memCount;
+    totalAmt += subtotal;
+    totalMem += memCount;
+    lines.push(`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0f0ee;">
+      <span>${v.icon} ${v.name} (${memCount} คน × ${amt.toLocaleString()} ฿)</span>
+      <span style="font-family:'Kanit',sans-serif;font-weight:700;color:#15803d;">${subtotal.toLocaleString()} ฿</span>
+    </div>`);
+  });
+
+  const box = document.getElementById('act-preview-box');
+  const content = document.getElementById('act-preview-content');
+  if (lines.length > 0 && content) {
+    if (box) box.style.display = 'block';
+    content.innerHTML = `
+      <div style="font-size:12px;color:#888;margin-bottom:6px;">📌 ${actName}</div>
+      ${lines.join('')}
+      <div style="display:flex;justify-content:space-between;margin-top:8px;font-family:'Kanit',sans-serif;font-weight:900;font-size:14px;">
+        <span>รวมทั้งหมด (${totalMem} คน)</span>
+        <span style="color:#15803d;">${totalAmt.toLocaleString()} ฿</span>
+      </div>`;
+  } else {
+    if (box) box.style.display = 'none';
+  }
+}
+
+// โหลดจำนวนสมาชิกแต่ละ tier จาก allMembers
+function updateActMemberCounts() {
+  // รอให้ allMembers โหลดก่อน (อาจต้องดึงใหม่)
+  const doCount = (members) => {
+    ACT_VIP_LIST.forEach(v => {
+      const count = members.filter(m => getVipLevel(m._totalDep||0).tier === v.tier).length;
+      const el = document.getElementById(`act-count-${v.tier}`);
+      if (el) { el.textContent = `${count} สมาชิก`; el.dataset.count = count; }
+    });
+    updateActPreview();
+  };
+  if (allMembers?.length) {
+    doCount(allMembers);
+  } else {
+    // โหลดใหม่ถ้ายังไม่มี
+    Promise.all([
+      sb.from('members').select('nick'),
+      sb.from('deposits').select('nick,amount').eq('status','approved'),
+    ]).then(([mR, dR]) => {
+      const depMap = {};
+      (dR.data||[]).forEach(d => depMap[d.nick] = (depMap[d.nick]||0)+Number(d.amount||0));
+      const mems = (mR.data||[]).map(m => ({...m, _totalDep: depMap[m.nick]||0}));
+      doCount(mems);
+    });
+  }
+}
+
+// ส่งรางวัล
+async function sendActivity() {
+  const actName = document.getElementById('act-name')?.value.trim();
+  if (!actName) { showToast('⚠️ กรุณาตั้งชื่อกิจกรรมก่อนครับ', 'error'); return; }
+
+  const target = document.querySelector('input[name="act-target"]:checked')?.value || 'all';
+
+  // เก็บ rewards ต่อ tier
+  const rewardMap = {}; // tier → amount
+  ACT_VIP_LIST.forEach(v => {
+    const amt = parseFloat(document.getElementById(`act-amt-${v.tier}`)?.value) || 0;
+    if (amt > 0) rewardMap[v.tier] = amt;
+  });
+
+  if (Object.keys(rewardMap).length === 0) {
+    showToast('⚠️ กรุณาใส่จำนวนเงินอย่างน้อย 1 ระดับครับ', 'error'); return;
+  }
+
+  // ยืนยัน
+  const previewContent = document.getElementById('act-preview-content')?.innerText || '';
+  if (!confirm(`ยืนยันส่งรางวัลกิจกรรม "${actName}" ?\n\nระบบจะโอนเงินเข้าบัญชีสมาชิกทันทีครับ`)) return;
+
+  const btn = document.getElementById('act-send-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ กำลังส่งรางวัล...';
+
+  try {
+    // โหลดสมาชิกทั้งหมด + ยอดเติมสะสม
+    const [mR, dR] = await Promise.all([
+      sb.from('members').select('nick,balance'),
+      sb.from('deposits').select('nick,amount').eq('status','approved'),
+    ]);
+    const depMap = {};
+    (dR.data||[]).forEach(d => depMap[d.nick] = (depMap[d.nick]||0)+Number(d.amount||0));
+    const members = (mR.data||[]).map(m => ({...m, _totalDep: depMap[m.nick]||0}));
+
+    // กรองสมาชิกที่จะได้รับ + เช็คป้ายเตือน
+    const eligible = members.filter(m => {
+      const tier = getVipLevel(m._totalDep).tier;
+      if (!rewardMap[tier]) return false; // ระดับนี้ไม่มีรางวัล
+      if (target === 'vip_only' && tier < 1) return false;
+      if (target === 'custom') {
+        const cb = document.querySelector(`input[name="act-tier-check"][value="${tier}"]`);
+        if (!cb?.checked) return false;
+      }
+      // เช็คป้ายเตือน — ห้ามรับรางวัล / บัญชีดำ
+      const mFlags = m.flags || [];
+      if (mFlags.includes('no_reward') || mFlags.includes('blacklist')) return false;
+      return true;
+    });
+
+    if (eligible.length === 0) {
+      showToast('⚠️ ไม่พบสมาชิกที่ตรงเงื่อนไข', 'error');
+      btn.disabled = false; btn.textContent = '🚀 ส่งรางวัลให้สมาชิกทันที'; return;
+    }
+
+    // ส่งรางวัลทีละคน (batch update)
+    let totalSent = 0, successCount = 0;
+    const actId = 'ACT-' + Date.now();
+    const now = new Date().toISOString();
+
+    for (const m of eligible) {
+      const tier = getVipLevel(m._totalDep).tier;
+      const reward = rewardMap[tier] || 0;
+      if (reward <= 0) continue;
+      const newBal = Number(m.balance||0) + reward;
+      await sb.from('members').update({ balance: newBal }).eq('nick', m.nick);
+      // บันทึก log ใน deposits (type: activity)
+      await sb.from('deposits').insert({
+        nick: m.nick, amount: reward,
+        bank: `กิจกรรม: ${actName}`,
+        txn: `${actId}-${m.nick}`,
+        status: 'approved',
+        approved_at: now,
+        approved_by: 'Admin (Activity)',
+      });
+      totalSent += reward;
+      successCount++;
+    }
+
+    // บันทึก activity log
+    try {
+      await sb.from('activity_logs').insert({
+        name: actName,
+        target_mode: target,
+        reward_map: rewardMap,
+        total_amount: totalSent,
+        total_members: successCount,
+        created_at: now,
+      });
+    } catch(_) {}
+
+    showToast(`✅ ส่งรางวัล "${actName}" ให้ ${successCount} คน รวม ${totalSent.toLocaleString()} ฿ สำเร็จแล้วครับ!`);
+
+    // reset form
+    document.getElementById('act-name').value = '';
+    ACT_VIP_LIST.forEach(v => {
+      const inp = document.getElementById(`act-amt-${v.tier}`);
+      if (inp) inp.value = '0';
+    });
+    document.getElementById('act-preview-box').style.display = 'none';
+    loadActivityLogs();
+    loadMembers();
+    loadOverview();
+
+  } catch(e) {
+    showToast('❌ เกิดข้อผิดพลาด: ' + (e?.message||e), 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚀 ส่งรางวัลให้สมาชิกทันที';
+  }
+}
+
+// โหลดประวัติกิจกรรม
+async function loadActivityLogs() {
+  const listEl = document.getElementById('act-logs-list');
+  if (listEl) listEl.innerHTML = '<div style="text-align:center;padding:28px;color:#aaa;font-family:\'Kanit\',sans-serif;">กำลังโหลด...</div>';
+
+  // ดึงจาก deposits ที่มี bank ขึ้นต้นด้วย "กิจกรรม:"
+  const { data: logs } = await sb.from('deposits')
+    .select('nick,amount,bank,txn,approved_at,created_at')
+    .like('bank','กิจกรรม:%')
+    .order('created_at',{ascending:false})
+    .limit(200);
+
+  const rows = logs || [];
+
+  // สรุปสถิติ
+  const actNames = [...new Set(rows.map(r => r.bank))];
+  const totalAmt = rows.reduce((s,r) => s+Number(r.amount||0), 0);
+  const setEl = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  setEl('act-stat-total',   actNames.length);
+  setEl('act-stat-members', rows.length);
+  setEl('act-stat-amount',  totalAmt.toLocaleString());
+
+  if (!rows.length) {
+    if (listEl) listEl.innerHTML = '<div style="text-align:center;padding:32px;color:#aaa;font-family:\'Kanit\',sans-serif;"><div style="font-size:32px;margin-bottom:8px;">🎉</div>ยังไม่มีกิจกรรมที่ส่งครับ</div>';
+    return;
+  }
+
+  // จัดกลุ่มตามชื่อกิจกรรม (bank field)
+  const grouped = {};
+  rows.forEach(r => {
+    const key = r.bank;
+    if (!grouped[key]) grouped[key] = { name: key.replace('กิจกรรม: ',''), rows:[], date: r.approved_at||r.created_at };
+    grouped[key].rows.push(r);
+  });
+
+  if (listEl) {
+    listEl.innerHTML = Object.values(grouped).map(g => {
+      const total = g.rows.reduce((s,r)=>s+Number(r.amount||0),0);
+      const dateStr = fmtDate(g.date);
+      const isOpen = Object.values(grouped).indexOf(g) === 0; // เปิดอันแรก
+      const gId = 'act-g-' + Math.random().toString(36).slice(2,8);
+      return `
+      <div style="border:1px solid #e5e5e0;border-radius:10px;overflow:hidden;margin-bottom:10px;">
+        <!-- header -->
+        <div onclick="toggleActGroup('${gId}')" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fafaf8;cursor:pointer;gap:12px;">
+          <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+            <span style="font-size:20px;">🎉</span>
+            <div>
+              <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:14px;">${g.name}</div>
+              <div style="font-size:11px;color:#aaa;margin-top:1px;">${dateStr} · ส่งให้ ${g.rows.length} คน</div>
+            </div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:16px;color:#15803d;">+${total.toLocaleString()} ฿</div>
+            <div style="font-size:11px;color:#aaa;" id="${gId}-arrow">${isOpen?'▲':'▼'}</div>
+          </div>
+        </div>
+        <!-- detail rows -->
+        <div id="${gId}" style="${isOpen?'':'display:none;'}">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr style="background:#f5f5f2;">
+              <th style="padding:7px 12px;text-align:left;font-family:'Kanit',sans-serif;font-size:11px;color:#888;">Nick</th>
+              <th style="padding:7px 12px;text-align:right;font-family:'Kanit',sans-serif;font-size:11px;color:#888;">รางวัล (฿)</th>
+              <th style="padding:7px 12px;text-align:right;font-family:'Kanit',sans-serif;font-size:11px;color:#888;">เวลา</th>
+            </tr></thead>
+            <tbody>
+              ${g.rows.map((r,i) => `<tr style="${i%2===1?'background:#fafaf8;':''}">
+                <td style="padding:7px 12px;"><strong style="cursor:pointer;color:var(--green);" onclick="openMember('${r.nick}')">${r.nick}</strong></td>
+                <td style="padding:7px 12px;text-align:right;font-family:'Kanit',sans-serif;font-weight:700;color:#15803d;">+${Number(r.amount).toLocaleString()}</td>
+                <td style="padding:7px 12px;text-align:right;color:#aaa;">${fmtDate(r.approved_at||r.created_at)}</td>
+              </tr>`).join('')}
+              <tr style="background:#f0fdf4;border-top:1px solid #86efac;">
+                <td style="padding:8px 12px;font-family:'Kanit',sans-serif;font-weight:900;font-size:12px;color:#15803d;">รวม ${g.rows.length} คน</td>
+                <td style="padding:8px 12px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:#15803d;">+${total.toLocaleString()} ฿</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+function toggleActGroup(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById(id+'-arrow');
+  if (!el) return;
+  const isOpen = el.style.display !== 'none';
+  el.style.display = isOpen ? 'none' : 'block';
+  if (arrow) arrow.textContent = isOpen ? '▼' : '▲';
+}
+
 const _origLoadAll = loadAll;
 loadAll = function() {
   _origLoadAll();
