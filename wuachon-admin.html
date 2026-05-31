@@ -233,6 +233,33 @@ tr:hover td{background:#fafafa;}
           <div class="form-row">
             <div class="fg"><label>รางวัล (บาท)</label><input id="m-prize" type="number" placeholder="500000"></div>
           </div>
+
+          <!-- รูปวัวทั้ง 2 ฝ่าย -->
+          <div class="form-row" style="align-items:flex-start;">
+            <div class="fg">
+              <label>📷 รูปวัว 🔴 ฝ่ายแดง</label>
+              <div style="display:flex;align-items:center;gap:12px;margin-top:6px;">
+                <div id="prev-photo-a" style="width:72px;height:72px;border-radius:50%;border:3px solid rgba(239,68,68,0.5);background:rgba(239,68,68,0.08);display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;flex-shrink:0;">🐂</div>
+                <div style="flex:1;">
+                  <input type="file" id="m-photo-a" accept="image/*" style="display:none;" onchange="previewMatchPhoto(this,'prev-photo-a')">
+                  <button type="button" onclick="document.getElementById('m-photo-a').click()" style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:8px 16px;border-radius:8px;border:1px solid rgba(239,68,68,0.4);background:rgba(239,68,68,0.08);color:#ef4444;cursor:pointer;width:100%;">📁 เลือกรูป</button>
+                  <button type="button" onclick="clearMatchPhoto('m-photo-a','prev-photo-a','🐂')" style="font-family:'Kanit',sans-serif;font-size:11px;padding:5px 12px;border-radius:6px;border:1px solid #e5e5e0;background:#f9f9f9;color:#888;cursor:pointer;width:100%;margin-top:4px;">✕ ลบรูป</button>
+                </div>
+              </div>
+            </div>
+            <div class="fg">
+              <label>📷 รูปวัว 🔵 ฝ่ายน้ำเงิน</label>
+              <div style="display:flex;align-items:center;gap:12px;margin-top:6px;">
+                <div id="prev-photo-b" style="width:72px;height:72px;border-radius:50%;border:3px solid rgba(59,130,246,0.5);background:rgba(59,130,246,0.08);display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;flex-shrink:0;">🐃</div>
+                <div style="flex:1;">
+                  <input type="file" id="m-photo-b" accept="image/*" style="display:none;" onchange="previewMatchPhoto(this,'prev-photo-b')">
+                  <button type="button" onclick="document.getElementById('m-photo-b').click()" style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:8px 16px;border-radius:8px;border:1px solid rgba(59,130,246,0.4);background:rgba(59,130,246,0.08);color:#3b82f6;cursor:pointer;width:100%;">📁 เลือกรูป</button>
+                  <button type="button" onclick="clearMatchPhoto('m-photo-b','prev-photo-b','🐃')" style="font-family:'Kanit',sans-serif;font-size:11px;padding:5px 12px;border-radius:6px;border:1px solid #e5e5e0;background:#f9f9f9;color:#888;cursor:pointer;width:100%;margin-top:4px;">✕ ลบรูป</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="form-row full">
             <div class="fg">
               <label>🔴 Live Stream URL (YouTube / Facebook)</label>
@@ -425,19 +452,75 @@ tr:hover td{background:#fafafa;}
       <!-- NEWS -->
       <div class="panel" id="panel-news">
         <div class="card">
-          <div class="card-title">✏️ เพิ่มข่าวสาร</div>
-          <div class="fg"><label>หัวข้อข่าว</label><input id="news-title" placeholder="หัวข้อ..."></div>
-          <div class="fg"><label>เนื้อหา</label><textarea id="news-body" rows="3" style="width:100%;padding:10px;border:1px solid #e0e0e0;border-radius:8px;font-family:'Sarabun',sans-serif;font-size:14px;resize:vertical;"></textarea></div>
-          <button class="save-btn" onclick="addNews()">📰 โพสต์ข่าว</button>
+          <div class="card-title">✏️ เพิ่มข้อความ Ticker</div>
+          <div class="fg">
+            <label>ข้อความที่ต้องการแสดง <em style="color:#888;">(จะวิ่งในแถบข่าวสาร)</em></label>
+            <input id="news-title" placeholder="เช่น: ประกาศรายชื่อกรรมการตัดสิน ปี 68" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:'Sarabun',sans-serif;">
+          </div>
+          <div class="fg" style="display:flex;align-items:center;gap:12px;margin-top:4px;">
+            <label style="font-weight:700;font-size:13px;">สถานะ:</label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
+              <input type="radio" name="news-status" value="published" checked> 🟢 แสดงทันที
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
+              <input type="radio" name="news-status" value="draft"> ⏸️ ซ่อนไว้ก่อน
+            </label>
+          </div>
+          <button class="save-btn" onclick="addNews()" style="margin-top:16px;">📢 เพิ่มข้อความ</button>
         </div>
         <div class="card">
-          <div class="card-title">📋 ข่าวสารทั้งหมด</div>
+          <div class="card-title">📋 ข้อความทั้งหมด <span id="news-count" style="font-size:12px;color:#888;font-weight:400;"></span></div>
           <div id="news-list"><div style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</div></div>
         </div>
       </div>
 
       <!-- SETTINGS -->
       <div class="panel" id="panel-settings">
+        <!-- ชื่อเว็บ & โลโก้ -->
+        <div class="card" style="border-left:4px solid #C8102E;">
+          <div class="card-title">🐂 ชื่อเว็บไซต์ & โลโก้</div>
+          <div class="form-row">
+            <div class="fg">
+              <label>ชื่อเว็บไซต์ (ส่วนแรก)</label>
+              <input id="sf-sitename1" placeholder="เช่น วัวชน" style="font-family:'Kanit',sans-serif;font-weight:700;">
+              <div style="font-size:11px;color:#aaa;margin-top:4px;">แสดงใน Navbar ซ้ายมือ (ตัวสีทอง)</div>
+            </div>
+            <div class="fg">
+              <label>ชื่อเว็บไซต์ (ส่วนที่สอง)</label>
+              <input id="sf-sitename2" placeholder="เช่น ลาว" style="font-family:'Kanit',sans-serif;font-weight:700;">
+              <div style="font-size:11px;color:#aaa;margin-top:4px;">แสดงต่อจากส่วนแรก (ตัวสีแดง)</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="fg">
+              <label>คำบรรยายใต้โลโก้วนกลม</label>
+              <input id="sf-logo-top" placeholder="เช่น วัวชนไทย" style="font-family:'Kanit',sans-serif;">
+              <div style="font-size:11px;color:#aaa;margin-top:4px;">ข้อความด้านบนโลโก้วงกลม (สีทอง)</div>
+            </div>
+            <div class="fg">
+              <label>คำบรรยายล่างโลโก้วนกลม</label>
+              <input id="sf-logo-bottom" placeholder="เช่น BULL FIGHT LAO" style="font-family:'Kanit',sans-serif;">
+              <div style="font-size:11px;color:#aaa;margin-top:4px;">ข้อความด้านล่างโลโก้วงกลม (สีขาว)</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="fg">
+              <label>ชื่อในแถบเบราว์เซอร์ (Title)</label>
+              <input id="sf-pagetitle" placeholder="เช่น วัวชนลาว — ศึกชนโคทั่วประเทศ">
+              <div style="font-size:11px;color:#aaa;margin-top:4px;">แสดงที่แท็บบราวเซอร์</div>
+            </div>
+          </div>
+          <!-- Preview -->
+          <div style="background:#f9f9f9;border:1px solid #e5e5e0;border-radius:10px;padding:14px;margin:12px 0;">
+            <div style="font-size:11px;color:#888;margin-bottom:8px;font-weight:700;">👁️ Preview Navbar:</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:32px;height:32px;background:#1A0A00;border-radius:50%;border:2px solid #F5A800;display:flex;align-items:center;justify-content:center;font-size:16px;">🐂</div>
+              <span style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:#F5A800;" id="sf-preview-name1">วัวชน</span><span style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:#C8102E;" id="sf-preview-name2">ลาว</span>
+            </div>
+          </div>
+          <button class="save-btn" onclick="saveSettings('siteInfo')" style="background:linear-gradient(135deg,#C8102E,#a50c24);">💾 บันทึกชื่อเว็บ & โลโก้</button>
+        </div>
+
         <!-- ค่าบริการ P2P -->
         <div class="card" style="border-left:4px solid var(--gold);">
           <div class="card-title">💹 ค่าบริการการเดิมพัน P2P</div>
@@ -822,11 +905,59 @@ function filterMatches_() {
     }).join('') + '</tbody></table>';
 }
 
+// Helper: อ่านไฟล์เป็น base64
+function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) { resolve(null); return; }
+    const reader = new FileReader();
+    reader.onload  = e => resolve(e.target.result);
+    reader.onerror = () => reject(new Error('อ่านไฟล์ไม่สำเร็จ'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// Preview รูปวัวใน form
+function previewMatchPhoto(input, previewId) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 3 * 1024 * 1024) {
+    showToast('⚠️ รูปต้องไม่เกิน 3MB ครับ', 'error');
+    input.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const prev = document.getElementById(previewId);
+    if (prev) {
+      prev.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+// ลบรูป
+function clearMatchPhoto(inputId, previewId, defaultEmoji) {
+  const input = document.getElementById(inputId);
+  if (input) input.value = '';
+  const prev = document.getElementById(previewId);
+  if (prev) prev.innerHTML = defaultEmoji;
+}
+
 async function addMatch() {
   const round   = document.getElementById('m-round').value.trim();
   const name_a  = document.getElementById('m-name-a').value.trim();
   const name_b  = document.getElementById('m-name-b').value.trim();
   if (!round || !name_a || !name_b) { showToast('⚠️ กรุณากรอกรุ่น และชื่อวัวทั้งสองฝั่งครับ','error'); return; }
+
+  const btn = document.querySelector('[onclick="addMatch()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ กำลังบันทึก...'; }
+
+  // อ่านรูป base64
+  const fileA = document.getElementById('m-photo-a')?.files[0] || null;
+  const fileB = document.getElementById('m-photo-b')?.files[0] || null;
+  const photo_a = await readFileAsBase64(fileA);
+  const photo_b = await readFileAsBase64(fileB);
+
   const code = String(Math.floor(1000 + Math.random() * 9000));
   const stream_url = document.getElementById('m-stream-url')?.value.trim() || null;
   const {error} = await sb.from('matches').insert({
@@ -840,10 +971,20 @@ async function addMatch() {
     location: document.getElementById('m-location').value.trim(),
     prize: parseFloat(document.getElementById('m-prize').value) || 0,
     status: 'upcoming', code, stream_url,
+    photo_a: photo_a || null,
+    photo_b: photo_b || null,
   });
+
+  if (btn) { btn.disabled = false; btn.textContent = '➕ เพิ่มคู่แข่งขัน'; }
   if (error) { showToast('❌ เกิดข้อผิดพลาด: '+error.message,'error'); return; }
   showToast(`✅ เพิ่มคู่แข่งขัน ${name_a} vs ${name_b} แล้วครับ! รหัส: ${code}`);
-  ['m-round','m-name-a','m-name-b','m-owner-a','m-owner-b','m-weight-a','m-weight-b','m-date','m-time','m-location','m-prize','m-stream-url'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+
+  // reset form
+  ['m-round','m-name-a','m-name-b','m-owner-a','m-owner-b','m-weight-a','m-weight-b','m-date','m-time','m-location','m-prize','m-stream-url'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  clearMatchPhoto('m-photo-a','prev-photo-a','🐂');
+  clearMatchPhoto('m-photo-b','prev-photo-b','🐃');
   loadMatches(); loadOverview();
 }
 
@@ -1395,36 +1536,86 @@ function filterBets() {
 
 // ===== NEWS =====
 async function loadNews() {
-  const {data} = await sb.from('news').select('*').order('created_at',{ascending:false}).limit(20);
+  const {data} = await sb.from('news').select('*').order('created_at',{ascending:false}).limit(50);
   const el = document.getElementById('news-list');
-  if (!data?.length) { el.innerHTML = '<div style="text-align:center;padding:20px;color:#aaa;">ยังไม่มีข่าวสารครับ</div>'; return; }
-  el.innerHTML = data.map(n => `
-    <div style="background:#f9f9f9;border:1px solid #e5e5e0;border-radius:10px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
-      <div>
-        <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:14px;">${n.title||'—'}</div>
-        <div style="font-size:12px;color:#666;margin-top:4px;">${n.body||''}</div>
-        <div style="font-size:11px;color:#aaa;margin-top:4px;">${fmtDate(n.created_at)}</div>
+  const countEl = document.getElementById('news-count');
+  if (!data?.length) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:#aaa;">ยังไม่มีข้อความครับ</div>';
+    if (countEl) countEl.textContent = '';
+    return;
+  }
+  const pub = data.filter(n=>n.status==='published').length;
+  if (countEl) countEl.textContent = `(แสดงอยู่ ${pub}/${data.length} รายการ)`;
+  el.innerHTML = data.map(n => {
+    const isOn = n.status === 'published';
+    return `
+    <div style="background:#f9f9f9;border:1px solid ${isOn?'#22c55e':'#e5e5e0'};border-radius:10px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;">
+      <div style="flex:1;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;${isOn?'background:rgba(34,197,94,0.12);color:#16a34a;border:1px solid rgba(34,197,94,0.3);':'background:rgba(156,163,175,0.15);color:#9ca3af;border:1px solid rgba(156,163,175,0.3);'}">${isOn?'🟢 แสดงอยู่':'⏸️ ซ่อนอยู่'}</span>
+          <span style="font-size:11px;color:#aaa;">${fmtDate(n.created_at)}</span>
+        </div>
+        <div id="news-text-${n.id}" style="font-family:'Kanit',sans-serif;font-weight:700;font-size:14px;color:#1a1a1a;">${n.title||'—'}</div>
+        <div id="news-edit-${n.id}" style="display:none;margin-top:6px;">
+          <input id="news-edit-input-${n.id}" value="${(n.title||'').replace(/"/g,'&quot;')}" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;font-family:'Sarabun',sans-serif;">
+          <div style="display:flex;gap:6px;margin-top:6px;">
+            <button class="btn btn-primary" onclick="saveNewsEdit('${n.id}')" style="padding:5px 14px;font-size:12px;">💾 บันทึก</button>
+            <button class="btn" onclick="cancelNewsEdit('${n.id}','${(n.title||'').replace(/'/g,"\'")}')" style="padding:5px 14px;font-size:12px;background:#f3f4f6;color:#555;border:1px solid #ddd;">ยกเลิก</button>
+          </div>
+        </div>
       </div>
-      <button class="btn btn-red" onclick="deleteNews('${n.id}')">ลบ</button>
-    </div>`).join('');
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <button class="btn" onclick="toggleNews('${n.id}','${isOn?'draft':'published'}')" style="padding:5px 12px;font-size:12px;background:${isOn?'rgba(156,163,175,0.15)':'rgba(34,197,94,0.12)'};color:${isOn?'#6b7280':'#16a34a'};border:1px solid ${isOn?'#e5e7eb':'rgba(34,197,94,0.3)'};">${isOn?'⏸️ ซ่อน':'🟢 แสดง'}</button>
+        <button class="btn" onclick="editNews('${n.id}')" style="padding:5px 12px;font-size:12px;background:rgba(59,130,246,0.1);color:#3b82f6;border:1px solid rgba(59,130,246,0.25);">✏️ แก้ไข</button>
+        <button class="btn btn-red" onclick="deleteNews('${n.id}')" style="padding:5px 12px;font-size:12px;">🗑️ ลบ</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 async function addNews() {
-  const title = document.getElementById('news-title').value.trim();
-  const body  = document.getElementById('news-body').value.trim();
-  if (!title) { showToast('⚠️ กรุณากรอกหัวข้อข่าวครับ','error'); return; }
-  const {error} = await sb.from('news').insert({ title, body });
+  const title  = document.getElementById('news-title').value.trim();
+  const status = document.querySelector('input[name="news-status"]:checked')?.value || 'published';
+  if (!title) { showToast('⚠️ กรุณากรอกข้อความครับ','error'); return; }
+  const {error} = await sb.from('news').insert({ title, status });
   if (error) { showToast('❌ เกิดข้อผิดพลาดครับ','error'); return; }
   document.getElementById('news-title').value = '';
-  document.getElementById('news-body').value = '';
-  showToast('✅ โพสต์ข่าวแล้วครับ!');
+  showToast(status === 'published' ? '✅ เพิ่มข้อความและแสดงแล้วครับ!' : '✅ บันทึกไว้แล้วครับ (ซ่อนอยู่)');
   loadNews();
 }
 
 async function deleteNews(id) {
-  if (!confirm('ลบข่าวนี้ใช่ไหมครับ?')) return;
+  if (!confirm('ลบข้อความนี้ใช่ไหมครับ?')) return;
   await sb.from('news').delete().eq('id',id);
-  showToast('✅ ลบข่าวแล้วครับ');
+  showToast('✅ ลบแล้วครับ');
+  loadNews();
+}
+
+async function toggleNews(id, newStatus) {
+  await sb.from('news').update({ status: newStatus }).eq('id', id);
+  showToast(newStatus === 'published' ? '🟢 เปิดแสดงแล้วครับ' : '⏸️ ซ่อนแล้วครับ');
+  loadNews();
+}
+
+function editNews(id) {
+  document.getElementById('news-text-' + id).style.display = 'none';
+  document.getElementById('news-edit-' + id).style.display = 'block';
+  const input = document.getElementById('news-edit-input-' + id);
+  if (input) { input.focus(); input.select(); }
+}
+
+function cancelNewsEdit(id, originalText) {
+  document.getElementById('news-text-' + id).style.display = 'block';
+  document.getElementById('news-edit-' + id).style.display = 'none';
+}
+
+async function saveNewsEdit(id) {
+  const input = document.getElementById('news-edit-input-' + id);
+  const newTitle = input?.value.trim();
+  if (!newTitle) { showToast('⚠️ ข้อความต้องไม่ว่างครับ','error'); return; }
+  const {error} = await sb.from('news').update({ title: newTitle }).eq('id', id);
+  if (error) { showToast('❌ บันทึกไม่สำเร็จครับ','error'); return; }
+  showToast('✅ แก้ไขแล้วครับ');
   loadNews();
 }
 
@@ -1435,6 +1626,28 @@ async function loadSettings() {
   const bank    = data.find(s=>s.key==='bankAccount')?.value || {};
   const contact = data.find(s=>s.key==='contact')?.value || {};
   const feeData = data.find(s=>s.key==='feeRate')?.value;
+  // โหลดชื่อเว็บ
+  const siteInfo = data.find(s=>s.key==='siteInfo')?.value || {};
+  const n1El = document.getElementById('sf-sitename1');
+  const n2El = document.getElementById('sf-sitename2');
+  const ltEl = document.getElementById('sf-logo-top');
+  const lbEl = document.getElementById('sf-logo-bottom');
+  const ptEl = document.getElementById('sf-pagetitle');
+  if (n1El) n1El.value = siteInfo.name1 || 'วัวชน';
+  if (n2El) n2El.value = siteInfo.name2 || 'ไทย';
+  if (ltEl) ltEl.value = siteInfo.logoTop || 'วัวชนไทย';
+  if (lbEl) lbEl.value = siteInfo.logoBottom || 'BULL FIGHT THAI';
+  if (ptEl) ptEl.value = siteInfo.pageTitle || '';
+  // live preview
+  function updatePreview() {
+    const p1 = document.getElementById('sf-preview-name1');
+    const p2 = document.getElementById('sf-preview-name2');
+    if (p1) p1.textContent = n1El?.value || 'วัวชน';
+    if (p2) p2.textContent = n2El?.value || 'ลาว';
+  }
+  if (n1El) n1El.addEventListener('input', updatePreview);
+  if (n2El) n2El.addEventListener('input', updatePreview);
+  updatePreview();
 
   if (bank.bankName) document.getElementById('sf-bank').value    = bank.bankName;
   if (bank.accNo)    document.getElementById('sf-accno').value   = bank.accNo;
@@ -1487,6 +1700,19 @@ function updateRefRatePreview(rate) {
 
 async function saveSettings(type) {
   let key, value;
+  if (type === 'siteInfo') {
+    const name1     = document.getElementById('sf-sitename1')?.value.trim() || 'วัวชน';
+    const name2     = document.getElementById('sf-sitename2')?.value.trim() || 'ไทย';
+    const logoTop   = document.getElementById('sf-logo-top')?.value.trim() || 'วัวชนไทย';
+    const logoBottom= document.getElementById('sf-logo-bottom')?.value.trim() || 'BULL FIGHT THAI';
+    const pageTitle = document.getElementById('sf-pagetitle')?.value.trim() || '';
+    await sb.from('settings').upsert({
+      key: 'siteInfo',
+      value: { name1, name2, logoTop, logoBottom, pageTitle }
+    }, { onConflict: 'key' });
+    showToast('✅ บันทึกชื่อเว็บ & โลโก้แล้วครับ! (Reload หน้าเว็บเพื่อเห็นผล)');
+    return;
+  }
   if (type === 'refRate') {
     const rate = parseFloat(document.getElementById('sf-ref-rate')?.value);
     if (isNaN(rate) || rate < 0 || rate > 30) {

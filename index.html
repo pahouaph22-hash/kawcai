@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>วัวชนไทย — ศึกวัวชนภาคใต้</title>
+<title>วัวชนไทย — ศึกชนโคทั่วประเทศลาว</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;700;900&family=Sarabun:wght@400;500&display=swap" rel="stylesheet">
 <script>
 // ── Global stubs ── รันก่อน CDN และ main script ──
@@ -229,7 +229,7 @@ fns.forEach(function(fn){
   .hero-title {
     font-family: 'Kanit', sans-serif;
     font-weight: 900;
-    font-size: clamp(48px, 8vw, 82px);
+    font-size: clamp(56px, 10vw, 100px);
     line-height: 1.0;
     color: var(--gold);
     position: relative;
@@ -811,7 +811,7 @@ fns.forEach(function(fn){
   .hero-title {
     font-family: 'Kanit', sans-serif;
     font-weight: 900;
-    font-size: clamp(48px, 8vw, 80px);
+    font-size: clamp(56px, 10vw, 100px);
     line-height: 1.0;
     color: var(--gold);
     position: relative;
@@ -2708,8 +2708,8 @@ fns.forEach(function(fn){
   <div class="particles" id="particles"></div>
   <div class="hero-icon">🐂</div>
   <div class="hero-badge">⚡ มหกรรมวัวชนแห่งปี</div>
-  <h1 class="hero-title">ศึก<span class="red">วัวชน</span><br>ภาคใต้</h1>
-  <p class="hero-sub">ประเพณีอันยิ่งใหญ่ · พลังแห่งสายเลือดใต้ · ความมันส์ที่หาที่ไหนไม่ได้</p>
+  <h1 class="hero-title">ศึก<span class="red">วัวชน</span><br>ทั่วประเทศลาว</h1>
+  <p class="hero-sub">ประเพณีอันยิ่งใหญ่ · พลังแห่งสายเลือดของคนลาว · ความมันส์ที่หาที่ไหนไม่ได้</p>
   <div class="hero-cta">
     <button class="btn-main" onclick="showRegister()">สมัครบัญชี</button>
     <button class="btn-outline" onclick="showSchedule()">ดูตารางแข่ง</button>
@@ -3804,7 +3804,7 @@ fns.forEach(function(fn){
     <a href="#">ติดต่อ</a>
     <a href="#">ข่าวสาร</a>
   </div>
-  <div class="footer-copy">© 2568 ศึกวัวชนภาคใต้ · สงวนลิขสิทธิ์</div>
+  <div class="footer-copy">© 2568 ศึกชนโคทั่วประเทศลาว · สงวนลิขสิทธิ์</div>
 </footer>
 
 
@@ -3858,6 +3858,32 @@ fns.forEach(function(fn){
     async function loadSettings() {
       const { data } = await sb.from('settings').select('*');
       if (!data) return;
+
+      // ===== SITE INFO =====
+      const siteInfo = data.find(s => s.key === 'siteInfo')?.value || {};
+      if (siteInfo.name1 || siteInfo.name2) {
+        const n1 = siteInfo.name1 || 'วัวชน';
+        const n2 = siteInfo.name2 || 'ไทย';
+        // Navbar
+        const navSpan = document.querySelector('.nav-logo > span');
+        if (navSpan) navSpan.innerHTML = `${n1}<span style="color:#C8102E;">${n2}</span>`;
+        // Footer logo
+        const fl = document.querySelector('.footer-logo');
+        if (fl) fl.innerHTML = `${n1}<span>${n2}</span>`;
+        // Register logo
+        const rl = document.querySelector('.register-logo');
+        if (rl) rl.innerHTML = `${n1}<span>${n2}</span>`;
+      }
+      if (siteInfo.logoTop) {
+        const tp = document.querySelector('textPath[href="#nt"]');
+        if (tp) tp.textContent = siteInfo.logoTop;
+      }
+      if (siteInfo.logoBottom) {
+        const bp = document.querySelector('textPath[href="#nb"]');
+        if (bp) bp.textContent = siteInfo.logoBottom;
+      }
+      if (siteInfo.pageTitle) document.title = siteInfo.pageTitle;
+
       const contact = data.find(s => s.key === 'contact')?.value || {};
       const bank    = data.find(s => s.key === 'bankAccount')?.value || {};
 
