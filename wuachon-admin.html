@@ -562,6 +562,15 @@ tr:hover td{background:#fafafa;}
           <div class="card-title" style="color:var(--green);">✅ เติมเงินสำเร็จ
             <span style="font-size:12px;color:#aaa;font-weight:400;" id="dep-done-count"></span>
           </div>
+          <div class="date-filter">
+            <label>📅 ตั้งแต่</label>
+            <input type="date" class="date-input" id="dep-done-from" onchange="filterDepDone()">
+            <label>ถึง</label>
+            <input type="date" class="date-input" id="dep-done-to" onchange="filterDepDone()">
+            <button class="btn-date-today" onclick="setDateSection('dep-done')">วันนี้</button>
+            <button class="btn-date-today" style="background:#f0f4ff;border-color:#3b82f6;color:#3b82f6;" onclick="setMonthSection('dep-done')">เดือนนี้</button>
+            <button class="btn-date-clear" onclick="clearDateSection('dep-done')">✕ ล้าง</button>
+          </div>
           <div style="overflow-x:auto;">
             <table>
               <thead><tr><th>Nick</th><th>จำนวน</th><th>ธนาคาร</th><th>TXN</th><th>อนุมัติเมื่อ</th></tr></thead>
@@ -574,6 +583,15 @@ tr:hover td{background:#fafafa;}
         <div class="card">
           <div class="card-title" style="color:#f87171;">❌ ถูกปฏิเสธ
             <span style="font-size:12px;color:#aaa;font-weight:400;" id="dep-reject-count"></span>
+          </div>
+          <div class="date-filter">
+            <label>📅 ตั้งแต่</label>
+            <input type="date" class="date-input" id="dep-reject-from" onchange="filterDepReject()">
+            <label>ถึง</label>
+            <input type="date" class="date-input" id="dep-reject-to" onchange="filterDepReject()">
+            <button class="btn-date-today" onclick="setDateSection('dep-reject')">วันนี้</button>
+            <button class="btn-date-today" style="background:#f0f4ff;border-color:#3b82f6;color:#3b82f6;" onclick="setMonthSection('dep-reject')">เดือนนี้</button>
+            <button class="btn-date-clear" onclick="clearDateSection('dep-reject')">✕ ล้าง</button>
           </div>
           <div style="overflow-x:auto;">
             <table>
@@ -612,6 +630,15 @@ tr:hover td{background:#fafafa;}
         <div class="card">
           <div class="card-title" style="color:var(--green);">✅ ถอนเงินสำเร็จ
             <span style="font-size:12px;color:#aaa;font-weight:400;" id="with-done-count"></span>
+          </div>
+          <div class="date-filter">
+            <label>📅 ตั้งแต่</label>
+            <input type="date" class="date-input" id="with-done-from" onchange="filterWithDone()">
+            <label>ถึง</label>
+            <input type="date" class="date-input" id="with-done-to" onchange="filterWithDone()">
+            <button class="btn-date-today" onclick="setDateSection('with-done')">วันนี้</button>
+            <button class="btn-date-today" style="background:#f0f4ff;border-color:#3b82f6;color:#3b82f6;" onclick="setMonthSection('with-done')">เดือนนี้</button>
+            <button class="btn-date-clear" onclick="clearDateSection('with-done')">✕ ล้าง</button>
           </div>
           <div style="overflow-x:auto;">
             <table>
@@ -742,6 +769,55 @@ tr:hover td{background:#fafafa;}
           </div>
           <div id="act-logs-list">
             <div style="text-align:center;padding:32px;color:#aaa;font-family:'Kanit',sans-serif;">กำลังโหลด...</div>
+          </div>
+        </div>
+
+        <!-- กิจกรรมแนะนำเพื่อน — ประวัติค่าคอมมิชชัน -->
+        <div class="card" style="border-left:4px solid #60a5fa;">
+          <div class="card-title" style="color:#2563eb;">🎁 ประวัติค่าคอมมิชชันแนะนำเพื่อน
+            <button class="btn btn-primary" onclick="loadRefCommissionLogs()">🔄 รีเฟรช</button>
+          </div>
+          <!-- สถิติ -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;">
+            <div class="stat-card"><div class="ico">🧾</div><div class="val" id="ref-stat-total">—</div><div class="lbl">รายการทั้งหมด</div></div>
+            <div class="stat-card"><div class="ico">👥</div><div class="val" id="ref-stat-referrers">—</div><div class="lbl">ผู้รับค่าคอมฯ</div></div>
+            <div class="stat-card"><div class="ico">💰</div><div class="val" id="ref-stat-amount">—</div><div class="lbl">รวมค่าคอมฯ (฿)</div></div>
+            <div class="stat-card"><div class="ico">📊</div><div class="val" id="ref-stat-today">—</div><div class="lbl">วันนี้ (฿)</div></div>
+          </div>
+          <!-- filter -->
+          <div class="date-filter" style="margin-bottom:12px;">
+            <label>📅 ตั้งแต่</label>
+            <input type="date" class="date-input" id="ref-log-from" onchange="loadRefCommissionLogs()">
+            <label>ถึง</label>
+            <input type="date" class="date-input" id="ref-log-to" onchange="loadRefCommissionLogs()">
+            <button class="btn-date-today" onclick="setDateSection2('ref-log')">วันนี้</button>
+            <button class="btn-date-clear" onclick="clearDateSection2('ref-log')">✕ ล้าง</button>
+            <select id="ref-log-level" onchange="loadRefCommissionLogs()" style="padding:5px 10px;border:1px solid #e0e0e0;border-radius:7px;font-size:12px;font-family:'Kanit',sans-serif;">
+              <option value="">ทุกชั้น</option>
+              <option value="1">ชั้นที่ 1</option>
+              <option value="2">ชั้นที่ 2</option>
+              <option value="3">ชั้นที่ 3</option>
+              <option value="4">ชั้นที่ 4</option>
+              <option value="5">ชั้นที่ 5</option>
+            </select>
+          </div>
+          <!-- ตาราง -->
+          <div style="overflow-x:auto;">
+            <table style="table-layout:fixed;width:100%;">
+              <colgroup>
+                <col style="width:40px"><col style="width:55px"><col style="width:110px">
+                <col style="width:110px"><col style="width:110px"><col style="width:110px"><col style="width:130px">
+              </colgroup>
+              <thead><tr>
+                <th>#</th><th>ชั้น</th><th>ผู้รับ</th><th>จากสมาชิก</th>
+                <th style="text-align:right;">เดิมพัน (฿)</th>
+                <th style="text-align:right;">คอมฯ (฿)</th>
+                <th style="text-align:right;">เวลา</th>
+              </tr></thead>
+              <tbody id="ref-logs-tbody">
+                <tr><td colspan="7" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -876,22 +952,67 @@ tr:hover td{background:#fafafa;}
           <button class="save-btn" onclick="saveSettings('fee')">💾 บันทึกค่าบริการ</button>
         </div>
         <div class="card" style="border-left:4px solid #60a5fa;">
-          <div class="card-title">🎁 ค่าคอมมิชชันระบบแนะนำสมาชิก</div>
-          <div class="form-row">
-            <div class="fg">
-              <label>อัตราค่าคอมฯ (%)</label>
+          <div class="card-title">🎁 ค่าคอมมิชชันระบบแนะนำสมาชิก (5 ชั้น)</div>
+          <div style="font-size:12px;color:#888;margin-bottom:14px;">คำนวณจากยอดเดิมพัน ทุกครั้งที่สมาชิกในสายงานลงเดิมพัน — สมาชิก A แนะนำ B แนะนำ C … ไล่ขึ้นไป 5 ชั้น</div>
+
+          <div style="display:grid;gap:8px;margin-bottom:14px;" id="ref-levels-wrap">
+            <div style="display:grid;grid-template-columns:110px 1fr 120px;align-items:center;gap:10px;padding:9px 14px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;">
+              <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;">🥇 ชั้นที่ 1</div>
               <div style="display:flex;align-items:center;gap:8px;">
-                <input id="sf-ref-rate" type="number" min="0" max="30" step="0.5" placeholder="5" style="flex:1;">
-                <span style="font-family:'Kanit',sans-serif;font-weight:700;font-size:16px;color:#60a5fa;">%</span>
+                <label style="font-size:12px;color:#888;white-space:nowrap;">ผู้แนะนำโดยตรง</label>
+                <input type="number" id="sf-ref-rate-1" min="0" max="30" step="0.1" placeholder="5" style="flex:1;padding:7px 10px;border:1px solid #bae6fd;border-radius:7px;font-family:'Kanit',sans-serif;font-size:14px;font-weight:700;text-align:right;">
+                <span style="color:#0ea5e9;font-weight:700;font-family:'Kanit',sans-serif;">%</span>
               </div>
-              <div style="font-size:11px;color:#aaa;margin-top:4px;">คำนวณจากยอดเติมเงินครั้งแรกของสมาชิกใหม่ (ค่าเริ่มต้น 5%)</div>
+              <div style="font-size:11px;color:#aaa;" id="ref-ex-1">ตัวอย่าง: —</div>
             </div>
-            <div class="fg">
-              <label>ตัวอย่าง</label>
-              <div id="ref-rate-preview" style="background:#f9f9f9;border:1px solid #e5e5e0;border-radius:8px;padding:12px;font-size:12px;color:#555;min-height:56px;">กรอก % เพื่อดูตัวอย่าง</div>
+            <div style="display:grid;grid-template-columns:110px 1fr 120px;align-items:center;gap:10px;padding:9px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;">
+              <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;">🥈 ชั้นที่ 2</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <label style="font-size:12px;color:#888;white-space:nowrap;">แนะนำชั้น 2</label>
+                <input type="number" id="sf-ref-rate-2" min="0" max="20" step="0.1" placeholder="3" style="flex:1;padding:7px 10px;border:1px solid #bbf7d0;border-radius:7px;font-family:'Kanit',sans-serif;font-size:14px;font-weight:700;text-align:right;">
+                <span style="color:#16a34a;font-weight:700;font-family:'Kanit',sans-serif;">%</span>
+              </div>
+              <div style="font-size:11px;color:#aaa;" id="ref-ex-2">ตัวอย่าง: —</div>
+            </div>
+            <div style="display:grid;grid-template-columns:110px 1fr 120px;align-items:center;gap:10px;padding:9px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;">
+              <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;">🥉 ชั้นที่ 3</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <label style="font-size:12px;color:#888;white-space:nowrap;">แนะนำชั้น 3</label>
+                <input type="number" id="sf-ref-rate-3" min="0" max="15" step="0.1" placeholder="2" style="flex:1;padding:7px 10px;border:1px solid #fde68a;border-radius:7px;font-family:'Kanit',sans-serif;font-size:14px;font-weight:700;text-align:right;">
+                <span style="color:#d97706;font-weight:700;font-family:'Kanit',sans-serif;">%</span>
+              </div>
+              <div style="font-size:11px;color:#aaa;" id="ref-ex-3">ตัวอย่าง: —</div>
+            </div>
+            <div style="display:grid;grid-template-columns:110px 1fr 120px;align-items:center;gap:10px;padding:9px 14px;background:#fdf4ff;border:1px solid #e9d5ff;border-radius:8px;">
+              <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;">4️⃣ ชั้นที่ 4</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <label style="font-size:12px;color:#888;white-space:nowrap;">แนะนำชั้น 4</label>
+                <input type="number" id="sf-ref-rate-4" min="0" max="10" step="0.1" placeholder="1" style="flex:1;padding:7px 10px;border:1px solid #e9d5ff;border-radius:7px;font-family:'Kanit',sans-serif;font-size:14px;font-weight:700;text-align:right;">
+                <span style="color:#9333ea;font-weight:700;font-family:'Kanit',sans-serif;">%</span>
+              </div>
+              <div style="font-size:11px;color:#aaa;" id="ref-ex-4">ตัวอย่าง: —</div>
+            </div>
+            <div style="display:grid;grid-template-columns:110px 1fr 120px;align-items:center;gap:10px;padding:9px 14px;background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;">
+              <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;">5️⃣ ชั้นที่ 5</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <label style="font-size:12px;color:#888;white-space:nowrap;">แนะนำชั้น 5</label>
+                <input type="number" id="sf-ref-rate-5" min="0" max="10" step="0.1" placeholder="0.5" style="flex:1;padding:7px 10px;border:1px solid #fecdd3;border-radius:7px;font-family:'Kanit',sans-serif;font-size:14px;font-weight:700;text-align:right;">
+                <span style="color:#e11d48;font-weight:700;font-family:'Kanit',sans-serif;">%</span>
+              </div>
+              <div style="font-size:11px;color:#aaa;" id="ref-ex-5">ตัวอย่าง: —</div>
             </div>
           </div>
-          <button class="save-btn" onclick="saveSettings('refRate')">💾 บันทึกค่าคอมฯ</button>
+
+          <div style="background:#f9f9f7;border:1px solid #e5e5e0;border-radius:8px;padding:11px 14px;font-size:12px;color:#666;margin-bottom:14px;">
+            💡 ตัวอย่าง: A แนะนำ B แนะนำ C → C เดิมพัน 1,000 ฿ → B ได้ชั้น 1, A ได้ชั้น 2
+            <br>ใส่ <b>0</b> เพื่อปิดชั้นนั้น · คอมมิชชันคำนวณจากยอดเดิมพัน ทุกครั้งที่สมาชิกลงเดิมพัน
+          </div>
+
+          <div style="display:flex;gap:8px;">
+            <button class="save-btn" onclick="saveRefRateLevels()" style="flex:1;">💾 บันทึกค่าคอมมิชชัน</button>
+            <button class="btn btn-primary" onclick="previewRefExample()" style="padding:10px 16px;font-size:12px;">👁 ดูตัวอย่าง</button>
+          </div>
+          <div id="ref-preview-result" style="display:none;margin-top:12px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 14px;font-size:12px;"></div>
         </div>
         <div class="card">
           <div class="card-title">🏦 บัญชีรับเงิน</div>
@@ -1067,6 +1188,45 @@ function clearDate(prefix) {
   if (filterFns[prefix]) filterFns[prefix]();
 }
 
+// ── helper สำหรับ section filter (dep-done, dep-reject, with-done) ──
+function setDateSection(section) {
+  const today = todayStr();
+  const from = document.getElementById(`${section}-from`);
+  const to   = document.getElementById(`${section}-to`);
+  if (from) from.value = today;
+  if (to)   to.value   = today;
+  _callSectionFilter(section);
+}
+
+function setMonthSection(section) {
+  const now   = new Date();
+  const y     = now.getFullYear();
+  const m     = String(now.getMonth()+1).padStart(2,'0');
+  const last  = new Date(y, now.getMonth()+1, 0).getDate();
+  const from  = document.getElementById(`${section}-from`);
+  const to    = document.getElementById(`${section}-to`);
+  if (from) from.value = `${y}-${m}-01`;
+  if (to)   to.value   = `${y}-${m}-${String(last).padStart(2,'0')}`;
+  _callSectionFilter(section);
+}
+
+function clearDateSection(section) {
+  const from = document.getElementById(`${section}-from`);
+  const to   = document.getElementById(`${section}-to`);
+  if (from) from.value = '';
+  if (to)   to.value   = '';
+  _callSectionFilter(section);
+}
+
+function _callSectionFilter(section) {
+  const map = {
+    'dep-done':    filterDepDone,
+    'dep-reject':  filterDepReject,
+    'with-done':   filterWithDone,
+  };
+  if (map[section]) map[section]();
+}
+
 function updateDateTag(prefix) {
   const tag  = document.getElementById(`${prefix}-date-tag`);
   if (!tag) return;
@@ -1135,6 +1295,7 @@ function loadAll() {
   loadNews();
   loadSettings();
   loadVipSettings();
+  loadRefRateLevels();
   ensureFlagColumns();
   subscribeNotifications();
   scheduleAutoRefresh();
@@ -1579,7 +1740,7 @@ async function ensureFlagColumns() {
 // เปิด modal SQL อัตโนมัติ
 function showFlagSqlModal() {
   if (document.getElementById('flag-sql-modal')) return; // ไม่เปิดซ้ำ
-  const sql = `ALTER TABLE members ADD COLUMN IF NOT EXISTS flags jsonb DEFAULT '[]'::jsonb;\nALTER TABLE members ADD COLUMN IF NOT EXISTS admin_note text DEFAULT '';`;
+  const sql = `ALTER TABLE members ADD COLUMN IF NOT EXISTS flags jsonb DEFAULT '[]'::jsonb;\nALTER TABLE members ADD COLUMN IF NOT EXISTS admin_note text DEFAULT '';\n\n-- ค่าคอมมิชชัน 5 ชั้น\nALTER TABLE referral_logs ADD COLUMN IF NOT EXISTS commission_type text DEFAULT 'first_deposit';\nALTER TABLE referral_logs ADD COLUMN IF NOT EXISTS level integer DEFAULT 1;`;
   const el = document.createElement('div');
   el.id = 'flag-sql-modal';
   el.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid #F5A800;border-radius:12px;padding:18px 22px;z-index:9998;width:560px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.5);';
@@ -2081,6 +2242,8 @@ async function payoutBets(matchId, winner, FEE_RATE = 0.07) {
   let totalPaid    = 0;
   for (const bet of bets) {
     await sb.from('bets').update({ status: bet.side_name === winner ? 'won' : 'lost' }).eq('id', bet.id);
+    // จ่ายค่าคอมมิชชัน 5 ชั้น ให้สายงานของทุกคนที่เดิมพัน
+    await payBetCommission(bet.nick, Number(bet.amount));
   }
   if (winnerPool > 0 && winnerBets.length > 0) {
     const payMap = new Map();
@@ -2128,20 +2291,49 @@ function filterDeposits() {
   updateDateTag('dep');
 
   const pending  = filtered.filter(d => d.status === 'pending');
-  const approved = allDeposits.filter(d => d.status === 'approved');
-  const rejected = allDeposits.filter(d => d.status === 'rejected');
 
-  // อัปเดต count badge
   const pdEl = document.getElementById('dep-pending-count');
-  const dnEl = document.getElementById('dep-done-count');
-  const rjEl = document.getElementById('dep-reject-count');
   if (pdEl) pdEl.textContent = `(${pending.length} รายการ)`;
-  if (dnEl) dnEl.textContent = `(${approved.length} รายการ)`;
-  if (rjEl) rjEl.textContent = `(${rejected.length} รายการ)`;
 
   renderDepositsPending(pending);
-  renderDepositsDone(approved);
-  renderDepositsRejected(rejected);
+  filterDepDone();
+  filterDepReject();
+}
+
+// ── filter เติมเงินสำเร็จ แยกช่วงเวลา ──
+function filterDepDone() {
+  const from = document.getElementById('dep-done-from')?.value || '';
+  const to   = document.getElementById('dep-done-to')?.value   || '';
+  let rows = allDeposits.filter(d => d.status === 'approved');
+  if (from || to) {
+    rows = rows.filter(d => {
+      const dt = (d.approved_at || d.created_at || '').slice(0,10);
+      if (from && dt < from) return false;
+      if (to   && dt > to)   return false;
+      return true;
+    });
+  }
+  const el = document.getElementById('dep-done-count');
+  if (el) el.textContent = `(${rows.length} รายการ)`;
+  renderDepositsDone(rows);
+}
+
+// ── filter ถูกปฏิเสธ แยกช่วงเวลา ──
+function filterDepReject() {
+  const from = document.getElementById('dep-reject-from')?.value || '';
+  const to   = document.getElementById('dep-reject-to')?.value   || '';
+  let rows = allDeposits.filter(d => d.status === 'rejected');
+  if (from || to) {
+    rows = rows.filter(d => {
+      const dt = (d.created_at || '').slice(0,10);
+      if (from && dt < from) return false;
+      if (to   && dt > to)   return false;
+      return true;
+    });
+  }
+  const el = document.getElementById('dep-reject-count');
+  if (el) el.textContent = `(${rows.length} รายการ)`;
+  renderDepositsRejected(rows);
 }
 
 function renderDepositsPending(rows) {
@@ -2288,14 +2480,29 @@ async function loadWithdrawals() {
 function filterWithdrawals() {
   const filtered = allWithdrawals.filter(w => inDateRange(w, 'with', 'created_at'));
   updateDateTag('with');
-  const pending  = filtered.filter(w => w.status === 'pending');
-  const approved = allWithdrawals.filter(w => w.status === 'approved');
+  const pending = filtered.filter(w => w.status === 'pending');
   const pdEl = document.getElementById('with-pending-count');
-  const dnEl = document.getElementById('with-done-count');
   if (pdEl) pdEl.textContent = `(${pending.length} รายการ)`;
-  if (dnEl) dnEl.textContent = `(${approved.length} รายการ)`;
   renderWithdrawalsPending(pending);
-  renderWithdrawalsDone(approved);
+  filterWithDone();
+}
+
+// ── filter ถอนเงินสำเร็จ แยกช่วงเวลา ──
+function filterWithDone() {
+  const from = document.getElementById('with-done-from')?.value || '';
+  const to   = document.getElementById('with-done-to')?.value   || '';
+  let rows = allWithdrawals.filter(w => w.status === 'approved');
+  if (from || to) {
+    rows = rows.filter(w => {
+      const dt = (w.approved_at || w.created_at || '').slice(0,10);
+      if (from && dt < from) return false;
+      if (to   && dt > to)   return false;
+      return true;
+    });
+  }
+  const el = document.getElementById('with-done-count');
+  if (el) el.textContent = `(${rows.length} รายการ)`;
+  renderWithdrawalsDone(rows);
 }
 
 function renderWithdrawalsPending(rows) {
@@ -2895,32 +3102,134 @@ async function loadReferralPanel() {
 }
 
 // จ่ายค่าคอมฯ แนะนำสมาชิก (เรียกจาก approveDeposit)
+// ===== MULTI-LEVEL REFERRAL COMMISSION (5 ชั้น) =====
+
+async function loadRefRateLevels() {
+  const { data } = await sb.from('settings').select('value').eq('key','refRateLevels').maybeSingle();
+  const levels = data?.value?.levels || [5, 3, 2, 1, 0.5];
+  for (let i = 1; i <= 5; i++) {
+    const inp = document.getElementById(`sf-ref-rate-${i}`);
+    if (inp) inp.value = levels[i-1] ?? 0;
+  }
+  // compat: โหลด refRate เดิมถ้ายังมี
+  if (!data) {
+    const { data: old } = await sb.from('settings').select('value').eq('key','refRate').maybeSingle();
+    if (old?.value?.rate) {
+      const inp = document.getElementById('sf-ref-rate-1');
+      if (inp) inp.value = old.value.rate;
+    }
+  }
+}
+
+async function saveRefRateLevels() {
+  const levels = [];
+  for (let i = 1; i <= 5; i++) {
+    const v = parseFloat(document.getElementById(`sf-ref-rate-${i}`)?.value || '0') || 0;
+    levels.push(v);
+  }
+  await safeUpsertSettings('refRateLevels', { levels });
+  // compat: อัปเดต refRate เดิมด้วย (ชั้น 1)
+  await safeUpsertSettings('refRate', { rate: levels[0] });
+  showToast('✅ บันทึกค่าคอมมิชชัน 5 ชั้นแล้วครับ!');
+}
+
+function previewRefExample() {
+  const levels = [];
+  for (let i = 1; i <= 5; i++) {
+    levels.push(parseFloat(document.getElementById(`sf-ref-rate-${i}`)?.value || '0') || 0);
+  }
+  const bet = 1000;
+  const lines = levels.map((r, i) => {
+    const comm = Math.floor(bet * r / 100);
+    return `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #e5f5e8;">
+      <span>ชั้นที่ ${i+1} (${r}%)</span>
+      <span style="font-family:'Kanit',sans-serif;font-weight:700;color:#15803d;">+${comm.toLocaleString()} ฿</span>
+    </div>`;
+  });
+  const total = levels.reduce((s,r) => s + Math.floor(bet*r/100), 0);
+  const el = document.getElementById('ref-preview-result');
+  if (el) {
+    el.style.display = 'block';
+    el.innerHTML = `<div style="font-family:'Kanit',sans-serif;font-weight:700;margin-bottom:8px;">🎯 ตัวอย่าง: สมาชิกเดิมพัน ${bet.toLocaleString()} ฿</div>
+    ${lines.join('')}
+    <div style="display:flex;justify-content:space-between;margin-top:6px;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;">
+      <span>รวมทุกชั้น</span><span style="color:#15803d;">+${total.toLocaleString()} ฿</span>
+    </div>`;
+  }
+}
+
+async function getRefRateLevels() {
+  const { data } = await sb.from('settings').select('value').eq('key','refRateLevels').maybeSingle();
+  return data?.value?.levels || [5, 3, 2, 1, 0.5];
+}
+
+// จ่ายค่าคอม 5 ชั้น จากยอดเดิมพัน
+async function payBetCommission(betterNick, betAmount) {
+  if (!betAmount || betAmount <= 0) return;
+  const levels = await getRefRateLevels();
+  // ไล่ขึ้นไป 5 ชั้น
+  let currentNick = betterNick;
+  const paid = [];
+  for (let depth = 0; depth < 5; depth++) {
+    const rate = levels[depth] || 0;
+    // ดึง referred_by ของสมาชิกปัจจุบัน
+    const { data: mem } = await sb.from('members').select('referred_by,balance').eq('nick', currentNick).maybeSingle();
+    if (!mem?.referred_by) break; // ไม่มีผู้แนะนำ → หยุด
+    const referrerNick = mem.referred_by;
+    if (rate > 0) {
+      const commission = Math.floor(Number(betAmount) * rate / 100);
+      if (commission > 0) {
+        const { data: referrer } = await sb.from('members').select('balance').eq('nick', referrerNick).maybeSingle();
+        if (referrer) {
+          await sb.from('members').update({ balance: (referrer.balance||0) + commission }).eq('nick', referrerNick);
+          try {
+            await sb.from('referral_logs').insert({
+              referrer_nick:   referrerNick,
+              new_member_nick: betterNick,
+              deposit_amount:  betAmount,
+              commission,
+              ref_rate:        rate,
+              commission_type: 'bet',
+              level:           depth + 1,
+              created_at:      new Date().toISOString(),
+            });
+          } catch(_) {}
+          paid.push({ nick: referrerNick, level: depth+1, commission });
+        }
+      }
+    }
+    currentNick = referrerNick; // ขึ้นไปชั้นถัดไป
+  }
+  if (paid.length) {
+    const summary = paid.map(p => `${p.nick}(ชั้น${p.level})+${p.commission}฿`).join(', ');
+    showToast(`🎁 คอมฯ เดิมพัน ${Number(betAmount).toLocaleString()} ฿ → ${summary}`);
+  }
+}
+
+// จ่ายค่าคอมฯ เติมเงิน (compat เดิม — ชั้นเดียว เฉพาะครั้งแรก)
 async function payReferralCommission(nick, depositAmount, isFirstDeposit) {
-  if (!isFirstDeposit) return; // จ่ายเฉพาะครั้งแรก
-  // ดึง referred_by ของสมาชิก
+  if (!isFirstDeposit) return;
   const { data: mem } = await sb.from('members').select('referred_by').eq('nick', nick).maybeSingle();
-  if (!mem?.referred_by) return; // ไม่มีผู้แนะนำ
-  const referrerNick = mem.referred_by;
-  // ดึง ref rate
-  const { data: settingsData } = await sb.from('settings').select('value').eq('key','refRate').maybeSingle();
-  const refRate = settingsData?.value?.rate ?? 5;
-  const commission = Math.floor(Number(depositAmount) * refRate / 100);
+  if (!mem?.referred_by) return;
+  const levels = await getRefRateLevels();
+  const rate = levels[0] || 5;
+  const commission = Math.floor(Number(depositAmount) * rate / 100);
   if (commission <= 0) return;
-  // เพิ่มยอดเงินให้ผู้แนะนำ
-  const { data: referrer } = await sb.from('members').select('balance').eq('nick', referrerNick).maybeSingle();
+  const { data: referrer } = await sb.from('members').select('balance').eq('nick', mem.referred_by).maybeSingle();
   if (!referrer) return;
-  await sb.from('members').update({ balance: (referrer.balance||0) + commission }).eq('nick', referrerNick);
-  // บันทึก log
+  await sb.from('members').update({ balance: (referrer.balance||0) + commission }).eq('nick', mem.referred_by);
   try {
     await sb.from('referral_logs').insert({
-      referrer_nick:   referrerNick,
+      referrer_nick:   mem.referred_by,
       new_member_nick: nick,
       deposit_amount:  depositAmount,
       commission,
-      ref_rate:        refRate,
+      ref_rate:        rate,
+      commission_type: 'first_deposit',
+      level:           1,
     });
   } catch(_) {}
-  showToast(`🎁 จ่ายค่าคอมฯ ${commission.toLocaleString()} ฿ ให้ ${referrerNick} (แนะนำ ${nick}) แล้วครับ`);
+  showToast(`🎁 คอมฯ เติมเงินครั้งแรก ${commission.toLocaleString()} ฿ → ${mem.referred_by}`);
 }
 
 // ===== REALTIME NOTIFICATIONS =====
@@ -3711,6 +4020,85 @@ function loadActivityPanel() {
   renderActVipRows();
   renderActCustomTiers();
   loadActivityLogs();
+  loadRefCommissionLogs();
+}
+
+// ── โหลดประวัติค่าคอมมิชชัน ──
+async function loadRefCommissionLogs() {
+  const tbody = document.getElementById('ref-logs-tbody');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:#aaa;">กำลังโหลด...</td></tr>';
+
+  const from  = document.getElementById('ref-log-from')?.value  || '';
+  const to    = document.getElementById('ref-log-to')?.value    || '';
+  const level = document.getElementById('ref-log-level')?.value || '';
+
+  let query = sb.from('referral_logs')
+    .select('*')
+    .eq('commission_type','bet')
+    .order('created_at',{ascending:false})
+    .limit(300);
+
+  if (from) query = query.gte('created_at', from + 'T00:00:00');
+  if (to)   query = query.lte('created_at', to   + 'T23:59:59');
+  if (level) query = query.eq('level', parseInt(level));
+
+  const { data: logs, error } = await query;
+
+  if (error) {
+    if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:20px;color:#f87171;">Error: ${error.message}</td></tr>`;
+    return;
+  }
+
+  const rows = logs || [];
+  const today = todayStr();
+
+  // สถิติ
+  const totalAmt   = rows.reduce((s,r) => s+Number(r.commission||0), 0);
+  const referrers  = new Set(rows.map(r=>r.referrer_nick)).size;
+  const todayAmt   = rows.filter(r=>(r.created_at||'').slice(0,10)===today).reduce((s,r)=>s+Number(r.commission||0),0);
+  const setEl = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  setEl('ref-stat-total',    rows.length.toLocaleString());
+  setEl('ref-stat-referrers',referrers.toLocaleString());
+  setEl('ref-stat-amount',   totalAmt.toLocaleString());
+  setEl('ref-stat-today',    todayAmt.toLocaleString());
+
+  if (!rows.length) {
+    if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:#aaa;"><div style="font-size:28px;margin-bottom:6px;">🎁</div>ยังไม่มีรายการค่าคอมฯ</td></tr>';
+    return;
+  }
+
+  const levelColors = ['','#0ea5e9','#16a34a','#d97706','#9333ea','#e11d48'];
+  const levelLabels = ['','🥇 ชั้น 1','🥈 ชั้น 2','🥉 ชั้น 3','4️⃣ ชั้น 4','5️⃣ ชั้น 5'];
+
+  if (tbody) tbody.innerHTML = rows.map((r,i) => {
+    const lv = r.level || 1;
+    return `<tr style="${i%2===1?'background:#fafaf8;':''}">
+      <td style="color:#aaa;font-size:12px;">${i+1}</td>
+      <td><span style="font-family:'Kanit',sans-serif;font-weight:700;font-size:11px;color:${levelColors[lv]||'#888'};">${levelLabels[lv]||`ชั้น${lv}`}</span></td>
+      <td><strong style="cursor:pointer;color:var(--green);text-decoration:underline;font-size:13px;" onclick="openMember('${r.referrer_nick}')">${r.referrer_nick||'—'}</strong></td>
+      <td style="font-size:12px;cursor:pointer;color:#555;text-decoration:underline;" onclick="openMember('${r.new_member_nick}')">${r.new_member_nick||'—'}</td>
+      <td style="text-align:right;font-family:'Kanit',sans-serif;font-size:12px;">${Number(r.deposit_amount||0).toLocaleString()}</td>
+      <td style="text-align:right;font-family:'Kanit',sans-serif;font-weight:700;color:#15803d;">+${Number(r.commission||0).toLocaleString()}</td>
+      <td style="text-align:right;font-size:11px;color:#aaa;">${fmtDate(r.created_at)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── helper date สำหรับ filter ใหม่ ──
+function setDateSection2(id) {
+  const today = todayStr();
+  const from = document.getElementById(`${id}-from`);
+  const to   = document.getElementById(`${id}-to`);
+  if (from) from.value = today;
+  if (to)   to.value   = today;
+  loadRefCommissionLogs();
+}
+function clearDateSection2(id) {
+  const from = document.getElementById(`${id}-from`);
+  const to   = document.getElementById(`${id}-to`);
+  if (from) from.value = '';
+  if (to)   to.value   = '';
+  loadRefCommissionLogs();
 }
 
 // สร้าง input rows ของแต่ละ VIP
