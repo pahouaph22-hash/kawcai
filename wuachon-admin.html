@@ -479,46 +479,81 @@ tr:hover td{background:#fafafa;}
         <!-- ชื่อเว็บ & โลโก้ -->
         <div class="card" style="border-left:4px solid #C8102E;">
           <div class="card-title">🐂 ชื่อเว็บไซต์ & โลโก้</div>
-          <div class="form-row">
-            <div class="fg">
-              <label>ชื่อเว็บไซต์ (ส่วนแรก)</label>
-              <input id="sf-sitename1" placeholder="เช่น วัวชน" style="font-family:'Kanit',sans-serif;font-weight:700;">
-              <div style="font-size:11px;color:#aaa;margin-top:4px;">แสดงใน Navbar ซ้ายมือ (ตัวสีทอง)</div>
-            </div>
-            <div class="fg">
-              <label>ชื่อเว็บไซต์ (ส่วนที่สอง)</label>
-              <input id="sf-sitename2" placeholder="เช่น ลาว" style="font-family:'Kanit',sans-serif;font-weight:700;">
-              <div style="font-size:11px;color:#aaa;margin-top:4px;">แสดงต่อจากส่วนแรก (ตัวสีแดง)</div>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="fg">
-              <label>คำบรรยายใต้โลโก้วนกลม</label>
-              <input id="sf-logo-top" placeholder="เช่น วัวชนไทย" style="font-family:'Kanit',sans-serif;">
-              <div style="font-size:11px;color:#aaa;margin-top:4px;">ข้อความด้านบนโลโก้วงกลม (สีทอง)</div>
-            </div>
-            <div class="fg">
-              <label>คำบรรยายล่างโลโก้วนกลม</label>
-              <input id="sf-logo-bottom" placeholder="เช่น BULL FIGHT LAO" style="font-family:'Kanit',sans-serif;">
-              <div style="font-size:11px;color:#aaa;margin-top:4px;">ข้อความด้านล่างโลโก้วงกลม (สีขาว)</div>
+
+          <!-- Diagram อธิบาย -->
+          <div style="background:#1a0a00;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-family:'Kanit',sans-serif;">
+            <div style="font-size:11px;color:rgba(255,248,236,0.4);margin-bottom:8px;">📌 ตำแหน่งที่แสดงใน Navbar</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="position:relative;">
+                  <div id="sf-prev-logo-small" style="width:38px;height:38px;border-radius:50%;border:2px solid #F5A800;background:#2a1200;display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden;">🐂</div>
+                  <div style="position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:9px;color:#F5A800;white-space:nowrap;">① โลโก้ซ้าย</div>
+                </div>
+                <div style="margin-left:8px;">
+                  <span id="sf-preview-name1" style="font-weight:900;font-size:18px;color:#F5A800;">วัวชน</span><span id="sf-preview-name2" style="font-weight:900;font-size:18px;color:#C8102E;">ลาว</span>
+                  <div style="font-size:9px;color:rgba(255,248,236,0.4);margin-top:2px;">② ชื่อเว็บ</div>
+                </div>
+              </div>
+              <div style="position:relative;text-align:center;">
+                <div style="width:44px;height:44px;border-radius:50%;border:3px solid #F5A800;background:#2a1200;display:flex;align-items:center;justify-content:center;font-size:10px;color:#F5A800;font-weight:700;text-align:center;line-height:1.2;overflow:hidden;" id="sf-prev-logo-big">วัวชน</div>
+                <div style="position:absolute;bottom:-16px;right:0;font-size:9px;color:#F5A800;white-space:nowrap;">③ โลโก้ขวา</div>
+              </div>
             </div>
           </div>
+
+          <!-- ① โลโก้ซ้าย (SVG วัวเล็ก) + ② ชื่อเว็บ -->
+          <div style="background:#f8f9fa;border:1px solid #e5e5e0;border-radius:10px;padding:14px;margin-bottom:12px;">
+            <div style="font-weight:700;font-size:13px;margin-bottom:10px;">① + ② ชื่อและโลโก้ฝั่งซ้าย Navbar</div>
+            <div class="form-row" style="margin:0;">
+              <div class="fg">
+                <label>ชื่อส่วนแรก <span style="color:#F5A800;font-weight:700;">■</span> สีทอง</label>
+                <input id="sf-sitename1" placeholder="เช่น วัวชน" style="font-family:'Kanit',sans-serif;font-weight:700;" oninput="updateSitePreview()">
+              </div>
+              <div class="fg">
+                <label>ชื่อส่วนที่สอง <span style="color:#C8102E;font-weight:700;">■</span> สีแดง</label>
+                <input id="sf-sitename2" placeholder="เช่น ลาว" style="font-family:'Kanit',sans-serif;font-weight:700;" oninput="updateSitePreview()">
+              </div>
+            </div>
+          </div>
+
+          <!-- ③ โลโก้วงกลมขวา -->
+          <div style="background:#f8f9fa;border:1px solid #e5e5e0;border-radius:10px;padding:14px;margin-bottom:12px;">
+            <div style="font-weight:700;font-size:13px;margin-bottom:10px;">③ ข้อความในโลโก้วงกลมขวา</div>
+            <div class="form-row" style="margin:0;">
+              <div class="fg">
+                <label>ข้อความบน <span style="color:#F5A800;">●</span> สีทอง</label>
+                <input id="sf-logo-top" placeholder="เช่น วัวชนลาว" style="font-family:'Kanit',sans-serif;" oninput="updateSitePreview()">
+              </div>
+              <div class="fg">
+                <label>ข้อความล่าง <span style="color:#fff;background:#555;padding:0 4px;border-radius:3px;">●</span> สีขาว</label>
+                <input id="sf-logo-bottom" placeholder="เช่น BULL FIGHT LAO" style="font-family:'Kanit',sans-serif;" oninput="updateSitePreview()">
+              </div>
+            </div>
+          </div>
+
+          <!-- รูปวัว Hero -->
+          <div style="background:#f8f9fa;border:1px solid #e5e5e0;border-radius:10px;padding:14px;margin-bottom:12px;">
+            <div style="font-weight:700;font-size:13px;margin-bottom:10px;">🐂 รูปวัวหน้าหลัก (Hero — กลางหน้าเว็บ)</div>
+            <div style="display:flex;align-items:center;gap:16px;">
+              <div id="hero-bull-preview" style="width:80px;height:80px;border-radius:12px;border:2px dashed #F5A800;background:#1a0a00;display:flex;align-items:center;justify-content:center;font-size:42px;overflow:hidden;flex-shrink:0;">🐂</div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                <input type="file" id="sf-hero-bull-file" accept="image/*" style="display:none;" onchange="previewHeroBull(this)">
+                <button type="button" onclick="document.getElementById('sf-hero-bull-file').click()" style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;padding:10px;border-radius:8px;border:2px solid #C8102E;background:#C8102E;color:#fff;cursor:pointer;">📁 เลือกรูปวัว</button>
+                <button type="button" onclick="clearHeroBull()" style="font-family:'Kanit',sans-serif;font-size:12px;padding:7px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#888;cursor:pointer;">✕ รีเซ็ตเป็น Emoji 🐂</button>
+                <div style="font-size:11px;color:#999;">PNG พื้นหลังโปร่งใส · ไม่เกิน 2MB</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Title แท็บ -->
           <div class="form-row">
             <div class="fg">
-              <label>ชื่อในแถบเบราว์เซอร์ (Title)</label>
+              <label>🌐 ชื่อแท็บเบราว์เซอร์</label>
               <input id="sf-pagetitle" placeholder="เช่น วัวชนลาว — ศึกชนโคทั่วประเทศ">
-              <div style="font-size:11px;color:#aaa;margin-top:4px;">แสดงที่แท็บบราวเซอร์</div>
             </div>
           </div>
-          <!-- Preview -->
-          <div style="background:#f9f9f9;border:1px solid #e5e5e0;border-radius:10px;padding:14px;margin:12px 0;">
-            <div style="font-size:11px;color:#888;margin-bottom:8px;font-weight:700;">👁️ Preview Navbar:</div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div style="width:32px;height:32px;background:#1A0A00;border-radius:50%;border:2px solid #F5A800;display:flex;align-items:center;justify-content:center;font-size:16px;">🐂</div>
-              <span style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:#F5A800;" id="sf-preview-name1">วัวชน</span><span style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:#C8102E;" id="sf-preview-name2">ลาว</span>
-            </div>
-          </div>
-          <button class="save-btn" onclick="saveSettings('siteInfo')" style="background:linear-gradient(135deg,#C8102E,#a50c24);">💾 บันทึกชื่อเว็บ & โลโก้</button>
+
+          <button id="btn-save-siteInfo" class="save-btn" onclick="saveSettings('siteInfo')" style="background:linear-gradient(135deg,#C8102E,#a50c24);font-size:15px;padding:14px;margin-top:8px;">💾 ยืนยันการเปลี่ยนแปลง</button>
         </div>
 
         <!-- ค่าบริการ P2P -->
@@ -563,6 +598,7 @@ tr:hover td{background:#fafafa;}
         <div class="card">
           <div class="card-title">🏦 บัญชีรับเงิน</div>
           <div class="form-row">
+            <div class="fg"><label>ธนาคาร</label><input id="sf-bank" placeholder="เช่น กสิกรไทย, ธนาคารลาว..."></div>
             <div class="fg"><label>เลขบัญชี</label><input id="sf-accno" placeholder="XXX-X-XXXXX-X"></div>
           </div>
           <div class="form-row">
@@ -648,7 +684,7 @@ async function changeAdminPass() {
   if (!p1 || p1.length < 6) { showToast('⚠️ รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษรครับ','error'); return; }
   if (p1 !== p2) { showToast('⚠️ รหัสผ่านไม่ตรงกันครับ','error'); return; }
   // บันทึกใน Supabase
-  await sb.from('settings').upsert({ key:'admin_password', value: p1 }, { onConflict: 'key' });
+  await safeUpsertSettings('admin_password', p1);
   ADMIN_PASS = p1;
   document.getElementById('new-pass').value = '';
   document.getElementById('new-pass2').value = '';
@@ -1584,6 +1620,64 @@ async function addNews() {
   loadNews();
 }
 
+function compressImage(file, maxW, maxH, quality) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+        if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function previewHeroBull(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('⚠️ รูปต้องไม่เกิน 5MB ครับ', 'error');
+    input.value = '';
+    return;
+  }
+  // บีบอัดรูปให้เหลือ max 300x300px quality 0.7 (~30-50KB)
+  const compressed = await compressImage(file, 300, 300, 0.75);
+  window._heroBullBase64 = compressed;
+  const prev = document.getElementById('hero-bull-preview');
+  if (prev) prev.innerHTML = `<img src="${compressed}" style="width:100%;height:100%;object-fit:contain;">`;
+  const sizeKB = Math.round(compressed.length * 0.75 / 1024);
+  showToast(`✅ โหลดรูปแล้วครับ (~${sizeKB} KB) กด "ยืนยัน" เพื่อบันทึก`);
+}
+
+function clearHeroBull() {
+  window._heroBullBase64 = null;
+  const input = document.getElementById('sf-hero-bull-file');
+  if (input) input.value = '';
+  const prev = document.getElementById('hero-bull-preview');
+  if (prev) prev.innerHTML = '🐂';
+  showToast('✅ รีเซ็ตเป็น Emoji แล้วครับ (กด "💾 บันทึก" เพื่อยืนยัน)');
+}
+
+// helper: UPDATE settings ก่อน ถ้าไม่มี row ค่อย INSERT
+async function safeUpsertSettings(key, value) {
+  const { error: eUpd } = await sb.from('settings').update({ value }).eq('key', key);
+  if (eUpd) {
+    // row ไม่มี — ลอง insert
+    const { error: eIns } = await sb.from('settings').insert({ key, value });
+    return eIns;
+  }
+  return null;
+}
+
 async function deleteNews(id) {
   if (!confirm('ลบข้อความนี้ใช่ไหมครับ?')) return;
   await sb.from('news').delete().eq('id',id);
@@ -1639,23 +1733,35 @@ async function loadSettings() {
   if (lbEl) lbEl.value = siteInfo.logoBottom || 'BULL FIGHT THAI';
   if (ptEl) ptEl.value = siteInfo.pageTitle || '';
   // live preview
-  function updatePreview() {
+  window.updateSitePreview = function() {
+    const n1 = n1El?.value || 'วัวชน';
+    const n2 = n2El?.value || 'ลาว';
+    const lt = document.getElementById('sf-logo-top')?.value || '';
     const p1 = document.getElementById('sf-preview-name1');
     const p2 = document.getElementById('sf-preview-name2');
-    if (p1) p1.textContent = n1El?.value || 'วัวชน';
-    if (p2) p2.textContent = n2El?.value || 'ลาว';
+    if (p1) p1.textContent = n1;
+    if (p2) p2.textContent = n2;
+    // update โลโก้วงกลม preview
+    const bigPrev = document.getElementById('sf-prev-logo-big');
+    if (bigPrev) bigPrev.textContent = lt || n1;
+  };
+  window.updateSitePreview();
+  // โหลดรูปวัว hero จาก siteInfo.heroBull
+  const heroBullVal = siteInfo.heroBull || null;
+  if (heroBullVal) {
+    window._heroBullBase64 = heroBullVal;
+    const prev = document.getElementById('hero-bull-preview');
+    if (prev) prev.innerHTML = `<img src="${heroBullVal}" style="width:100%;height:100%;object-fit:contain;">`;
   }
-  if (n1El) n1El.addEventListener('input', updatePreview);
-  if (n2El) n2El.addEventListener('input', updatePreview);
-  updatePreview();
 
-  if (bank.bankName) document.getElementById('sf-bank').value    = bank.bankName;
-  if (bank.accNo)    document.getElementById('sf-accno').value   = bank.accNo;
-  if (bank.accName)  document.getElementById('sf-accname').value = bank.accName;
-  if (contact.phone1)    document.getElementById('sf-phone').value = contact.phone1;
-  if (contact.lineId)    document.getElementById('sf-line').value  = contact.lineId;
-  if (contact.fbName)    document.getElementById('sf-fb').value    = contact.fbName;
-  if (contact.hoursTime) document.getElementById('sf-hours').value = contact.hoursTime;
+  const setVal = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
+  setVal('sf-bank',    bank.bankName);
+  setVal('sf-accno',   bank.accNo);
+  setVal('sf-accname', bank.accName);
+  setVal('sf-phone',   contact.phone1);
+  setVal('sf-line',    contact.lineId);
+  setVal('sf-fb',      contact.fbName);
+  setVal('sf-hours',   contact.hoursTime);
 
   // โหลดค่า fee rate
   const feeEl = document.getElementById('sf-fee-rate');
@@ -1706,11 +1812,41 @@ async function saveSettings(type) {
     const logoTop   = document.getElementById('sf-logo-top')?.value.trim() || 'วัวชนไทย';
     const logoBottom= document.getElementById('sf-logo-bottom')?.value.trim() || 'BULL FIGHT THAI';
     const pageTitle = document.getElementById('sf-pagetitle')?.value.trim() || '';
-    await sb.from('settings').upsert({
-      key: 'siteInfo',
-      value: { name1, name2, logoTop, logoBottom, pageTitle }
-    }, { onConflict: 'key' });
-    showToast('✅ บันทึกชื่อเว็บ & โลโก้แล้วครับ! (Reload หน้าเว็บเพื่อเห็นผล)');
+    // อ่านรูปวัว hero
+    const heroBullFile = document.getElementById('sf-hero-bull-file')?.files[0] || null;
+    let heroBull = window._heroBullBase64 || null; // ใช้ค่าที่เก็บไว้
+    if (heroBullFile) {
+      heroBull = await new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = e => res(e.target.result);
+        r.onerror = () => rej();
+        r.readAsDataURL(heroBullFile);
+      });
+    }
+    const siteBtn = document.getElementById('btn-save-siteInfo');
+    if (siteBtn) { siteBtn.disabled = true; siteBtn.textContent = '⏳ กำลังบันทึก...'; }
+    // บันทึก siteInfo — UPDATE ก่อน ถ้าไม่มี row ค่อย INSERT
+    const newVal = { name1, name2, logoTop, logoBottom, pageTitle, heroBull };
+    const { error: eUpd, count } = await sb.from('settings')
+      .update({ value: newVal })
+      .eq('key', 'siteInfo')
+      .select('key');
+
+    let finalError = null;
+    if (eUpd) {
+      // ถ้า update ล้มเหลว ลอง insert
+      const { error: eIns } = await sb.from('settings')
+        .insert({ key: 'siteInfo', value: newVal });
+      finalError = eIns;
+    }
+
+    if (siteBtn) { siteBtn.disabled = false; siteBtn.textContent = '💾 ยืนยันการเปลี่ยนแปลง'; }
+    if (finalError) {
+      showToast('❌ บันทึกไม่สำเร็จ: ' + finalError.message + ' — กรุณา run SQL ใน Supabase ก่อนครับ', 'error');
+    } else {
+      window._heroBullBase64 = heroBull;
+      showToast('✅ บันทึกแล้วครับ! Reload เพื่อเห็นรูปใหม่');
+    }
     return;
   }
   if (type === 'refRate') {
@@ -1718,7 +1854,7 @@ async function saveSettings(type) {
     if (isNaN(rate) || rate < 0 || rate > 30) {
       showToast('⚠️ กรุณากรอก % ระหว่าง 0–30 ครับ', 'error'); return;
     }
-    await sb.from('settings').upsert({ key:'refRate', value:{ rate } }, { onConflict:'key' });
+    await safeUpsertSettings('refRate', { rate });
     showToast(`✅ บันทึกค่าคอมฯ แนะนำสมาชิก ${rate}% แล้วครับ!`);
     updateRefRatePreview(rate);
     return;
@@ -1733,7 +1869,7 @@ async function saveSettings(type) {
     }
     key = 'feeRate';
     value = { rate };
-    await sb.from('settings').upsert({ key, value }, { onConflict:'key' });
+    const _ue = await safeUpsertSettings(key, value);
     showToast(`✅ บันทึกค่าบริการ ${rate}% แล้วครับ!`);
     updateFeePreview(rate);
     return;
@@ -1741,7 +1877,7 @@ async function saveSettings(type) {
     key = 'contact';
     value = { phone1: document.getElementById('sf-phone').value, lineId: document.getElementById('sf-line').value, fbName: document.getElementById('sf-fb').value, hoursTime: document.getElementById('sf-hours').value };
   }
-  await sb.from('settings').upsert({ key, value }, { onConflict:'key' });
+  const _ue = await safeUpsertSettings(key, value);
   showToast('✅ บันทึกการตั้งค่าแล้วครับ!');
 }
 
