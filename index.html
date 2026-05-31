@@ -2370,14 +2370,20 @@ fns.forEach(function(fn){
   .account-tabs::-webkit-scrollbar{display:none;}
   .account-tabs{-ms-overflow-style:none;scrollbar-width:none;}
   /* Notification item */
-  .notif-item{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:8px;margin-bottom:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);cursor:pointer;transition:background .15s;}
-  .notif-item:hover{background:rgba(255,255,255,0.08);}
-  .notif-item.unread{border-color:rgba(245,200,66,0.3);background:rgba(245,200,66,0.06);}
-  .notif-item-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
-  .notif-item-body{flex:1;}
-  .notif-item-title{font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;color:var(--cream);}
-  .notif-item-sub{font-size:11px;color:rgba(240,255,232,0.45);margin-top:2px;}
-  .notif-item-time{font-size:10px;color:rgba(240,255,232,0.25);margin-top:3px;}
+  .notif-item{display:flex;gap:10px;align-items:flex-start;padding:14px 16px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);cursor:pointer;transition:all .2s;}
+  .notif-item:hover{background:rgba(255,255,255,0.08);transform:translateY(-1px);}
+  .notif-item.unread{border-color:rgba(245,200,66,0.35);background:rgba(245,200,66,0.06);}
+  .notif-item.type-success{border-left:3px solid #4ade80;}
+  .notif-item.type-error{border-left:3px solid #f87171;}
+  .notif-item.type-info{border-left:3px solid #60a5fa;}
+  .notif-item-icon{font-size:24px;flex-shrink:0;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;}
+  .notif-item-body{flex:1;min-width:0;}
+  .notif-item-title{font-family:'Kanit',sans-serif;font-weight:700;font-size:14px;color:var(--cream);}
+  .notif-item-sub{font-size:12px;color:rgba(240,255,232,0.5);margin-top:3px;line-height:1.5;}
+  .notif-item-time{font-size:10px;color:rgba(240,255,232,0.25);margin-top:5px;}
+  .notif-item-unread-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:6px;}
+  .notif-chip{font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(240,255,232,.5);cursor:pointer;transition:all .15s;}
+  .notif-chip:hover,.notif-chip.active{background:rgba(245,200,66,.15);border-color:rgba(245,200,66,.4);color:var(--gold);}
   .acc-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
   .acc-info-item{background:rgba(255,255,255,0.04);border:1px solid rgba(39,148,63,0.15);border-radius:10px;padding:14px 16px;}
   .acc-info-label{font-size:11px;color:rgba(240,255,232,0.4);font-family:'Kanit',sans-serif;letter-spacing:1px;margin-bottom:5px;}
@@ -3159,10 +3165,12 @@ fns.forEach(function(fn){
 
     <!-- Profile Banner (Mobile-first redesign) -->
     <div class="account-banner" style="position:relative;overflow:hidden;">
-      <!-- Notification Bell -->
-      <button id="notif-bell" onclick="toggleNotifCenter()" style="position:absolute;top:14px;right:14px;background:none;border:none;cursor:pointer;font-size:20px;color:rgba(240,255,232,0.6);z-index:2;">
-        🔔<span id="notif-count" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-family:'Kanit',sans-serif;font-size:9px;font-weight:900;padding:1px 5px;border-radius:999px;min-width:16px;text-align:center;">0</span>
-      </button>
+    <!-- Notification Bell → ชี้ไปที่ tab แจ้งเตือน -->
+    <button id="notif-bell" onclick="switchAccTab('notifications', document.getElementById('notif-tab-btn'))"
+      style="position:absolute;top:14px;right:14px;background:none;border:none;cursor:pointer;font-size:22px;color:rgba(240,255,232,0.7);z-index:2;padding:4px;transition:transform .2s;"
+      onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">
+      🔔<span id="notif-count" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-family:'Kanit',sans-serif;font-size:9px;font-weight:900;padding:1px 5px;border-radius:999px;min-width:16px;text-align:center;">0</span>
+    </button>
 
       <!-- Avatar: คลิกเปลี่ยนรูปได้ -->
       <div class="account-avatar" id="acc-avatar" onclick="openAvatarPicker()" title="เปลี่ยนรูปโปรไฟล์">
@@ -3181,20 +3189,6 @@ fns.forEach(function(fn){
         <div class="account-balance-val" id="acc-balance">0</div>
         <div class="account-balance-unit">บาท</div>
         <button onclick="logout()" style="margin-top:8px;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 14px;border-radius:6px;border:1px solid rgba(248,113,113,0.4);background:transparent;color:#f87171;cursor:pointer;">ออกจากระบบ</button>
-      </div>
-    </div>
-
-    <!-- Notification Center (ซ่อนไว้) -->
-    <div id="notif-center" style="display:none;background:rgba(0,0,0,0.4);border:1px solid rgba(245,200,66,0.2);border-radius:14px;margin-bottom:16px;overflow:hidden;">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);">
-        <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:14px;color:var(--gold);">🔔 การแจ้งเตือน</div>
-        <div style="display:flex;gap:8px;">
-          <button onclick="clearNotifications()" style="font-family:'Kanit',sans-serif;font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(240,255,232,0.4);cursor:pointer;">ล้างทั้งหมด</button>
-          <button onclick="toggleNotifCenter()" style="background:none;border:none;color:rgba(240,255,232,0.4);font-size:18px;cursor:pointer;line-height:1;">×</button>
-        </div>
-      </div>
-      <div id="notif-list" style="max-height:260px;overflow-y:auto;padding:8px;">
-        <div style="text-align:center;padding:20px;color:rgba(240,255,232,0.25);font-family:'Kanit',sans-serif;font-size:13px;">ยังไม่มีการแจ้งเตือนครับ</div>
       </div>
     </div>
 
@@ -3224,6 +3218,10 @@ fns.forEach(function(fn){
       <button class="acc-tab" onclick="switchAccTab('txn',this)" style="flex-shrink:0;">📋 ธุรกรรม</button>
       <button class="acc-tab" onclick="switchAccTab('support',this)" style="flex-shrink:0;">💬 ติดต่อ</button>
       <button class="acc-tab" onclick="switchAccTab('referral',this);loadReferralTab();" style="flex-shrink:0;">🎁 แนะนำเพื่อน</button>
+      <button class="acc-tab" id="notif-tab-btn" onclick="switchAccTab('notifications',this)" style="flex-shrink:0;position:relative;">
+        🔔 แจ้งเตือน
+        <span id="notif-tab-badge" style="display:none;position:absolute;top:4px;right:4px;background:var(--red);color:#fff;font-family:'Kanit',sans-serif;font-size:9px;font-weight:900;padding:1px 5px;border-radius:999px;min-width:14px;text-align:center;line-height:1.4;">0</span>
+      </button>
     </div>
 
     <!-- DASHBOARD TAB -->
@@ -3416,31 +3414,41 @@ fns.forEach(function(fn){
           <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:22px;color:var(--accent);" id="dep-confirm-amount">0 ฿</div>
         </div>
 
-        <!-- ข้อมูลบัญชีปลายทาง (ดึงจาก Firestore) -->
-        <div style="background:var(--dark3);border:1px solid rgba(245,200,66,0.2);border-radius:12px;overflow:hidden;margin-bottom:16px;">
-          <div style="background:rgba(245,200,66,0.08);padding:12px 16px;border-bottom:1px solid rgba(245,200,66,0.15);">
-            <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;color:var(--gold);">บัญชีรับเงิน วัวชนไทย</div>
-          </div>
-          <div style="padding:16px;">
-            <div style="display:flex;align-items:center;gap:14px;">
-              <!-- QR Code -->
-              <div id="dep-qr-wrap" style="flex-shrink:0;width:100px;height:100px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                <div id="dep-qr-placeholder" style="text-align:center;padding:8px;">
-                  <div style="font-size:28px;">📷</div>
-                  <div style="font-size:9px;color:#aaa;font-family:'Kanit',sans-serif;margin-top:3px;">QR Code</div>
+        <!-- ข้อมูลบัญชีปลายทาง — dynamic จาก Admin settings -->
+        <div style="margin-bottom:16px;">
+          <!-- Tab เลือกบัญชี (แสดงเมื่อมีหลายบัญชี) -->
+          <div id="dep-bank-tabs" style="display:none;gap:6px;flex-wrap:wrap;margin-bottom:10px;"></div>
+
+          <!-- กล่องแสดงบัญชีที่เลือก -->
+          <div style="background:var(--dark3);border:1px solid rgba(245,200,66,0.2);border-radius:12px;overflow:hidden;">
+            <div style="background:rgba(245,200,66,0.08);padding:12px 16px;border-bottom:1px solid rgba(245,200,66,0.15);display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;color:var(--gold);" id="dep-bank-header">🏦 บัญชีรับเงิน</div>
+              <div id="dep-bank-badge" style="display:none;font-family:'Kanit',sans-serif;font-size:10px;font-weight:700;padding:2px 9px;border-radius:999px;background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3);">✅ เปิดใช้งาน</div>
+            </div>
+            <div style="padding:16px;">
+              <div style="display:flex;align-items:center;gap:14px;">
+                <!-- QR Code -->
+                <div id="dep-qr-wrap" style="flex-shrink:0;width:100px;height:100px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                  <div id="dep-qr-placeholder" style="text-align:center;padding:8px;">
+                    <div style="font-size:28px;">📷</div>
+                    <div style="font-size:9px;color:#aaa;font-family:'Kanit',sans-serif;margin-top:3px;">QR Code</div>
+                  </div>
+                  <img id="dep-qr-img" src="" style="display:none;width:100%;height:100%;object-fit:contain;">
                 </div>
-                <img id="dep-qr-img" src="" style="display:none;width:100%;height:100%;object-fit:contain;">
-              </div>
-              <!-- ข้อมูลบัญชี -->
-              <div style="flex:1;">
-                <div style="font-size:11px;color:rgba(240,255,232,0.4);font-family:'Kanit',sans-serif;margin-bottom:4px;">ธนาคาร</div>
-                <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:15px;color:var(--cream);" id="dep-bank-name">กสิกรไทย (KBank)</div>
-                <div style="font-size:11px;color:rgba(240,255,232,0.4);font-family:'Kanit',sans-serif;margin-top:8px;margin-bottom:4px;">เลขบัญชี</div>
-                <div style="display:flex;align-items:center;gap:8px;">
-                  <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:var(--gold);letter-spacing:1px;" id="dep-acc-no">123-4-56789-0</div>
-                  <button onclick="copyDepAccNo()" style="font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid rgba(245,200,66,0.3);background:transparent;color:var(--gold);cursor:pointer;">คัดลอก</button>
+                <!-- ข้อมูลบัญชี -->
+                <div style="flex:1;">
+                  <div style="font-size:11px;color:rgba(240,255,232,0.4);font-family:'Kanit',sans-serif;margin-bottom:4px;">ธนาคาร / ช่องทาง</div>
+                  <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:15px;color:var(--cream);" id="dep-bank-name">—</div>
+                  <div style="font-size:11px;color:rgba(240,255,232,0.4);font-family:'Kanit',sans-serif;margin-top:8px;margin-bottom:4px;">เลขบัญชี</div>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:var(--gold);letter-spacing:1px;" id="dep-acc-no">—</div>
+                    <button onclick="copyDepAccNo()" style="font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid rgba(245,200,66,0.3);background:transparent;color:var(--gold);cursor:pointer;">📋 คัดลอก</button>
+                  </div>
+                  <div style="font-size:11px;color:rgba(240,255,232,0.4);font-family:'Kanit',sans-serif;margin-top:6px;">
+                    ชื่อบัญชี: <span style="color:var(--cream);font-family:'Kanit',sans-serif;font-weight:500;" id="dep-acc-name">—</span>
+                  </div>
+                  <div id="dep-bank-note-wrap" style="display:none;font-size:11px;color:rgba(240,255,232,0.35);margin-top:4px;" id="dep-acc-note"></div>
                 </div>
-                <div style="font-size:11px;color:rgba(240,255,232,0.4);font-family:'Kanit',sans-serif;margin-top:6px;">ชื่อบัญชี: <span style="color:var(--cream);font-family:'Kanit',sans-serif;font-weight:500;" id="dep-acc-name">วัวชนไทย</span></div>
               </div>
             </div>
           </div>
@@ -3722,6 +3730,54 @@ fns.forEach(function(fn){
       <div id="ref-logs-list" style="display:flex;flex-direction:column;gap:8px;">
         <div style="text-align:center;padding:24px;color:rgba(240,255,232,0.3);font-size:13px;">กำลังโหลด...</div>
       </div>
+    </div>
+
+    <!-- NOTIFICATIONS TAB -->
+    <div class="acc-panel" id="acc-notifications">
+
+      <!-- header bar -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:15px;color:var(--cream);">🔔 การแจ้งเตือน</div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="_filterNotif('')" id="nf-all"
+            style="font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border-radius:7px;border:1px solid rgba(245,200,66,.5);background:rgba(245,200,66,.1);color:var(--gold);cursor:pointer;">ทั้งหมด</button>
+          <button onclick="clearNotifications()"
+            style="font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border-radius:7px;border:1px solid rgba(248,113,113,.3);background:transparent;color:#f87171;cursor:pointer;">🗑 ล้างทั้งหมด</button>
+        </div>
+      </div>
+
+      <!-- filter chips -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;" id="notif-filter-chips">
+        <button onclick="_filterNotif('')"   class="notif-chip active">📋 ทั้งหมด</button>
+        <button onclick="_filterNotif('success')" class="notif-chip">✅ สำเร็จ</button>
+        <button onclick="_filterNotif('error')"   class="notif-chip">❌ ปฏิเสธ</button>
+        <button onclick="_filterNotif('slip')"    class="notif-chip">🧾 มีสลิป</button>
+      </div>
+
+      <!-- summary stats -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">
+        <div style="background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:20px;color:#4ade80;" id="ns-total">0</div>
+          <div style="font-size:10px;color:rgba(240,255,232,.4);font-family:'Kanit',sans-serif;margin-top:2px;">ทั้งหมด</div>
+        </div>
+        <div style="background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.2);border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:20px;color:var(--gold);" id="ns-unread">0</div>
+          <div style="font-size:10px;color:rgba(240,255,232,.4);font-family:'Kanit',sans-serif;margin-top:2px;">ยังไม่อ่าน</div>
+        </div>
+        <div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:20px;color:#60a5fa;" id="ns-slips">0</div>
+          <div style="font-size:10px;color:rgba(240,255,232,.4);font-family:'Kanit',sans-serif;margin-top:2px;">มีสลิป</div>
+        </div>
+      </div>
+
+      <!-- notification list -->
+      <div id="notif-list" style="display:flex;flex-direction:column;gap:10px;">
+        <div style="text-align:center;padding:40px;color:rgba(240,255,232,.25);font-family:'Kanit',sans-serif;">
+          <div style="font-size:40px;margin-bottom:10px;">🔔</div>
+          ยังไม่มีการแจ้งเตือนครับ
+        </div>
+      </div>
+
     </div>
 
     <div class="acc-panel" id="acc-support">
@@ -4325,16 +4381,35 @@ fns.forEach(function(fn){
       })
       .on('postgres_changes', {
         event: 'UPDATE', schema: 'public', table: 'withdrawals'
-      }, payload => {
+      }, async payload => {
         const w = payload.new;
         if (w.nick !== nick) return;
         if (w.status === 'approved') {
-          addNotification('🏧', 'โอนเงินสำเร็จ!', `-${Number(w.amount).toLocaleString()} ฿ โอนให้คุณแล้วครับ`, 'success');
-          showFEToast(`✅ ถอนเงิน -${Number(w.amount).toLocaleString()} ฿ สำเร็จแล้วครับ!`);
+          // slip_url อาจไม่มาใน realtime payload — fetch ใหม่
+          let slipUrl = w.slip_url || '';
+          if (!slipUrl) {
+            const { data: wd } = await sb.from('withdrawals').select('slip_url').eq('id', w.id).maybeSingle();
+            slipUrl = wd?.slip_url || '';
+          }
+          const amtFmt = Number(w.amount).toLocaleString();
+
+          addNotification('🏧', 'โอนเงินสำเร็จแล้วครับ!',
+            `−${amtFmt} ฿ โอนเข้าบัญชีของคุณแล้ว${slipUrl ? ' · มีสลิปแนบ' : ''}`,
+            'success', slipUrl);
+          showFEToast(`✅ ถอนเงิน −${amtFmt} ฿ สำเร็จแล้วครับ!`);
+
+          if (slipUrl) {
+            _showWithdrawSlipPopup(amtFmt, slipUrl);
+          } else {
+            _showRewardPopup('🏧', 'โอนเงินสำเร็จ', `ถอนเงิน −${amtFmt} ฿`, Number(w.amount));
+          }
+
+          refreshBalance();
           loadTxnHistory(); loadWithHistory();
         } else if (w.status === 'rejected') {
           refreshBalance();
-          addNotification('❌', 'คำขอถอนเงินถูกปฏิเสธ', 'ยอดเงินคืนแล้วครับ', 'error');
+          addNotification('❌', 'คำขอถอนเงินถูกปฏิเสธ',
+            `ยอดเงิน ${Number(w.amount).toLocaleString()} ฿ คืนแล้วครับ`, 'error');
           showFEToast(`❌ คำขอถอนเงินถูกปฏิเสธ คืนเงินให้แล้วครับ`);
           loadTxnHistory(); loadWithHistory();
         }
@@ -4664,6 +4739,58 @@ fns.forEach(function(fn){
     setTimeout(() => t.remove(), duration);
   }
 
+  // ── popup สลิปถอนเงิน ──
+  function _showWithdrawSlipPopup(amtFmt, slipUrl) {
+    document.getElementById('withdraw-slip-popup')?.remove();
+    const pop = document.createElement('div');
+    pop.id = 'withdraw-slip-popup';
+    pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:10001;display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeInBg .3s ease;';
+    pop.innerHTML = `
+      <div style="
+        background:linear-gradient(160deg,#0f2e18,#1a4a28);
+        border:2px solid #F5C842;border-radius:22px;
+        width:100%;max-width:360px;
+        text-align:center;padding:28px 20px;
+        box-shadow:0 0 60px rgba(245,200,66,.2);
+        animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
+        position:relative;
+      ">
+        <button onclick="document.getElementById('withdraw-slip-popup').remove()"
+          style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:16px;width:28px;height:28px;border-radius:50%;cursor:pointer;">✕</button>
+
+        <div style="font-size:40px;margin-bottom:6px;">🏧</div>
+        <div style="font-family:Kanit,sans-serif;font-weight:900;font-size:18px;color:#F5C842;margin-bottom:4px;">โอนเงินสำเร็จแล้วครับ!</div>
+        <div style="font-family:Kanit,sans-serif;font-size:13px;color:rgba(240,255,232,.6);margin-bottom:16px;">ถอนเงิน −${amtFmt} ฿ เข้าบัญชีของคุณแล้ว</div>
+
+        <!-- สลิป -->
+        <div style="background:rgba(255,255,255,.05);border:1px solid rgba(245,200,66,.25);border-radius:12px;padding:12px;margin-bottom:16px;">
+          <div style="font-family:Kanit,sans-serif;font-size:12px;color:rgba(240,255,232,.5);margin-bottom:8px;">🧾 สลิปการโอนเงินจาก Admin</div>
+          <img src="${slipUrl}" alt="สลิปโอนเงิน"
+            onclick="_viewSlipFE('${slipUrl}')"
+            style="width:100%;max-height:200px;object-fit:contain;border-radius:8px;cursor:pointer;display:block;"
+            onerror="this.closest('div').innerHTML='<div style=\\'color:rgba(240,255,232,.4);font-size:12px;padding:12px;font-family:Kanit,sans-serif;\\'>⚠️ ไม่สามารถโหลดสลิปได้ครับ</div>'">
+          <button onclick="_viewSlipFE('${slipUrl}')"
+            style="font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 14px;border-radius:6px;border:1px solid rgba(245,200,66,.4);background:transparent;color:var(--gold);cursor:pointer;margin-top:8px;">
+            🔍 ขยายดูสลิป
+          </button>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <a href="${slipUrl}" target="_blank" download
+            style="flex:1;font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;padding:11px;border-radius:9px;border:1px solid rgba(245,200,66,.4);background:transparent;color:var(--gold);cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:4px;">
+            ⬇ บันทึกสลิป
+          </a>
+          <button onclick="document.getElementById('withdraw-slip-popup').remove()"
+            style="flex:1;font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;padding:11px;border-radius:9px;border:none;background:linear-gradient(135deg,#1B6B2F,#27943F);color:#fff;cursor:pointer;">
+            รับทราบ ✓
+          </button>
+        </div>
+      </div>`;
+    pop.addEventListener('click', e => { if (e.target === pop) pop.remove(); });
+    setTimeout(() => pop?.remove(), 30000); // ปิดอัตโนมัติ 30 วิ
+    document.body.appendChild(pop);
+  }
+
   // ── popup รางวัล — แสดงตรงกลางหน้าจอ พร้อม animation ──
   function _showRewardPopup(icon, type, detail, amount) {
     // ลบอันเก่าก่อน
@@ -4730,12 +4857,39 @@ fns.forEach(function(fn){
       if (e.target === pop) pop.remove();
     });
     document.body.appendChild(pop);
+    setTimeout(() => pop?.remove(), 8000);
+  } // end _showRewardPopup
 
-    // ปิดอัตโนมัติหลัง 8 วินาที
+  // ── popup รางวัล — แสดงตรงกลางหน้าจอ พร้อม animation ──
+  function _showRewardPopup(icon, type, detail, amount) {
+    document.getElementById('reward-popup')?.remove();
+    const pop = document.createElement('div');
+    pop.id = 'reward-popup';
+    pop.style.cssText = 'position:fixed;inset:0;z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.65);animation:fadeInBg .3s ease;';
+    pop.innerHTML = `
+      <style>
+        @keyframes fadeInBg { from{opacity:0} to{opacity:1} }
+        @keyframes popIn { from{transform:scale(.7) translateY(30px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
+        @keyframes coinSpin { 0%{transform:rotateY(0)} 100%{transform:rotateY(720deg)} }
+        @keyframes shimmer { 0%,100%{opacity:.7} 50%{opacity:1} }
+      </style>
+      <div style="background:linear-gradient(160deg,#0f2e18,#1a4a28);border:2px solid #F5C842;border-radius:22px;padding:32px 28px;width:100%;max-width:320px;text-align:center;box-shadow:0 0 60px rgba(245,200,66,.25);animation:popIn .4s cubic-bezier(.34,1.56,.64,1);position:relative;">
+        <button onclick="document.getElementById('reward-popup').remove()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:16px;width:28px;height:28px;border-radius:50%;cursor:pointer;line-height:1;">✕</button>
+        <div style="font-size:56px;margin-bottom:8px;animation:coinSpin .8s .2s ease both;">${icon}</div>
+        <div style="font-family:Kanit,sans-serif;font-size:13px;color:rgba(255,220,100,.7);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase;">${type}</div>
+        <div style="font-family:Kanit,sans-serif;font-weight:700;font-size:15px;color:#fff;margin-bottom:16px;">${detail}</div>
+        <div style="background:linear-gradient(135deg,#F5C842,#f0a500);border-radius:12px;padding:14px;margin-bottom:20px;animation:shimmer 2s infinite;">
+          <div style="font-size:11px;color:rgba(0,0,0,.6);font-family:Kanit,sans-serif;margin-bottom:2px;">ยอดรางวัล</div>
+          <div style="font-family:Kanit,sans-serif;font-weight:900;font-size:30px;color:#1a1a1a;">+${Number(amount).toLocaleString()}</div>
+          <div style="font-size:13px;color:rgba(0,0,0,.6);font-family:Kanit,sans-serif;">บาท เข้าบัญชีแล้วครับ!</div>
+        </div>
+        <button onclick="document.getElementById('reward-popup').remove()" style="width:100%;background:linear-gradient(135deg,#1B6B2F,#27943F);color:#fff;font-family:Kanit,sans-serif;font-weight:900;font-size:15px;padding:13px;border:none;border-radius:10px;cursor:pointer;letter-spacing:.5px;">รับทราบ ✓</button>
+      </div>`;
+    pop.addEventListener('click', e => { if (e.target === pop) pop.remove(); });
+    document.body.appendChild(pop);
     setTimeout(() => pop?.remove(), 8000);
   }
 
-  // ── เปลี่ยนรหัสผ่าน (ลูกค้าทำเอง) ──
   window.submitChangePass = window._real_submitChangePass = async function submitChangePass() {
     const oldPass = document.getElementById('cp-old').value;
     const newPass = document.getElementById('cp-new').value;
@@ -4933,14 +5087,17 @@ fns.forEach(function(fn){
   }
 
   // ── NOTIFICATION CENTER ──
-  let notifications = [];
+  let notifications  = [];
+  let _depBanks      = [];   // บัญชีรับเงินที่ active
+  let _depBankIdx    = 0;    // index ที่เลือกอยู่
+  let _notifFilter   = '';
 
   window.toggleNotifCenter = window._real_toggleNotifCenter = function toggleNotifCenter() {
-    const el = document.getElementById('notif-center');
-    if (!el) return;
-    const isOpen = el.style.display !== 'none';
-    el.style.display = isOpen ? 'none' : 'block';
-    if (!isOpen) markNotifsRead();
+    // redirect ไปที่ tab แจ้งเตือนแทน dropdown เดิม
+    const btn = document.getElementById('notif-tab-btn');
+    switchAccTab('notifications', btn);
+    notifications.forEach(n => n.unread = false);
+    updateNotifBadge();
   }
 
   function markNotifsRead() {
@@ -4950,50 +5107,209 @@ fns.forEach(function(fn){
   }
 
   window.clearNotifications = window._real_clearNotifications = function clearNotifications() {
+    if (!notifications.length) return;
     notifications = [];
+    _notifFilter = '';
     updateNotifBadge();
     renderNotifs();
   }
 
-  function addNotification(icon, title, sub, type='info') {
-    const n = { id: Date.now(), icon, title, sub, type, time: new Date(), unread: true };
+  function addNotification(icon, title, sub, type='info', slip_url='') {
+    const n = { id: Date.now(), icon, title, sub, type, time: new Date(), unread: true, slip_url };
     notifications.unshift(n);
-    if (notifications.length > 20) notifications.pop();
+    if (notifications.length > 50) notifications.pop();
     updateNotifBadge();
     renderNotifs();
   }
 
   function updateNotifBadge() {
-    const unread = notifications.filter(n=>n.unread).length;
-    const badge  = document.getElementById('notif-count');
-    const bell   = document.getElementById('notif-bell');
-    if (!badge) return;
-    if (unread > 0) {
-      badge.style.display = 'block';
-      badge.textContent   = unread > 9 ? '9+' : unread;
-    } else {
-      badge.style.display = 'none';
-    }
+    const unread = notifications.filter(n => n.unread).length;
+    const slips  = notifications.filter(n => n.slip_url).length;
+
+    // badge บน bell icon
+    const badge = document.getElementById('notif-count');
+    if (badge) { badge.style.display = unread>0?'block':'none'; badge.textContent = unread>9?'9+':unread; }
+
+    // badge บน tab
+    const tabBadge = document.getElementById('notif-tab-badge');
+    if (tabBadge) { tabBadge.style.display = unread>0?'block':'none'; tabBadge.textContent = unread>9?'9+':unread; }
+
+    // stats ใน panel
+    const setEl = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+    setEl('ns-total',  notifications.length);
+    setEl('ns-unread', unread);
+    setEl('ns-slips',  slips);
+  }
+
+  function _filterNotif(type) {
+    _notifFilter = type;
+    // update chip active state
+    document.querySelectorAll('.notif-chip').forEach(c => {
+      const cType = c.getAttribute('onclick')?.match(/'([^']*)'/)?.[1] || '';
+      c.classList.toggle('active', cType === type);
+    });
+    renderNotifs();
   }
 
   function renderNotifs() {
+    updateNotifBadge();
+
     const el = document.getElementById('notif-list');
-    if (!el) return;
-    if (!notifications.length) {
-      el.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(240,255,232,0.25);font-family:Kanit,sans-serif;font-size:13px;">ยังไม่มีการแจ้งเตือนครับ</div>';
+    if (!el) return; // panel ยังไม่ได้ mount
+
+    let items = notifications;
+    if (_notifFilter === 'success') items = items.filter(n => n.type === 'success');
+    else if (_notifFilter === 'error') items = items.filter(n => n.type === 'error');
+    else if (_notifFilter === 'slip')  items = items.filter(n => n.slip_url);
+
+    if (!items.length) {
+      el.innerHTML = `<div style="text-align:center;padding:48px 20px;color:rgba(240,255,232,.25);font-family:'Kanit',sans-serif;">
+        <div style="font-size:48px;margin-bottom:12px;opacity:.4;">🔔</div>
+        <div style="font-size:14px;">ยังไม่มีการแจ้งเตือนครับ</div>
+        ${_notifFilter ? `<div style="font-size:12px;margin-top:6px;opacity:.6;">ลองเลือก "ทั้งหมด" เพื่อดูทุกรายการ</div>` : ''}
+      </div>`;
       return;
     }
-    el.innerHTML = notifications.map(n => {
-      const timeStr = n.time.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
-      return `<div class="notif-item ${n.unread?'unread':''}">
+
+    el.innerHTML = items.map(n => {
+      const timeStr = n.time instanceof Date
+        ? n.time.toLocaleString('th-TH',{hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'})
+        : '';
+      const typeClass = `type-${n.type||'info'}`;
+      const bgGlow = n.type==='success' ? 'rgba(74,222,128,.03)' : n.type==='error' ? 'rgba(248,113,113,.03)' : 'rgba(96,165,250,.03)';
+
+      const slipHtml = n.slip_url ? `
+        <div style="margin-top:10px;background:rgba(255,255,255,.04);border:1px solid rgba(245,200,66,.2);border-radius:10px;padding:10px;overflow:hidden;">
+          <div style="font-size:10px;color:rgba(240,255,232,.4);font-family:'Kanit',sans-serif;margin-bottom:6px;">🧾 สลิปการโอนเงิน</div>
+          <img src="${n.slip_url}" alt="สลิป"
+            onclick="event.stopPropagation();_viewSlipFE('${n.slip_url}')"
+            style="width:100%;max-height:160px;object-fit:contain;border-radius:8px;cursor:pointer;display:block;"
+            onerror="this.closest('div').style.display='none'">
+          <button onclick="event.stopPropagation();_viewSlipFE('${n.slip_url}')"
+            style="font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 14px;border-radius:6px;border:1px solid rgba(245,200,66,.3);background:transparent;color:var(--gold);cursor:pointer;margin-top:8px;width:100%;">
+            🔍 ขยายดูสลิปเต็ม
+          </button>
+        </div>` : '';
+
+      return `<div class="notif-item ${n.unread?'unread':''} ${typeClass}" onclick="_markNotifRead(${n.id})" style="background:${bgGlow};">
         <div class="notif-item-icon">${n.icon}</div>
         <div class="notif-item-body">
-          <div class="notif-item-title">${n.title}</div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+            <div class="notif-item-title">${n.title}</div>
+            ${n.unread ? '<div class="notif-item-unread-dot"></div>' : ''}
+          </div>
           <div class="notif-item-sub">${n.sub||''}</div>
+          ${slipHtml}
           <div class="notif-item-time">${timeStr}</div>
         </div>
       </div>`;
     }).join('');
+  }
+
+  
+
+  // ── โหลดประวัติการแจ้งเตือนจาก DB ──
+  async function _loadNotifHistory() {
+    if (!currentUser) return;
+    const nick = currentUser.nick;
+    const [depRes, withRes] = await Promise.all([
+      sb.from('deposits').select('amount,bank,status,slip_url,created_at,approved_at')
+        .eq('nick', nick).neq('status','pending')
+        .order('created_at',{ascending:false}).limit(20),
+      sb.from('withdrawals').select('amount,status,slip_url,created_at,approved_at')
+        .eq('nick', nick).neq('status','pending')
+        .order('created_at',{ascending:false}).limit(20),
+    ]);
+
+    const histNotifs = [];
+
+    // withdrawals
+    for (const w of (withRes.data||[])) {
+      const amt = Number(w.amount||0).toLocaleString();
+      if (w.status === 'approved') {
+        // fetch slip_url ถ้าไม่มีใน row
+        let slip = w.slip_url || '';
+        histNotifs.push({
+          id: 'hist-w-'+w.created_at,
+          icon: '🏧', title: 'โอนเงินสำเร็จ',
+          sub: `−${amt} ฿ โอนเข้าบัญชีของคุณแล้ว${slip?' · มีสลิปแนบ':''}`,
+          type: 'success', slip_url: slip,
+          time: new Date(w.approved_at||w.created_at), unread: false
+        });
+      } else if (w.status === 'rejected') {
+        histNotifs.push({
+          id: 'hist-wr-'+w.created_at,
+          icon: '❌', title: 'คำขอถอนเงินถูกปฏิเสธ',
+          sub: `ยอดเงิน ${amt} ฿ คืนแล้วครับ`,
+          type: 'error', slip_url: '',
+          time: new Date(w.created_at), unread: false
+        });
+      }
+    }
+
+    // deposits
+    for (const d of (depRes.data||[])) {
+      const amt = Number(d.amount||0).toLocaleString();
+      const bank = d.bank || '';
+      if (d.status === 'approved' && !bank.startsWith('กิจกรรม:') && !bank.startsWith('คอมฯ')) {
+        histNotifs.push({
+          id: 'hist-d-'+d.created_at,
+          icon: '💰', title: 'เติมเงินสำเร็จ',
+          sub: `+${amt} ฿ เข้าบัญชีแล้วครับ`,
+          type: 'success', slip_url: '',
+          time: new Date(d.approved_at||d.created_at), unread: false
+        });
+      } else if (d.status === 'approved' && bank.startsWith('กิจกรรม:')) {
+        histNotifs.push({
+          id: 'hist-act-'+d.created_at,
+          icon: '🎉', title: 'รางวัลกิจกรรม',
+          sub: `${bank.replace('กิจกรรม:','').trim()} · +${amt} ฿`,
+          type: 'success', slip_url: '',
+          time: new Date(d.approved_at||d.created_at), unread: false
+        });
+      } else if (d.status === 'rejected') {
+        histNotifs.push({
+          id: 'hist-dr-'+d.created_at,
+          icon: '❌', title: 'คำขอเติมเงินถูกปฏิเสธ',
+          sub: `จำนวน ${amt} ฿`,
+          type: 'error', slip_url: '',
+          time: new Date(d.created_at), unread: false
+        });
+      }
+    }
+
+    // เรียงและ merge กับ notifications ใน memory
+    histNotifs.sort((a,b) => b.time - a.time);
+    // เพิ่มเฉพาะที่ยังไม่มีใน memory
+    const existIds = new Set(notifications.map(n => String(n.id)));
+    for (const n of histNotifs) {
+      if (!existIds.has(String(n.id))) notifications.push(n);
+    }
+    notifications.sort((a,b) => new Date(b.time) - new Date(a.time));
+    renderNotifs();
+  }
+
+  function _markNotifRead(id) {
+    const n = notifications.find(n => n.id === id);
+    if (n) { n.unread = false; updateNotifBadge(); renderNotifs(); }
+  }
+
+  function _viewSlipFE(url) {
+    document.getElementById('slip-fe-modal')?.remove();
+    const modal = document.createElement('div');
+    modal.id = 'slip-fe-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:10010;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;cursor:zoom-out;';
+    modal.innerHTML = `
+      <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:14px;color:var(--gold);margin-bottom:12px;">🧾 สลิปการโอนเงิน</div>
+      <img src="${url}" style="max-width:92vw;max-height:72vh;object-fit:contain;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.6);" onclick="event.stopPropagation()">
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button onclick="document.getElementById('slip-fe-modal').remove()"
+          style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;padding:10px 24px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#fff;cursor:pointer;">✕ ปิด</button>
+        <a href="${url}" target="_blank" download
+          style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;padding:10px 24px;border-radius:9px;border:none;background:var(--gold);color:#1a1a1a;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:5px;">⬇ บันทึกสลิป</a>
+      </div>`;
+    modal.addEventListener('click', () => modal.remove());
+    document.body.appendChild(modal);
   }
 
   // ── Auth Tab Switch ──
@@ -5401,30 +5717,31 @@ fns.forEach(function(fn){
     document.getElementById('dep-step3').style.display = 'block';
   }
 
-  // ── หลายบัญชีรับเงิน ──
-  let _depBanks = [], _depBankIdx = 0;
+  // ── _renderDepBankAccounts + copyDepAccNo defined below ──
 
   function _renderDepBankAccounts(banks) {
-    _depBanks = banks; _depBankIdx = 0;
-    if (banks.length === 0) return;
-    // เพิ่ม tab selector ถ้ามีหลายบัญชี
-    const tabAnchor = document.getElementById('dep-step2');
-    if (!tabAnchor) { _showDepBank(0); return; }
-    let tabWrap = document.getElementById('dep-bank-tabs');
-    if (!tabWrap) {
-      tabWrap = document.createElement('div');
-      tabWrap.id = 'dep-bank-tabs';
-      tabWrap.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;padding:0 0 12px;';
-      const anchor = tabAnchor.querySelector('[style*="border-radius:12px"]');
-      if (anchor) anchor.parentNode.insertBefore(tabWrap, anchor);
-    }
+    _depBanks = banks;
+    _depBankIdx = 0;
+    if (!banks.length) return;
+
+    const tabWrap = document.getElementById('dep-bank-tabs');
+
     if (banks.length > 1) {
-      tabWrap.innerHTML = banks.map((b,i) => `
-        <button id="dep-btab-${i}" onclick="_selectDepBank(${i})"
-          style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all .15s;
-          ${i===0?'background:var(--gold);color:#1a1a1a;border:1px solid var(--gold);':'background:transparent;color:rgba(240,255,232,.6);border:1px solid rgba(240,255,232,.2);'}">
-          🏦 ${b.bankName}</button>`).join('');
+      // มีหลายบัญชี → แสดง tabs
+      if (tabWrap) {
+        tabWrap.style.display = 'flex';
+        tabWrap.innerHTML = banks.map((b,i) => `
+          <button id="dep-btab-${i}" onclick="_selectDepBank(${i})"
+            style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all .2s;
+            ${i===0 ? 'background:var(--gold);color:#1a1a1a;border:2px solid var(--gold);' : 'background:transparent;color:rgba(240,255,232,.6);border:1.5px solid rgba(240,255,232,.2);'}">
+            🏦 ${b.bankName}
+          </button>`).join('');
+      }
+    } else {
+      // บัญชีเดียว — ซ่อน tab bar
+      if (tabWrap) tabWrap.style.display = 'none';
     }
+
     _showDepBank(0);
   }
 
@@ -5433,18 +5750,39 @@ fns.forEach(function(fn){
     _depBanks.forEach((_,i) => {
       const btn = document.getElementById(`dep-btab-${i}`);
       if (!btn) return;
-      if (i===idx) { btn.style.background='var(--gold)'; btn.style.color='#1a1a1a'; btn.style.border='1px solid var(--gold)'; }
-      else { btn.style.background='transparent'; btn.style.color='rgba(240,255,232,.6)'; btn.style.border='1px solid rgba(240,255,232,.2)'; }
+      if (i === idx) {
+        btn.style.background = 'var(--gold)'; btn.style.color = '#1a1a1a'; btn.style.border = '2px solid var(--gold)';
+      } else {
+        btn.style.background = 'transparent'; btn.style.color = 'rgba(240,255,232,.6)'; btn.style.border = '1.5px solid rgba(240,255,232,.2)';
+      }
     });
     _showDepBank(idx);
   };
 
   function _showDepBank(idx) {
-    const b = _depBanks[idx]; if (!b) return;
-    const setTxt = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v||'—'; };
+    const b = _depBanks[idx];
+    if (!b) return;
+
+    const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v || '—'; };
     setTxt('dep-bank-name', b.bankName);
     setTxt('dep-acc-no',    b.accNo);
     setTxt('dep-acc-name',  b.accName);
+
+    // header
+    const hdr = document.getElementById('dep-bank-header');
+    if (hdr) hdr.textContent = `🏦 ${b.bankName}`;
+
+    // badge (แสดงถ้ามีหลายบัญชี)
+    const badge = document.getElementById('dep-bank-badge');
+    if (badge) badge.style.display = _depBanks.length > 1 ? 'block' : 'none';
+
+    // หมายเหตุ
+    const noteWrap = document.getElementById('dep-bank-note-wrap');
+    const noteEl   = document.getElementById('dep-acc-note');
+    if (noteWrap && noteEl) {
+      if (b.note) { noteEl.textContent = `📌 ${b.note}`; noteWrap.style.display = 'block'; }
+      else         { noteWrap.style.display = 'none'; }
+    }
   }
 
   function copyDepAccNo() {
@@ -5862,6 +6200,18 @@ fns.forEach(function(fn){
     if (id === 'deposit')   loadDepHistory();
     if (id === 'withdraw')  { loadWithdrawPanel(); loadWithHistory(); }
     if (id === 'bet')       loadBetHistory();
+    if (id === 'notifications') {
+      renderNotifs();
+      // โหลดประวัติจาก DB ถ้ายังไม่มีการแจ้งเตือนในหน่วยความจำ
+      if (notifications.length === 0 && currentUser) {
+        _loadNotifHistory();
+      }
+      setTimeout(() => {
+        notifications.forEach(n => n.unread = false);
+        updateNotifBadge();
+        renderNotifs();
+      }, 300);
+    }
     // re-apply flags ทุกครั้งที่เปลี่ยน tab
     if (currentUser?.flags?.length) setTimeout(() => applyFlagUI(currentUser.flags), 50);
   }
@@ -5906,6 +6256,22 @@ fns.forEach(function(fn){
     const txn  = genTxnFE(4);
     const nick = currentUser.nick || '';
 
+    // ── Upload สลิปขึ้น Supabase Storage ──
+    let slip_url = '';
+    const slipFile = document.getElementById('dep-slip-file')?.files?.[0];
+    if (slipFile) {
+      const ext      = slipFile.name.split('.').pop() || 'jpg';
+      const filePath = `slips/dep_${nick}_${Date.now()}.${ext}`;
+      const { data: upData, error: upErr } = await sb.storage
+        .from('slips')
+        .upload(filePath, slipFile, { upsert: true, contentType: slipFile.type });
+      if (!upErr && upData) {
+        const { data: urlData } = sb.storage.from('slips').getPublicUrl(filePath);
+        slip_url = urlData?.publicUrl || '';
+      }
+      // ถ้า upload ไม่สำเร็จ (bucket ไม่มี) ก็ยังส่งคำขอได้ แค่ไม่มี URL
+    }
+
     // ✅ บันทึกลง Supabase deposits
     const { error } = await sb.from('deposits').insert({
       nick,
@@ -5913,6 +6279,7 @@ fns.forEach(function(fn){
       lname: currentUser.lname || '',
       phone: currentUser.phone || '',
       amount, bank, txn,
+      slip_url,
       status: 'pending'
     });
 
@@ -6428,6 +6795,7 @@ fns.forEach(function(fn){
     if (e.target === document.getElementById('modal'))
       document.getElementById('modal').classList.remove('open');
   }
+
 </script>
 </body>
 </html>
