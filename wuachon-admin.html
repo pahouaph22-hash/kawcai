@@ -45,12 +45,38 @@ body{font-family:'Sarabun',sans-serif;background:#f4f4f0;color:#1a1a1a;min-heigh
 .panel{display:none;}
 .panel.active{display:block;}
 
-/* CARDS */
+/* STAT CARDS — NEW */
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
-.stat-card{background:#fff;border-radius:12px;padding:18px;border:1px solid #e5e5e0;}
-.stat-card .val{font-family:'Kanit',sans-serif;font-weight:900;font-size:28px;color:#1a1a1a;}
-.stat-card .lbl{font-size:12px;color:#aaa;margin-top:4px;}
-.stat-card .ico{font-size:24px;margin-bottom:8px;}
+.stat-card{background:#fff;border-radius:14px;padding:18px 16px;border:1px solid #e5e5e0;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;transition:box-shadow .2s,transform .15s;}
+.stat-card::before{content:'';position:absolute;inset:0;background:transparent;transition:background .2s;}
+.stat-card-click{cursor:pointer;}
+.stat-card-click:hover{box-shadow:0 6px 24px rgba(0,0,0,.1);transform:translateY(-2px);}
+.stat-card-click:hover::before{background:rgba(0,0,0,.015);}
+.stat-card-icon-wrap{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.stat-ico-blue{background:#eff6ff;}.stat-ico-gold{background:#fffbeb;}.stat-ico-green{background:#f0fdf4;}.stat-ico-red{background:#fff5f5;}
+.stat-card-body{flex:1;min-width:0;}
+.stat-main-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px;}
+.stat-val{font-family:'Kanit',sans-serif;font-weight:900;font-size:26px;color:#1a1a1a;line-height:1;}
+.stat-badge{font-family:'Kanit',sans-serif;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;}
+.stat-badge-blue{background:#dbeafe;color:#1d4ed8;}.stat-badge-gold{background:#fef9c3;color:#854d0e;}.stat-badge-green{background:#dcfce7;color:#15803d;}.stat-badge-red{background:#fee2e2;color:#991b1b;}
+.stat-lbl{font-size:12px;color:#888;font-family:'Kanit',sans-serif;}
+.stat-sub{font-size:11px;color:#aaa;margin-top:3px;}
+.stat-sub b{color:#555;}
+.stat-arrow{font-size:16px;color:#ccc;flex-shrink:0;transition:transform .2s,color .2s;}
+.stat-card-click:hover .stat-arrow{transform:translateX(3px);color:#888;}
+/* CHART TABS & RANGE BUTTONS */
+.chart-tab{font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;padding:10px 18px;border:none;background:transparent;cursor:pointer;color:#888;border-bottom:3px solid transparent;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;}
+.chart-tab:hover{color:#333;background:#f9f9f7;}
+.chart-tab.active{color:#1a1a1a;border-bottom-color:#1a1a1a;background:#f4f4f0;}
+.chart-tab-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.chart-range-btn{font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:20px;background:#fff;color:#888;cursor:pointer;transition:all .15s;}
+.chart-range-btn:hover{border-color:#888;color:#333;}
+.chart-range-btn.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a;}
+.chart-stat-mini{background:#fafaf8;border:1px solid #e5e5e0;border-radius:8px;padding:10px 14px;}
+.chart-stat-mini .csm-val{font-family:'Kanit',sans-serif;font-weight:900;font-size:20px;}
+.chart-stat-mini .csm-lbl{font-size:11px;color:#aaa;margin-top:2px;}
+.chart-stat-mini .csm-delta{font-size:11px;font-family:'Kanit',sans-serif;font-weight:700;margin-top:4px;}
+.csm-up{color:#16a34a;}.csm-down{color:#dc2626;}.csm-flat{color:#888;}
 .card{background:#fff;border-radius:12px;padding:20px;border:1px solid #e5e5e0;margin-bottom:16px;}
 .card-title{font-family:'Kanit',sans-serif;font-weight:700;font-size:15px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
 
@@ -112,6 +138,9 @@ tr:hover td{background:#fafafa;}
 
 @media(max-width:768px){
   .stat-grid{grid-template-columns:1fr 1fr;}
+  .stat-val{font-size:20px;}
+  .chart-tab{padding:8px 12px;font-size:12px;}
+}
   .form-row,.form-row.three{grid-template-columns:1fr;}
   .sb-section{display:none;}
   .sb-item{padding:12px 10px;font-size:12px;}
@@ -164,15 +193,175 @@ tr:hover td{background:#fafafa;}
 
       <!-- OVERVIEW -->
       <div class="panel active" id="panel-overview">
+
+        <!-- STAT CARDS -->
         <div class="stat-grid">
-          <div class="stat-card"><div class="ico">👥</div><div class="val" id="ov-members">—</div><div class="lbl">สมาชิกทั้งหมด</div></div>
-          <div class="stat-card"><div class="ico">🏆</div><div class="val" id="ov-matches">—</div><div class="lbl">คู่แข่งขัน</div></div>
-          <div class="stat-card"><div class="ico">💰</div><div class="val" id="ov-dep" style="color:var(--red);">—</div><div class="lbl">รอเติมเงิน</div></div>
-          <div class="stat-card"><div class="ico">🏧</div><div class="val" id="ov-with" style="color:var(--red);">—</div><div class="lbl">รอถอนเงิน</div></div>
+          <!-- สมาชิก -->
+          <div class="stat-card stat-card-click" onclick="openOvDetail('members')" title="คลิกดูรายละเอียด">
+            <div class="stat-card-icon-wrap stat-ico-blue">👥</div>
+            <div class="stat-card-body">
+              <div class="stat-main-row">
+                <span class="stat-val" id="ov-members">—</span>
+                <span class="stat-badge stat-badge-blue" id="ov-members-today">+0 วันนี้</span>
+              </div>
+              <div class="stat-lbl">สมาชิกทั้งหมด</div>
+              <div class="stat-sub" id="ov-members-sub">ลงทะเบียนวันนี้ <b id="ov-members-today-n">0</b> คน</div>
+            </div>
+            <div class="stat-arrow">→</div>
+          </div>
+
+          <!-- คู่แข่งขัน -->
+          <div class="stat-card stat-card-click" onclick="openOvDetail('matches')" title="คลิกดูรายละเอียด">
+            <div class="stat-card-icon-wrap stat-ico-gold">🏆</div>
+            <div class="stat-card-body">
+              <div class="stat-main-row">
+                <span class="stat-val" id="ov-matches">—</span>
+                <span class="stat-badge stat-badge-gold" id="ov-matches-today">+0 วันนี้</span>
+              </div>
+              <div class="stat-lbl">คู่แข่งขันทั้งหมด</div>
+              <div class="stat-sub">เพิ่มวันนี้ <b id="ov-matches-today-n">0</b> คู่</div>
+            </div>
+            <div class="stat-arrow">→</div>
+          </div>
+
+          <!-- เติมเงิน -->
+          <div class="stat-card stat-card-click" onclick="openOvDetail('deposits')" title="คลิกดูรายละเอียด">
+            <div class="stat-card-icon-wrap stat-ico-green">💰</div>
+            <div class="stat-card-body">
+              <div class="stat-main-row">
+                <span class="stat-val" id="ov-dep-total" style="color:var(--green);">—</span>
+                <span class="stat-badge stat-badge-green" id="ov-dep-today-badge">วันนี้ 0</span>
+              </div>
+              <div class="stat-lbl">เติมเงินทั้งหมด (รายการ)</div>
+              <div class="stat-sub">วันนี้ <b id="ov-dep-today-n">0</b> รายการ · รอดำเนินการ <b id="ov-dep-pending-n" style="color:var(--red);">0</b></div>
+            </div>
+            <div class="stat-arrow">→</div>
+          </div>
+
+          <!-- ถอนเงิน -->
+          <div class="stat-card stat-card-click" onclick="openOvDetail('withdrawals')" title="คลิกดูรายละเอียด">
+            <div class="stat-card-icon-wrap stat-ico-red">🏧</div>
+            <div class="stat-card-body">
+              <div class="stat-main-row">
+                <span class="stat-val" id="ov-with-total" style="color:var(--red);">—</span>
+                <span class="stat-badge stat-badge-red" id="ov-with-today-badge">วันนี้ 0</span>
+              </div>
+              <div class="stat-lbl">ถอนเงินทั้งหมด (รายการ)</div>
+              <div class="stat-sub">วันนี้ <b id="ov-with-today-n">0</b> รายการ · รอดำเนินการ <b id="ov-with-pending-n" style="color:var(--red);">0</b></div>
+            </div>
+            <div class="stat-arrow">→</div>
+          </div>
         </div>
+
+
+        <!-- GROWTH CHARTS -->
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div style="padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+            <div>
+              <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:15px;">📈 แนวโน้มการเติบโต</div>
+              <div style="font-size:12px;color:#aaa;margin-top:2px;">เปรียบเทียบข้อมูลตามช่วงเวลา</div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+              <span style="font-family:'Kanit',sans-serif;font-size:11px;color:#888;">มุมมอง:</span>
+              <button class="chart-range-btn active" data-range="month" onclick="setChartRange('month',this)">รายเดือน</button>
+              <button class="chart-range-btn" data-range="quarter" onclick="setChartRange('quarter',this)">รายไตรมาส</button>
+              <button class="chart-range-btn" data-range="year" onclick="setChartRange('year',this)">รายปี</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:0;border-bottom:1px solid #e5e5e0;margin-top:14px;overflow-x:auto;">
+            <button class="chart-tab active" data-chart="members" onclick="switchChart('members',this)"><span class="chart-tab-dot" style="background:#3b82f6;"></span>สมาชิก</button>
+            <button class="chart-tab" data-chart="matches" onclick="switchChart('matches',this)"><span class="chart-tab-dot" style="background:#F5A800;"></span>คู่แข่งขัน</button>
+            <button class="chart-tab" data-chart="deposits" onclick="switchChart('deposits',this)"><span class="chart-tab-dot" style="background:#22c55e;"></span>เติมเงิน</button>
+            <button class="chart-tab" data-chart="withdrawals" onclick="switchChart('withdrawals',this)"><span class="chart-tab-dot" style="background:#ef4444;"></span>ถอนเงิน</button>
+            <button class="chart-tab" data-chart="all" onclick="switchChart('all',this)"><span class="chart-tab-dot" style="background:#8b5cf6;"></span>ภาพรวม</button>
+          </div>
+          <div style="padding:16px 20px 20px;">
+            <div id="chart-summary-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px;"></div>
+            <div style="position:relative;width:100%;height:280px;">
+              <canvas id="growth-chart" role="img" aria-label="กราฟแนวโน้มการเติบโตของระบบวัวชน">กำลังโหลดข้อมูล...</canvas>
+            </div>
+            <div id="chart-legend" style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:#888;"></div>
+          </div>
+        </div>
+
+        <!-- FINANCE SUMMARY TABLE -->
+        <div class="card" style="padding:0;overflow:hidden;">
+          <!-- Header -->
+          <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-bottom:1px solid #e5e5e0;">
+            <div>
+              <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:15px;">💹 สรุปการเงิน</div>
+              <div style="font-size:12px;color:#aaa;margin-top:2px;">เปรียบเทียบรายรับ-รายจ่าย และกำไร/ขาดทุนตามช่วงเวลา</div>
+            </div>
+            <button onclick="loadFinanceTable()" style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:6px 14px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">🔄 รีเฟรช</button>
+          </div>
+
+          <!-- Table -->
+          <div style="overflow-x:auto;">
+            <table id="finance-table" style="width:100%;border-collapse:collapse;min-width:680px;">
+              <thead>
+                <tr style="background:#fafaf8;">
+                  <th style="padding:11px 16px;text-align:left;font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;color:#666;border-bottom:2px solid #e5e5e0;white-space:nowrap;min-width:110px;">ช่วงเวลา</th>
+                  <th style="padding:11px 14px;text-align:right;font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;color:#3b82f6;border-bottom:2px solid #e5e5e0;white-space:nowrap;">
+                    <span style="display:inline-flex;align-items:center;gap:4px;justify-content:flex-end;">👥 สมาชิก</span>
+                  </th>
+                  <th style="padding:11px 14px;text-align:right;font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;color:#16a34a;border-bottom:2px solid #e5e5e0;white-space:nowrap;">💰 เติมเงิน (฿)</th>
+                  <th style="padding:11px 14px;text-align:right;font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;color:#dc2626;border-bottom:2px solid #e5e5e0;white-space:nowrap;">🏧 ถอนเงิน (฿)</th>
+                  <th style="padding:11px 14px;text-align:right;font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;color:#666;border-bottom:2px solid #e5e5e0;white-space:nowrap;">⇄ เติม−ถอน (฿)</th>
+                  <th style="padding:11px 14px;text-align:right;font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;color:#666;border-bottom:2px solid #e5e5e0;white-space:nowrap;">📊 กำไร/ขาดทุน (฿)</th>
+                  <th style="padding:11px 14px;text-align:right;font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;color:#854d0e;border-bottom:2px solid #e5e5e0;white-space:nowrap;">🏦 ค่าบริการ (฿)</th>
+                </tr>
+              </thead>
+              <tbody id="finance-tbody">
+                <tr><td colspan="7" style="text-align:center;padding:32px;color:#aaa;font-family:'Kanit',sans-serif;">กำลังโหลด...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Footer note -->
+          <div style="padding:10px 16px;background:#fafaf8;border-top:1px solid #f0f0ee;font-size:11px;color:#bbb;display:flex;gap:16px;flex-wrap:wrap;">
+            <span>* เติม−ถอน = ยอดเติมเงินอนุมัติ − ยอดถอนเงินอนุมัติ</span>
+            <span>* กำไร/ขาดทุน = (เติม − ถอน) จากเดิมพัน (ผู้ชนะรับ − ผู้แพ้หาย)</span>
+            <span>* ค่าบริการ = หักจากยอด pool เดิมพันตามเปอร์เซ็นต์ที่ตั้งค่าไว้</span>
+          </div>
+        </div>
+
+        <!-- RECENT LIST -->
         <div class="card">
           <div class="card-title">🕐 รายการล่าสุด</div>
           <div id="ov-recent"><div style="text-align:center;padding:20px;color:#aaa;">กำลังโหลด...</div></div>
+        </div>
+      </div>
+
+      <!-- OVERVIEW DETAIL MODAL -->
+      <div id="ov-detail-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:700;align-items:center;justify-content:center;padding:16px;" onclick="if(event.target===this)closeOvDetail()">
+        <div style="background:#fff;border-radius:16px;width:100%;max-width:820px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.3);overflow:hidden;">
+
+          <!-- Modal Header -->
+          <div id="ov-detail-header" style="padding:16px 20px;border-bottom:2px solid #e5e5e0;display:flex;align-items:center;justify-content:space-between;background:#fafaf8;flex-shrink:0;">
+            <div>
+              <div id="ov-detail-title" style="font-family:'Kanit',sans-serif;font-weight:900;font-size:17px;">รายละเอียด</div>
+              <div id="ov-detail-subtitle" style="font-size:12px;color:#aaa;margin-top:2px;"></div>
+            </div>
+            <button onclick="closeOvDetail()" style="background:rgba(0,0,0,.06);border:none;width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;">✕</button>
+          </div>
+
+          <!-- Date Filter Bar -->
+          <div style="padding:12px 20px;border-bottom:1px solid #e5e5e0;background:#fff;display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex-shrink:0;">
+            <span style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;color:#666;">📅 ช่วงเวลา:</span>
+            <input type="date" id="ov-detail-from" class="date-input" onchange="renderOvDetail()">
+            <span style="font-size:12px;color:#aaa;">ถึง</span>
+            <input type="date" id="ov-detail-to" class="date-input" onchange="renderOvDetail()">
+            <button class="btn-date-today" onclick="setOvDetailToday()">วันนี้</button>
+            <button class="btn-date-today" style="background:#f0f4ff;border-color:#3b82f6;color:#3b82f6;" onclick="setOvDetailThisMonth()">เดือนนี้</button>
+            <button class="btn-date-clear" onclick="clearOvDetailDate()">✕ ล้าง</button>
+            <span id="ov-detail-count" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:12px;color:#aaa;"></span>
+          </div>
+
+          <!-- Table -->
+          <div style="overflow-y:auto;flex:1;padding:16px 20px;">
+            <div id="ov-detail-table"><div style="text-align:center;padding:32px;color:#aaa;">กำลังโหลด...</div></div>
+          </div>
+
         </div>
       </div>
 
@@ -818,40 +1007,256 @@ function loadAll() {
 
 // ===== OVERVIEW =====
 async function loadOverview() {
-  const [m, mm, d, w] = await Promise.all([
+  const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+  const todayISO   = todayStart.toISOString();
+
+  const [memAll, memToday, mmAll, mmToday, depAll, depToday, depPending, withAll, withToday, withPending] = await Promise.all([
     sb.from('members').select('*',{count:'exact',head:true}),
+    sb.from('members').select('*',{count:'exact',head:true}).gte('created_at', todayISO),
     sb.from('matches').select('*',{count:'exact',head:true}),
+    sb.from('matches').select('*',{count:'exact',head:true}).gte('created_at', todayISO),
+    sb.from('deposits').select('*',{count:'exact',head:true}),
+    sb.from('deposits').select('*',{count:'exact',head:true}).gte('created_at', todayISO),
     sb.from('deposits').select('*',{count:'exact',head:true}).eq('status','pending'),
+    sb.from('withdrawals').select('*',{count:'exact',head:true}),
+    sb.from('withdrawals').select('*',{count:'exact',head:true}).gte('created_at', todayISO),
     sb.from('withdrawals').select('*',{count:'exact',head:true}).eq('status','pending'),
   ]);
-  document.getElementById('ov-members').textContent = m.count ?? '—';
-  document.getElementById('ov-matches').textContent = mm.count ?? '—';
-  document.getElementById('ov-dep').textContent = d.count ?? '—';
-  document.getElementById('ov-with').textContent = w.count ?? '—';
+
+  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+
+  // สมาชิก
+  const mAll = memAll.count??0, mToday = memToday.count??0;
+  set('ov-members', mAll.toLocaleString());
+  set('ov-members-today', `+${mToday} วันนี้`);
+  set('ov-members-today-n', mToday);
+
+  // คู่แข่งขัน
+  const mxAll = mmAll.count??0, mxToday = mmToday.count??0;
+  set('ov-matches', mxAll.toLocaleString());
+  set('ov-matches-today', `+${mxToday} วันนี้`);
+  set('ov-matches-today-n', mxToday);
+
+  // เติมเงิน
+  const dAll = depAll.count??0, dToday = depToday.count??0, dPend = depPending.count??0;
+  set('ov-dep-total', dAll.toLocaleString());
+  set('ov-dep-today-badge', `วันนี้ ${dToday}`);
+  set('ov-dep-today-n', dToday);
+  set('ov-dep-pending-n', dPend);
+
+  // ถอนเงิน
+  const wAll = withAll.count??0, wToday = withToday.count??0, wPend = withPending.count??0;
+  set('ov-with-total', wAll.toLocaleString());
+  set('ov-with-today-badge', `วันนี้ ${wToday}`);
+  set('ov-with-today-n', wToday);
+  set('ov-with-pending-n', wPend);
+
+  // notif badge (รอดำเนินการรวม)
+  const totalPending = dPend + wPend;
+  const badge = document.getElementById('notif-badge');
+  if (badge) { badge.textContent = totalPending; badge.style.display = totalPending > 0 ? 'inline' : 'none'; }
 
   // รายการล่าสุด
-  const [deps, withs] = await Promise.all([
+  const [deps, withs, newMems] = await Promise.all([
     sb.from('deposits').select('*').order('created_at',{ascending:false}).limit(5),
     sb.from('withdrawals').select('*').order('created_at',{ascending:false}).limit(5),
+    sb.from('members').select('nick,created_at').order('created_at',{ascending:false}).limit(3),
   ]);
   const all = [
-    ...(deps.data||[]).map(r=>({...r,type:'dep'})),
-    ...(withs.data||[]).map(r=>({...r,type:'with'})),
-  ].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,8);
+    ...(deps.data||[]).map(r=>({...r,_type:'dep'})),
+    ...(withs.data||[]).map(r=>({...r,_type:'with'})),
+    ...(newMems.data||[]).map(r=>({...r,_type:'member'})),
+  ].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,10);
+
   const el = document.getElementById('ov-recent');
   if (!all.length) { el.innerHTML = '<div style="text-align:center;padding:20px;color:#aaa;">ยังไม่มีรายการ</div>'; return; }
-  el.innerHTML = all.map(r => `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0f0f0;">
-      <div>
-        <span style="font-family:'Kanit',sans-serif;font-weight:700;">${r.nick}</span>
-        <span style="font-size:12px;color:#aaa;margin-left:8px;">${r.type==='dep'?'💰 เติมเงิน':'🏧 ถอนเงิน'}</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <span style="font-family:'Kanit',sans-serif;font-weight:700;color:${r.type==='dep'?'var(--green)':'var(--red)'};">${r.type==='dep'?'+':'-'}${Number(r.amount).toLocaleString()} ฿</span>
-        <span class="badge badge-${r.status}">${r.status==='pending'?'⏳ รอ':r.status==='approved'?'✅ อนุมัติ':'❌ ปฏิเสธ'}</span>
+  el.innerHTML = all.map(r => {
+    if (r._type === 'member') return `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f5f5f2;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="width:28px;height:28px;border-radius:50%;background:#eff6ff;display:inline-flex;align-items:center;justify-content:center;font-size:14px;">👤</span>
+          <span style="font-family:'Kanit',sans-serif;font-weight:700;cursor:pointer;color:var(--green);text-decoration:underline;" onclick="openMember('${r.nick}')">${r.nick}</span>
+          <span style="font-size:11px;color:#aaa;">สมัครสมาชิกใหม่</span>
+        </div>
         <span style="font-size:11px;color:#aaa;">${fmtDate(r.created_at)}</span>
+      </div>`;
+    const isDep = r._type === 'dep';
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f5f5f2;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="width:28px;height:28px;border-radius:50%;background:${isDep?'#f0fdf4':'#fff5f5'};display:inline-flex;align-items:center;justify-content:center;font-size:14px;">${isDep?'💰':'🏧'}</span>
+          <span style="font-family:'Kanit',sans-serif;font-weight:700;cursor:pointer;color:var(--green);text-decoration:underline;" onclick="openMember('${r.nick}')">${r.nick}</span>
+          <span style="font-size:11px;color:#aaa;">${isDep?'เติมเงิน':'ถอนเงิน'}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-family:'Kanit',sans-serif;font-weight:700;font-size:14px;color:${isDep?'var(--green)':'var(--red)'};">${isDep?'+':'-'}${Number(r.amount).toLocaleString()} ฿</span>
+          <span class="badge badge-${r.status}">${r.status==='pending'?'⏳ รอ':r.status==='approved'?'✅ อนุมัติ':'❌ ปฏิเสธ'}</span>
+          <span style="font-size:11px;color:#aaa;">${fmtDate(r.created_at)}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ===== OVERVIEW DETAIL MODAL =====
+let _ovDetailType = '';
+let _ovDetailData = [];
+
+async function openOvDetail(type) {
+  _ovDetailType = type;
+  document.getElementById('ov-detail-overlay').style.display = 'flex';
+  document.getElementById('ov-detail-table').innerHTML = '<div style="text-align:center;padding:32px;color:#aaa;">กำลังโหลด...</div>';
+
+  const titles = { members:'👥 สมาชิกทั้งหมด', matches:'🏆 คู่แข่งขันทั้งหมด', deposits:'💰 รายการเติมเงินทั้งหมด', withdrawals:'🏧 รายการถอนเงินทั้งหมด' };
+  document.getElementById('ov-detail-title').textContent = titles[type] || 'รายละเอียด';
+
+  let data = [];
+  if (type === 'members') {
+    const r = await sb.from('members').select('nick,fname,lname,phone,balance,created_at').order('created_at',{ascending:false});
+    data = r.data || [];
+  } else if (type === 'matches') {
+    const r = await sb.from('matches').select('round,name_a,name_b,date,status,prize,created_at,code').order('created_at',{ascending:false});
+    data = r.data || [];
+  } else if (type === 'deposits') {
+    const r = await sb.from('deposits').select('nick,amount,bank,status,txn,created_at').order('created_at',{ascending:false});
+    data = r.data || [];
+  } else if (type === 'withdrawals') {
+    const r = await sb.from('withdrawals').select('nick,amount,bank,acc_no,status,txn,created_at').order('created_at',{ascending:false});
+    data = r.data || [];
+  }
+  _ovDetailData = data;
+  renderOvDetail();
+}
+
+function closeOvDetail() {
+  document.getElementById('ov-detail-overlay').style.display = 'none';
+}
+
+function setOvDetailToday() {
+  const t = todayStr();
+  document.getElementById('ov-detail-from').value = t;
+  document.getElementById('ov-detail-to').value   = t;
+  renderOvDetail();
+}
+
+function setOvDetailThisMonth() {
+  const now = new Date();
+  const y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0');
+  const lastDay = new Date(y, now.getMonth()+1, 0).getDate();
+  document.getElementById('ov-detail-from').value = `${y}-${m}-01`;
+  document.getElementById('ov-detail-to').value   = `${y}-${m}-${lastDay}`;
+  renderOvDetail();
+}
+
+function clearOvDetailDate() {
+  document.getElementById('ov-detail-from').value = '';
+  document.getElementById('ov-detail-to').value   = '';
+  renderOvDetail();
+}
+
+function renderOvDetail() {
+  const from = document.getElementById('ov-detail-from')?.value || '';
+  const to   = document.getElementById('ov-detail-to')?.value   || '';
+  const type = _ovDetailType;
+
+  let rows = _ovDetailData.filter(r => {
+    const d = (r.created_at||'').slice(0,10);
+    if (from && d < from) return false;
+    if (to   && d > to)   return false;
+    return true;
+  });
+
+  const countEl = document.getElementById('ov-detail-count');
+  if (countEl) countEl.textContent = `แสดง ${rows.length.toLocaleString()} รายการ`;
+
+  // Update subtitle
+  const subEl = document.getElementById('ov-detail-subtitle');
+  if (subEl) {
+    if (from || to) subEl.textContent = `📅 ${from?fmtDateShort(from):'...'} → ${to?fmtDateShort(to):'...'}`;
+    else subEl.textContent = 'ข้อมูลทั้งหมด';
+  }
+
+  const el = document.getElementById('ov-detail-table');
+  if (!rows.length) { el.innerHTML = '<div style="text-align:center;padding:32px;color:#aaa;">ไม่พบข้อมูลในช่วงเวลานี้</div>'; return; }
+
+  if (type === 'members') {
+    el.innerHTML = `<table><thead><tr>
+      <th>#</th><th>Nick</th><th>ชื่อ-นามสกุล</th><th>เบอร์</th><th>ยอดเงิน (฿)</th><th>สมัครเมื่อ</th>
+    </tr></thead><tbody>` + rows.map((r,i) => `<tr>
+      <td style="color:#aaa;font-size:12px;">${i+1}</td>
+      <td><strong style="cursor:pointer;color:var(--green);text-decoration:underline;" onclick="closeOvDetail();openMember('${r.nick}')">${r.nick||'—'}</strong></td>
+      <td>${r.fname||''} ${r.lname||''}</td>
+      <td style="font-size:12px;">${r.phone||'—'}</td>
+      <td style="font-family:'Kanit',sans-serif;font-weight:700;color:var(--green);">${Number(r.balance||0).toLocaleString()}</td>
+      <td style="font-size:12px;color:#aaa;">${fmtDate(r.created_at)}</td>
+    </tr>`).join('') + '</tbody></table>';
+
+  } else if (type === 'matches') {
+    el.innerHTML = `<table><thead><tr>
+      <th>#</th><th>รหัส</th><th>รุ่น</th><th>🔴 เจ้าบ้าน</th><th>🔵 ทีมเยือน</th><th>วันที่แข่ง</th><th>รางวัล (฿)</th><th>สถานะ</th>
+    </tr></thead><tbody>` + rows.map((r,i) => `<tr>
+      <td style="color:#aaa;font-size:12px;">${i+1}</td>
+      <td>${r.code?`<span class="match-code">${r.code}</span>`:'—'}</td>
+      <td><strong>${r.round||'—'}</strong></td>
+      <td>${r.name_a||'—'}</td>
+      <td>${r.name_b||'—'}</td>
+      <td style="font-size:12px;color:#aaa;">${r.date||'—'}</td>
+      <td style="font-family:'Kanit',sans-serif;font-weight:700;">${Number(r.prize||0).toLocaleString()}</td>
+      <td><span class="badge badge-${r.status==='done'?'approved':r.status==='live'?'live':'upcoming'}">${r.status==='done'?'✅ จบ':r.status==='live'?'🔴 Live':'⏳ รอ'}</span></td>
+    </tr>`).join('') + '</tbody></table>';
+
+  } else if (type === 'deposits') {
+    // สรุปยอด
+    const totalAmt = rows.filter(r=>r.status==='approved').reduce((s,r)=>s+Number(r.amount||0),0);
+    const pendCount = rows.filter(r=>r.status==='pending').length;
+    el.innerHTML = `
+      <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 16px;min-width:140px;">
+          <div style="font-size:11px;color:#888;">ยอดอนุมัติรวม</div>
+          <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:var(--green);">${totalAmt.toLocaleString()} ฿</div>
+        </div>
+        <div style="background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:10px 16px;min-width:140px;">
+          <div style="font-size:11px;color:#888;">รอดำเนินการ</div>
+          <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:var(--red);">${pendCount} รายการ</div>
+        </div>
       </div>
-    </div>`).join('');
+      <table><thead><tr>
+        <th>#</th><th>Nick</th><th>จำนวน (฿)</th><th>ธนาคาร</th><th>TXN</th><th>สถานะ</th><th>เวลา</th>
+      </tr></thead><tbody>` + rows.map((r,i) => `<tr>
+        <td style="color:#aaa;font-size:12px;">${i+1}</td>
+        <td><strong style="cursor:pointer;color:var(--green);text-decoration:underline;" onclick="closeOvDetail();openMember('${r.nick}')">${r.nick||'—'}</strong></td>
+        <td style="font-family:'Kanit',sans-serif;font-weight:700;color:var(--green);">+${Number(r.amount||0).toLocaleString()}</td>
+        <td style="font-size:12px;">${r.bank||'—'}</td>
+        <td style="font-size:11px;color:#aaa;">${r.txn||'—'}</td>
+        <td><span class="badge badge-${r.status}">${r.status==='approved'?'✅ อนุมัติ':r.status==='rejected'?'❌ ปฏิเสธ':'⏳ รอ'}</span></td>
+        <td style="font-size:12px;color:#aaa;">${fmtDate(r.created_at)}</td>
+      </tr>`).join('') + '</tbody></table>';
+
+  } else if (type === 'withdrawals') {
+    const totalAmt = rows.filter(r=>r.status==='approved').reduce((s,r)=>s+Number(r.amount||0),0);
+    const pendCount = rows.filter(r=>r.status==='pending').length;
+    el.innerHTML = `
+      <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+        <div style="background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:10px 16px;min-width:140px;">
+          <div style="font-size:11px;color:#888;">ยอดถอนสำเร็จรวม</div>
+          <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:var(--red);">${totalAmt.toLocaleString()} ฿</div>
+        </div>
+        <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:10px 16px;min-width:140px;">
+          <div style="font-size:11px;color:#888;">รอดำเนินการ</div>
+          <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:#854d0e;">${pendCount} รายการ</div>
+        </div>
+      </div>
+      <table><thead><tr>
+        <th>#</th><th>Nick</th><th>จำนวน (฿)</th><th>ธนาคาร</th><th>เลขบัญชี</th><th>สถานะ</th><th>เวลา</th>
+      </tr></thead><tbody>` + rows.map((r,i) => `<tr>
+        <td style="color:#aaa;font-size:12px;">${i+1}</td>
+        <td><strong style="cursor:pointer;color:var(--green);text-decoration:underline;" onclick="closeOvDetail();openMember('${r.nick}')">${r.nick||'—'}</strong></td>
+        <td style="font-family:'Kanit',sans-serif;font-weight:700;color:var(--red);">-${Number(r.amount||0).toLocaleString()}</td>
+        <td style="font-size:12px;">${r.bank||'—'}</td>
+        <td style="font-size:12px;">${r.acc_no||'—'}</td>
+        <td><span class="badge badge-${r.status}">${r.status==='approved'?'✅ โอนแล้ว':r.status==='rejected'?'❌ ปฏิเสธ':'⏳ รอ'}</span></td>
+        <td style="font-size:12px;color:#aaa;">${fmtDate(r.created_at)}</td>
+      </tr>`).join('') + '</tbody></table>';
+  }
 }
 
 // ===== MEMBERS =====
@@ -2307,6 +2712,528 @@ async function saveMemberEdit(nick, id) {
   showToast(`✅ บันทึกข้อมูล ${nick} เรียบร้อยแล้วครับ`);
   closeMember();
   loadMembers(); loadOverview();
+}
+</script>
+
+<!-- CHART.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ===== GROWTH CHART ENGINE =====
+let _growthChart = null;
+let _chartRange  = 'month';
+let _chartType   = 'members';
+let _rawData     = { members:[], matches:[], deposits:[], withdrawals:[] };
+
+// โหลดข้อมูลดิบจาก Supabase (ดึงครั้งเดียว แล้วค่อย slice ตาม range)
+async function loadChartData() {
+  // ดึงข้อมูล created_at ทั้งหมด (limit สูงสุด เพราะต้องการ aggregate)
+  const [mR, xR, dR, wR] = await Promise.all([
+    sb.from('members').select('created_at').order('created_at',{ascending:true}),
+    sb.from('matches').select('created_at').order('created_at',{ascending:true}),
+    sb.from('deposits').select('created_at,amount,status').order('created_at',{ascending:true}),
+    sb.from('withdrawals').select('created_at,amount,status').order('created_at',{ascending:true}),
+  ]);
+  _rawData.members     = mR.data || [];
+  _rawData.matches     = xR.data || [];
+  _rawData.deposits    = dR.data || [];
+  _rawData.withdrawals = wR.data || [];
+  renderGrowthChart();
+}
+
+// กำหนด range ปัจจุบัน
+function setChartRange(range, btn) {
+  _chartRange = range;
+  document.querySelectorAll('.chart-range-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrowthChart();
+}
+
+// เปลี่ยน chart type (tab)
+function switchChart(type, btn) {
+  _chartType = type;
+  document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrowthChart();
+}
+
+// สร้าง labels + buckets ตาม range
+function buildBuckets(range) {
+  const now    = new Date();
+  const labels = [];
+  const keys   = [];   // YYYY-MM หรือ YYYY-QN หรือ YYYY
+
+  if (range === 'month') {
+    // ย้อนหลัง 18 เดือน + ไปข้างหน้า 6 เดือน = 24 buckets
+    for (let i = -18; i <= 6; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0');
+      keys.push(`${y}-${m}`);
+      labels.push(`${['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'][d.getMonth()]} ${(y+543).toString().slice(-2)}`);
+    }
+  } else if (range === 'quarter') {
+    // ย้อน 8 ไตรมาส + ไปข้างหน้า 4 ไตรมาส = 12 buckets
+    const curQ = Math.floor(now.getMonth()/3);
+    for (let i = -8; i <= 4; i++) {
+      let q = curQ + i, y = now.getFullYear();
+      while (q < 0) { q += 4; y--; }
+      while (q > 3) { q -= 4; y++; }
+      keys.push(`${y}-Q${q+1}`);
+      labels.push(`Q${q+1}/${(y+543).toString().slice(-2)}`);
+    }
+  } else {
+    // รายปี: ตั้งแต่ปีแรกที่มีข้อมูล ถึงอีก 15 ปี
+    const allDates = [
+      ..._rawData.members, ..._rawData.matches,
+      ..._rawData.deposits, ..._rawData.withdrawals
+    ].map(r => new Date(r.created_at).getFullYear()).filter(Boolean);
+    const minYear = allDates.length ? Math.min(...allDates) : now.getFullYear();
+    const maxYear = now.getFullYear() + 15;
+    for (let y = minYear; y <= maxYear; y++) {
+      keys.push(`${y}`);
+      labels.push(`${y + 543}`);
+    }
+  }
+  return { labels, keys };
+}
+
+// map created_at → bucket key
+function dateToBucketKey(iso, range) {
+  const d = new Date(iso);
+  if (!iso || isNaN(d)) return null;
+  const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0');
+  if (range === 'month')   return `${y}-${m}`;
+  if (range === 'quarter') return `${y}-Q${Math.floor(d.getMonth()/3)+1}`;
+  return `${y}`;
+}
+
+// Aggregate: count per bucket
+function aggregateCounts(rows, range, keys) {
+  const map = {};
+  keys.forEach(k => map[k] = 0);
+  rows.forEach(r => {
+    const k = dateToBucketKey(r.created_at, range);
+    if (k && map[k] !== undefined) map[k]++;
+  });
+  return keys.map(k => map[k]);
+}
+
+// Aggregate: sum amount per bucket (สำหรับ deposits/withdrawals)
+function aggregateAmounts(rows, range, keys, statusFilter) {
+  const map = {};
+  keys.forEach(k => map[k] = 0);
+  rows.forEach(r => {
+    if (statusFilter && r.status !== statusFilter) return;
+    const k = dateToBucketKey(r.created_at, range);
+    if (k && map[k] !== undefined) map[k] += Number(r.amount||0);
+  });
+  return keys.map(k => map[k]);
+}
+
+// Cumulative sum
+function cumulative(arr) {
+  let s = 0; return arr.map(v => (s += v));
+}
+
+function renderGrowthChart() {
+  const { labels, keys } = buildBuckets(_chartRange);
+  const nowKey = dateToBucketKey(new Date().toISOString(), _chartRange);
+  const nowIdx = keys.indexOf(nowKey);
+
+  // สีตาม type
+  const palette = {
+    members:     { bg:'rgba(59,130,246,0.15)',  border:'#3b82f6',  fill:'rgba(59,130,246,0.08)'  },
+    matches:     { bg:'rgba(245,168,0,0.15)',   border:'#F5A800',  fill:'rgba(245,168,0,0.08)'   },
+    deposits:    { bg:'rgba(34,197,94,0.15)',   border:'#22c55e',  fill:'rgba(34,197,94,0.08)'   },
+    withdrawals: { bg:'rgba(239,68,68,0.15)',   border:'#ef4444',  fill:'rgba(239,68,68,0.08)'   },
+  };
+
+  // Build datasets ตาม tab ที่เลือก
+  let datasets = [];
+  let summaryItems = [];
+
+  const buildDS = (type, label, rows, isAmount) => {
+    const p    = palette[type];
+    const data = isAmount
+      ? aggregateAmounts(rows, _chartRange, keys, 'approved')
+      : aggregateCounts(rows, _chartRange, keys);
+    const cumData = cumulative(data);
+
+    // หา current, prev (1 bucket ก่อน), total
+    const cur  = data[nowIdx] ?? 0;
+    const prev = data[nowIdx - 1] ?? 0;
+    const total= cumData[nowIdx] ?? cumData[cumData.length-1];
+    const delta = cur - prev;
+    const deltaClass = delta > 0 ? 'csm-up' : delta < 0 ? 'csm-down' : 'csm-flat';
+    const deltaSign  = delta > 0 ? '▲' : delta < 0 ? '▼' : '—';
+
+    summaryItems.push({ label, cur, total, delta, deltaClass, deltaSign, isAmount });
+
+    return [
+      {
+        label: `${label} (ช่วงนี้)`,
+        data,
+        backgroundColor: p.bg,
+        borderColor:     p.border,
+        borderWidth:     2,
+        tension:         0.4,
+        fill:            true,
+        pointRadius:     (ctx) => ctx.dataIndex === nowIdx ? 5 : 2,
+        pointBackgroundColor: p.border,
+        type: 'bar',
+        yAxisID: 'y',
+        order: 2,
+        barThickness: _chartRange === 'year' ? 18 : _chartRange === 'quarter' ? 14 : 8,
+      },
+      {
+        label: `${label} (สะสม)`,
+        data: cumData,
+        backgroundColor: 'transparent',
+        borderColor:     p.border,
+        borderWidth:     2.5,
+        borderDash:      [],
+        tension:         0.4,
+        fill:            false,
+        pointRadius:     (ctx) => ctx.dataIndex === nowIdx ? 6 : 0,
+        pointBackgroundColor: p.border,
+        type: 'line',
+        yAxisID: 'y1',
+        order: 1,
+      }
+    ];
+  };
+
+  if (_chartType === 'all') {
+    const mData  = cumulative(aggregateCounts(_rawData.members,    _chartRange, keys));
+    const xData  = cumulative(aggregateCounts(_rawData.matches,    _chartRange, keys));
+    const dData  = cumulative(aggregateAmounts(_rawData.deposits,  _chartRange, keys, 'approved'));
+    const wData  = cumulative(aggregateAmounts(_rawData.withdrawals,_chartRange, keys, 'approved'));
+    datasets = [
+      { label:'สมาชิก (สะสม)',        data:mData, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.05)',  fill:true, tension:0.4, borderWidth:2, pointRadius:0, type:'line', yAxisID:'y' },
+      { label:'คู่แข่ง (สะสม)',       data:xData, borderColor:'#F5A800', backgroundColor:'rgba(245,168,0,0.05)',   fill:true, tension:0.4, borderWidth:2, pointRadius:0, type:'line', yAxisID:'y' },
+    ];
+    // เส้นแนวตั้งปัจจุบัน — ใช้ annotation plugin ไม่ได้ ให้ highlight ด้วย pointRadius
+    const makeHighlight = (arr, color) => ({
+      label: '', data: arr.map((v,i) => i === nowIdx ? v : null),
+      borderColor: color, backgroundColor: color,
+      pointRadius: 6, pointHoverRadius: 8, showLine: false, type:'scatter', yAxisID:'y',
+    });
+    datasets.push(makeHighlight(mData,'#3b82f6'), makeHighlight(xData,'#F5A800'));
+
+    // Summary all
+    const now_m = (aggregateCounts(_rawData.members, _chartRange, keys))[nowIdx] ?? 0;
+    const now_x = (aggregateCounts(_rawData.matches, _chartRange, keys))[nowIdx] ?? 0;
+    const now_d = (aggregateAmounts(_rawData.deposits, _chartRange, keys,'approved'))[nowIdx] ?? 0;
+    const now_w = (aggregateAmounts(_rawData.withdrawals, _chartRange, keys,'approved'))[nowIdx] ?? 0;
+    summaryItems = [
+      { label:'สมาชิก',    cur:now_m, total:mData[nowIdx]??0, delta:0, deltaClass:'csm-flat', deltaSign:'—', isAmount:false },
+      { label:'คู่แข่ง',   cur:now_x, total:xData[nowIdx]??0, delta:0, deltaClass:'csm-flat', deltaSign:'—', isAmount:false },
+      { label:'เติมเงิน',  cur:now_d, total:dData[nowIdx]??0, delta:0, deltaClass:'csm-flat', deltaSign:'—', isAmount:true  },
+      { label:'ถอนเงิน',   cur:now_w, total:wData[nowIdx]??0, delta:0, deltaClass:'csm-flat', deltaSign:'—', isAmount:true  },
+    ];
+  } else if (_chartType === 'members') {
+    datasets = buildDS('members', 'สมาชิก', _rawData.members, false);
+  } else if (_chartType === 'matches') {
+    datasets = buildDS('matches', 'คู่แข่งขัน', _rawData.matches, false);
+  } else if (_chartType === 'deposits') {
+    datasets = buildDS('deposits', 'เติมเงิน', _rawData.deposits, true);
+  } else if (_chartType === 'withdrawals') {
+    datasets = buildDS('withdrawals', 'ถอนเงิน', _rawData.withdrawals, true);
+  }
+
+  // Render summary cards
+  const sumEl = document.getElementById('chart-summary-row');
+  if (sumEl) {
+    const isAmt = _chartType === 'deposits' || _chartType === 'withdrawals';
+    const fmt = (v, isA) => isA ? `${v.toLocaleString()} ฿` : v.toLocaleString();
+    sumEl.innerHTML = summaryItems.map(s => `
+      <div class="chart-stat-mini">
+        <div class="csm-val">${fmt(s.cur, s.isAmount)}</div>
+        <div class="csm-lbl">${s.label} ช่วงนี้</div>
+        <div class="csm-delta ${s.deltaClass}">${s.deltaSign} ${Math.abs(s.delta)} จากช่วงก่อน</div>
+      </div>
+      <div class="chart-stat-mini">
+        <div class="csm-val" style="font-size:16px;">${fmt(s.total, s.isAmount)}</div>
+        <div class="csm-lbl">${s.label} สะสม</div>
+        <div class="csm-delta csm-flat">ณ ปัจจุบัน</div>
+      </div>`).join('');
+  }
+
+  // ทำลาย chart เก่า
+  if (_growthChart) { _growthChart.destroy(); _growthChart = null; }
+
+  const ctx = document.getElementById('growth-chart');
+  if (!ctx) return;
+
+  // เส้นแบ่ง "ปัจจุบัน"
+  const nowLinePlugin = {
+    id: 'nowLine',
+    afterDraw(chart) {
+      if (nowIdx < 0) return;
+      const { ctx: c, chartArea: { top, bottom }, scales: { x } } = chart;
+      const xPos = x.getPixelForValue(nowIdx);
+      c.save();
+      c.setLineDash([4, 4]);
+      c.strokeStyle = 'rgba(0,0,0,0.2)';
+      c.lineWidth = 1.5;
+      c.beginPath(); c.moveTo(xPos, top); c.lineTo(xPos, bottom); c.stroke();
+      c.setLineDash([]);
+      c.fillStyle = 'rgba(0,0,0,0.5)';
+      c.font = '10px Kanit,sans-serif';
+      c.textAlign = 'center';
+      c.fillText('▼ ปัจจุบัน', xPos, top + 10);
+      c.restore();
+    }
+  };
+
+  const hasY1 = datasets.some(d => d.yAxisID === 'y1');
+  const isAmountChart = _chartType === 'deposits' || _chartType === 'withdrawals';
+
+  _growthChart = new Chart(ctx, {
+    data: { labels, datasets },
+    options: {
+      responsive:          true,
+      maintainAspectRatio: false,
+      interaction:         { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (item) => {
+              const v = Math.round(item.raw ?? 0);
+              return ` ${item.dataset.label}: ${isAmountChart ? v.toLocaleString()+' ฿' : v.toLocaleString()}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid:  { display: false },
+          ticks: {
+            font:       { family: 'Kanit', size: 10 },
+            color:      '#aaa',
+            maxRotation: 45,
+            autoSkip:   true,
+            maxTicksLimit: _chartRange === 'year' ? 20 : _chartRange === 'quarter' ? 12 : 12,
+          }
+        },
+        y: {
+          position:       'left',
+          beginAtZero:    true,
+          grid:           { color: 'rgba(0,0,0,0.05)' },
+          ticks:          { font:{ family:'Kanit', size:10 }, color:'#aaa', callback: v => isAmountChart ? (v>=1000?`${Math.round(v/1000)}K`:v) : v }
+        },
+        ...(hasY1 ? {
+          y1: {
+            position:    'right',
+            beginAtZero: true,
+            grid:        { drawOnChartArea: false },
+            ticks:       { font:{ family:'Kanit', size:10 }, color:'#888', callback: v => isAmountChart ? (v>=1000?`${Math.round(v/1000)}K`:v) : v }
+          }
+        } : {})
+      }
+    },
+    plugins: [nowLinePlugin]
+  });
+
+  // Custom legend
+  const legendEl = document.getElementById('chart-legend');
+  if (legendEl) {
+    legendEl.innerHTML = datasets.filter(d=>d.label).map(d => {
+      const color = typeof d.borderColor === 'string' ? d.borderColor : '#888';
+      const isLine = d.type === 'line';
+      return `<span style="display:inline-flex;align-items:center;gap:4px;">
+        <span style="width:${isLine?'20px':'10px'};height:${isLine?'3px':'10px'};background:${color};border-radius:2px;flex-shrink:0;"></span>
+        <span>${d.label}</span>
+      </span>`;
+    }).filter(Boolean).join('');
+  }
+}
+
+// เรียก loadChartData หลังจาก dashboard โหลดครบ
+const _origLoadAll = loadAll;
+loadAll = function() {
+  _origLoadAll();
+  loadChartData();
+  loadFinanceTable();
+};
+
+// ===== FINANCE SUMMARY TABLE =====
+async function loadFinanceTable() {
+  const tbody = document.getElementById('finance-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:#aaa;font-family:\'Kanit\',sans-serif;">กำลังโหลด...</td></tr>';
+
+  // โหลดข้อมูลทั้งหมดพร้อมกัน
+  const [memRes, depRes, withRes, betRes, settRes] = await Promise.all([
+    sb.from('members').select('created_at').order('created_at', { ascending: true }),
+    sb.from('deposits').select('created_at,amount,status').order('created_at', { ascending: true }),
+    sb.from('withdrawals').select('created_at,amount,status').order('created_at', { ascending: true }),
+    sb.from('bets').select('created_at,amount,status,odds').order('created_at', { ascending: true }),
+    sb.from('settings').select('value').eq('key', 'feeRate').maybeSingle(),
+  ]);
+
+  const members     = memRes.data  || [];
+  const deposits    = depRes.data  || [];
+  const withdrawals = withRes.data || [];
+  const bets        = betRes.data  || [];
+  const feeRate     = (settRes.data?.value?.rate ?? 7) / 100;
+
+  // ฟังก์ชันช่วย: แปลง ISO → Date
+  const d = iso => new Date(iso);
+
+  // กำหนดช่วงเวลา
+  const now       = new Date();
+  const todayStart= new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayEnd  = new Date(todayStart.getTime() + 86400000 - 1);
+
+  const ystStart  = new Date(todayStart.getTime() - 86400000);
+  const ystEnd    = new Date(todayStart.getTime() - 1);
+
+  // สัปดาห์นี้ (จันทร์–อาทิตย์)
+  const dayOfWeek = now.getDay() === 0 ? 6 : now.getDay() - 1; // 0=Mon
+  const weekStart = new Date(todayStart.getTime() - dayOfWeek * 86400000);
+  const weekEnd   = new Date(weekStart.getTime() + 7 * 86400000 - 1);
+
+  // สัปดาห์ก่อน
+  const prevWeekStart = new Date(weekStart.getTime() - 7 * 86400000);
+  const prevWeekEnd   = new Date(weekStart.getTime() - 1);
+
+  // เดือนนี้
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthEnd   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+  // เดือนก่อน
+  const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const prevMonthEnd   = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+
+  const periods = [
+    { label: 'วันนี้',         icon: '🌤️', from: todayStart,     to: todayEnd     },
+    { label: 'เมื่อวาน',       icon: '📅',  from: ystStart,       to: ystEnd       },
+    { label: 'สัปดาห์นี้',     icon: '📆',  from: weekStart,      to: weekEnd      },
+    { label: 'สัปดาห์ก่อน',   icon: '📋',  from: prevWeekStart,  to: prevWeekEnd  },
+    { label: 'เดือนนี้',       icon: '🗓️',  from: monthStart,     to: monthEnd     },
+    { label: 'เดือนก่อน',      icon: '📂',  from: prevMonthStart, to: prevMonthEnd },
+  ];
+
+  // ฟังก์ชัน filter ตามช่วง
+  const inRange = (iso, from, to) => {
+    const t = d(iso).getTime();
+    return t >= from.getTime() && t <= to.getTime();
+  };
+
+  // คำนวณแต่ละช่วง
+  const rows = periods.map(p => {
+    // สมาชิกใหม่
+    const newMembers = members.filter(r => inRange(r.created_at, p.from, p.to)).length;
+
+    // เติมเงิน (อนุมัติเท่านั้น)
+    const depAmt = deposits
+      .filter(r => r.status === 'approved' && inRange(r.created_at, p.from, p.to))
+      .reduce((s, r) => s + Number(r.amount || 0), 0);
+
+    // ถอนเงิน (อนุมัติเท่านั้น)
+    const withAmt = withdrawals
+      .filter(r => r.status === 'approved' && inRange(r.created_at, p.from, p.to))
+      .reduce((s, r) => s + Number(r.amount || 0), 0);
+
+    // เติม − ถอน
+    const netFlow = depAmt - withAmt;
+
+    // เดิมพันในช่วง: คำนวณกำไร/ขาดทุนของระบบ
+    // กำไรระบบ = ยอดแพ้ทั้งหมด − ยอดชนะทั้งหมด (เฉพาะ won/lost)
+    const betsInRange = bets.filter(r => inRange(r.created_at, p.from, p.to));
+    const betLost = betsInRange
+      .filter(r => r.status === 'lost')
+      .reduce((s, r) => s + Number(r.amount || 0), 0);
+    const betWon = betsInRange
+      .filter(r => r.status === 'won')
+      .reduce((s, r) => s + Number(r.amount || 0), 0);
+    // pool = lost+won, ค่าบริการหักจาก pool ก่อนจ่าย
+    const poolTotal = betLost + betWon;
+    const feeAmt    = Math.floor(poolTotal * feeRate);
+    // กำไร/ขาดทุน = เติม − ถอน (มุมมองสภาพคล่องระบบ)
+    const profitLoss = netFlow;
+
+    return { ...p, newMembers, depAmt, withAmt, netFlow, profitLoss, feeAmt };
+  });
+
+  // Render
+  const fmt = v => Math.abs(v) >= 1000000
+    ? (v/1000000).toFixed(1) + 'M'
+    : Math.abs(v) >= 1000
+    ? (v/1000).toFixed(1) + 'K'
+    : v.toLocaleString();
+
+  const fmtMoney = v => {
+    const sign = v < 0 ? '−' : '';
+    return sign + fmt(Math.abs(v));
+  };
+
+  const colorNet = v => v > 0 ? '#16a34a' : v < 0 ? '#dc2626' : '#888';
+  const colorProfit = v => v > 0 ? '#16a34a' : v < 0 ? '#dc2626' : '#888';
+
+  tbody.innerHTML = rows.map((r, i) => {
+    const isToday   = i === 0;
+    const rowBg     = isToday ? 'background:#fffbeb;' : (i % 2 === 0 ? '' : 'background:#fafaf8;');
+    const fontW     = isToday ? 'font-weight:700;' : '';
+
+    const netColor  = colorNet(r.netFlow);
+    const profColor = colorProfit(r.profitLoss);
+
+    return `<tr style="${rowBg}${isToday ? 'border-left:3px solid #F5A800;' : ''}">
+      <td style="padding:12px 16px;font-family:'Kanit',sans-serif;font-size:13px;${fontW}white-space:nowrap;">
+        <span style="margin-right:6px;">${r.icon}</span>${r.label}
+        ${isToday ? '<span style="font-size:10px;background:#fef9c3;color:#854d0e;padding:1px 6px;border-radius:4px;margin-left:4px;font-family:\'Kanit\',sans-serif;font-weight:700;">ปัจจุบัน</span>' : ''}
+      </td>
+      <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;${fontW}font-size:13px;color:#3b82f6;">
+        ${r.newMembers > 0 ? '+' : ''}${r.newMembers.toLocaleString()}
+      </td>
+      <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;${fontW}font-size:13px;color:#16a34a;">
+        ${r.depAmt > 0 ? '+' : ''}${fmtMoney(r.depAmt)}
+      </td>
+      <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;${fontW}font-size:13px;color:#dc2626;">
+        ${r.withAmt > 0 ? '−' : ''}${fmt(r.withAmt)}
+      </td>
+      <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;${fontW}font-size:13px;color:${netColor};">
+        ${r.netFlow >= 0 ? '+' : ''}${fmtMoney(r.netFlow)}
+      </td>
+      <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;${fontW}font-size:14px;color:${profColor};">
+        <span style="display:inline-flex;align-items:center;gap:3px;">
+          ${r.profitLoss > 0
+            ? `<span style="font-size:10px;">▲</span>`
+            : r.profitLoss < 0
+            ? `<span style="font-size:10px;">▼</span>`
+            : ''}
+          ${r.profitLoss >= 0 ? '+' : ''}${fmtMoney(r.profitLoss)}
+        </span>
+      </td>
+      <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;${fontW}font-size:13px;color:#854d0e;">
+        ${r.feeAmt > 0 ? '+' : ''}${fmtMoney(r.feeAmt)}
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Total row
+  const totals = rows.reduce((acc, r) => ({
+    newMembers: acc.newMembers + r.newMembers,
+    depAmt:     acc.depAmt    + r.depAmt,
+    withAmt:    acc.withAmt   + r.withAmt,
+    netFlow:    acc.depAmt    + r.depAmt - (acc.withAmt + r.withAmt),
+    profitLoss: acc.profitLoss + r.profitLoss,
+    feeAmt:     acc.feeAmt    + r.feeAmt,
+  }), { newMembers:0, depAmt:0, withAmt:0, netFlow:0, profitLoss:0, feeAmt:0 });
+  // fix netFlow accumulation
+  totals.netFlow = totals.depAmt - totals.withAmt;
+
+  tbody.innerHTML += `<tr style="background:#f0f4f8;border-top:2px solid #e5e5e0;">
+    <td style="padding:12px 16px;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;">รวมทั้งหมด</td>
+    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:#3b82f6;">+${totals.newMembers.toLocaleString()}</td>
+    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:#16a34a;">+${fmtMoney(totals.depAmt)}</td>
+    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:#dc2626;">−${fmt(totals.withAmt)}</td>
+    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:${colorNet(totals.netFlow)};">${totals.netFlow>=0?'+':''}${fmtMoney(totals.netFlow)}</td>
+    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:14px;color:${colorProfit(totals.profitLoss)};">${totals.profitLoss>=0?'+':''}${fmtMoney(totals.profitLoss)}</td>
+    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:#854d0e;">+${fmtMoney(totals.feeAmt)}</td>
+  </tr>`;
 }
 </script>
 
