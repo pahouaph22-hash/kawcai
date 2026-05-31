@@ -428,12 +428,36 @@ tr:hover td{background:#fafafa;}
             </select>
           </div>
           <div style="overflow-x:auto;">
-            <table>
-              <thead><tr>
-                <th>Nick</th><th>VIP</th><th>ชื่อ-นามสกุล</th><th>เบอร์</th>
-                <th>ยอดเงิน</th><th>เติมสะสม</th><th>สมัครเมื่อ</th><th>จัดการ</th>
-              </tr></thead>
-              <tbody id="members-tbody"><tr class="loading-row"><td colspan="8" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
+            <table style="table-layout:fixed;width:100%;min-width:860px;">
+              <colgroup>
+                <col style="width:130px"><!-- Nick -->
+                <col style="width:120px"><!-- VIP -->
+                <col style="width:130px"><!-- ชื่อ -->
+                <col style="width:110px"><!-- เบอร์ -->
+                <col style="width:95px"> <!-- ยอดเงิน -->
+                <col style="width:95px"> <!-- เติมสะสม -->
+                <col style="width:95px"> <!-- ถอนสะสม -->
+                <col style="width:105px"><!-- เติม-ถอน -->
+                <col style="width:95px"> <!-- สมัครเมื่อ -->
+                <col style="width:100px"><!-- จัดการ -->
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Nick</th>
+                  <th>VIP</th>
+                  <th>ชื่อ-นามสกุล</th>
+                  <th>เบอร์</th>
+                  <th style="text-align:right;">💰 ยอดเงิน</th>
+                  <th style="text-align:right;color:#16a34a;">⬆ เติมสะสม</th>
+                  <th style="text-align:right;color:#dc2626;">⬇ ถอนสะสม</th>
+                  <th style="text-align:right;color:#1d4ed8;">± เติม−ถอน</th>
+                  <th style="text-align:right;">สมัครเมื่อ</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="members-tbody">
+                <tr class="loading-row"><td colspan="10" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr>
+              </tbody>
             </table>
           </div>
         </div>
@@ -719,30 +743,112 @@ tr:hover td{background:#fafafa;}
 
       <!-- REFERRAL -->
       <div class="panel" id="panel-referral">
+
+        <!-- ── stat cards ── -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:0;">
+          <div class="stat-card"><div class="ico">🤝</div><div class="val" id="ref-total-referrers">—</div><div class="lbl">ผู้แนะนำทั้งหมด</div></div>
+          <div class="stat-card"><div class="ico">👥</div><div class="val" id="ref-total-members">—</div><div class="lbl">สมาชิกที่ถูกแนะนำ</div></div>
+          <div class="stat-card"><div class="ico">💰</div><div class="val" id="ref-total-commission">—</div><div class="lbl">คอมฯ จ่ายรวม (฿)</div></div>
+          <div class="stat-card"><div class="ico">📋</div><div class="val" id="ref-total-logs">—</div><div class="lbl">รายการทั้งหมด</div></div>
+        </div>
+
+        <!-- ── ตาราง: สรุปต่อผู้แนะนำ (Referrer Summary) ── -->
         <div class="card">
-          <div class="card-title">🎁 ภาพรวมระบบแนะนำสมาชิก
-            <div style="display:flex;gap:8px;">
-              <button class="btn btn-primary" onclick="loadReferralPanel()">🔄 รีเฟรช</button>
-            </div>
+          <div class="card-title">🏆 สรุปผู้แนะนำ — จำนวนสมาชิกที่แนะนำมา
+            <button onclick="loadReferralPanel()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">🔄 รีเฟรช</button>
           </div>
-          <div id="ref-stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
-            <div class="stat-card"><div class="ico">👥</div><div class="val" id="ref-total-members">—</div><div class="lbl">สมาชิกที่ถูกแนะนำ</div></div>
-            <div class="stat-card"><div class="ico">💰</div><div class="val" id="ref-total-commission">—</div><div class="lbl">คอมฯ จ่ายรวม (฿)</div></div>
-            <div class="stat-card"><div class="ico">📋</div><div class="val" id="ref-total-logs">—</div><div class="lbl">รายการทั้งหมด</div></div>
+
+          <!-- search + filter -->
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
+            <input id="ref-search-nick" placeholder="🔍 ค้นหาชื่อผู้แนะนำ..." oninput="filterReferralSummary()"
+              style="flex:1;min-width:180px;padding:8px 13px;border:1px solid #e0e0e0;border-radius:9px;font-family:'Kanit',sans-serif;font-size:13px;">
+            <select id="ref-sort-by" onchange="filterReferralSummary()"
+              style="padding:8px 12px;border:1px solid #e0e0e0;border-radius:9px;font-family:'Kanit',sans-serif;font-size:12px;">
+              <option value="count">เรียงตามจำนวนสมาชิก</option>
+              <option value="commission">เรียงตามค่าคอมฯ รวม</option>
+              <option value="nick">เรียงตามชื่อ</option>
+            </select>
           </div>
+
           <div style="overflow-x:auto;">
             <table>
-              <thead><tr><th>ผู้แนะนำ</th><th>สมาชิกใหม่</th><th>ยอดเติมเงิน</th><th>คอมฯ ที่ได้</th><th>อัตรา</th><th>วันที่</th></tr></thead>
-              <tbody id="ref-logs-tbody"><tr><td colspan="6" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
+              <thead>
+                <tr>
+                  <th style="width:36px;">#</th>
+                  <th>ผู้แนะนำ</th>
+                  <th style="text-align:center;">สมาชิกที่แนะนำ</th>
+                  <th style="text-align:center;">ชั้น 1</th>
+                  <th style="text-align:center;">ชั้น 2+</th>
+                  <th style="text-align:right;">คอมฯ รวม (฿)</th>
+                  <th style="text-align:right;">ล่าสุด</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="ref-summary-tbody">
+                <tr><td colspan="8" style="text-align:center;padding:28px;color:#aaa;">กำลังโหลด...</td></tr>
+              </tbody>
             </table>
           </div>
+          <div id="ref-summary-footer" style="padding:8px 12px;font-size:11px;color:#aaa;border-top:1px solid #f0f0ee;"></div>
         </div>
+
+        <!-- ── ตาราง: ประวัติรายการคอมฯ ── -->
         <div class="card">
-          <div class="card-title">🏆 Top ผู้แนะนำสมาชิก
-            <button onclick="loadReferralPanel()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
-            <button onclick="loadReferralPanel()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button></div>
-          <div id="ref-top-list"><div style="text-align:center;padding:20px;color:#aaa;">กำลังโหลด...</div></div>
+          <div class="card-title" style="margin-bottom:12px;">📋 ประวัติรายการคอมมิชชัน
+            <button onclick="loadReferralPanel()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">🔄 รีเฟรช</button>
+          </div>
+
+          <!-- filter bar -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;">
+            <input id="ref-log-search" placeholder="🔍 ค้นหา nick..." oninput="filterReferralLogs()"
+              style="flex:1;min-width:150px;padding:7px 12px;border:1px solid #e0e0e0;border-radius:8px;font-family:'Kanit',sans-serif;font-size:12px;">
+            <input type="date" id="ref-log-from2" onchange="filterReferralLogs()"
+              style="padding:7px 10px;border:1px solid #e0e0e0;border-radius:8px;font-size:12px;">
+            <input type="date" id="ref-log-to2" onchange="filterReferralLogs()"
+              style="padding:7px 10px;border:1px solid #e0e0e0;border-radius:8px;font-size:12px;">
+            <button onclick="_refLogToday()" style="font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:6px 12px;border:1px solid #1B6B2F;border-radius:8px;background:#f0faf4;color:#1B6B2F;cursor:pointer;">วันนี้</button>
+            <button onclick="_refLogMonth()" style="font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:6px 12px;border:1px solid #3b82f6;border-radius:8px;background:#f0f4ff;color:#3b82f6;cursor:pointer;">เดือนนี้</button>
+            <button onclick="_refLogClear()" style="font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:6px 12px;border:1px solid #e0e0e0;border-radius:8px;background:#fff;color:#aaa;cursor:pointer;">✕ ล้าง</button>
+            <select id="ref-log-level2" onchange="filterReferralLogs()"
+              style="padding:7px 10px;border:1px solid #e0e0e0;border-radius:8px;font-size:12px;font-family:'Kanit',sans-serif;">
+              <option value="">ทุกชั้น</option>
+              <option value="1">ชั้น 1</option>
+              <option value="2">ชั้น 2</option>
+              <option value="3">ชั้น 3</option>
+              <option value="4">ชั้น 4</option>
+              <option value="5">ชั้น 5</option>
+            </select>
+            <span id="ref-log-count" style="font-family:'Kanit',sans-serif;font-size:11px;color:#aaa;"></span>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table style="table-layout:fixed;width:100%;">
+              <colgroup>
+                <col style="width:40px"><col style="width:55px"><col style="width:110px">
+                <col style="width:110px"><col><col style="width:100px">
+                <col style="width:80px"><col style="width:130px">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th style="text-align:center;">ชั้น</th>
+                  <th>ผู้แนะนำ</th>
+                  <th>สมาชิก</th>
+                  <th style="text-align:right;">ยอดเดิมพัน/เติม (฿)</th>
+                  <th style="text-align:right;">คอมฯ (฿)</th>
+                  <th style="text-align:center;">อัตรา</th>
+                  <th style="text-align:right;">เวลา</th>
+                </tr>
+              </thead>
+              <tbody id="ref-logs-tbody2">
+                <tr><td colspan="8" style="text-align:center;padding:28px;color:#aaa;">กำลังโหลด...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="ref-logs-footer2" style="padding:8px 12px;font-size:11px;color:#aaa;border-top:1px solid #f0f0ee;"></div>
         </div>
+
+      </div>
       </div>
 
       <!-- ACTIVITY -->
@@ -1760,6 +1866,36 @@ function buildFlagBadgeHtml(key) {
 
 // ===== FLAG COLUMN AUTO-INIT =====
 // เรียกครั้งเดียวตอน login เพื่อสร้าง column flags + admin_note ถ้ายังไม่มี
+function filterDownline() {
+  const q  = (document.getElementById('downline-search')?.value||'').toLowerCase();
+  const tb = document.getElementById('downline-tbody');
+  const countEl = document.getElementById('downline-count');
+  if (!tb) return;
+
+  const all = window._mdDownline || [];
+  const rows = all.filter(d => !q || d.nick.toLowerCase().includes(q));
+
+  if (countEl) countEl.textContent = q ? `${rows.length} / ${all.length} คน` : `${all.length} คน`;
+
+  if (!rows.length) {
+    tb.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:20px;color:#aaa;font-family:'Kanit',sans-serif;">ไม่พบ "${q}"</td></tr>`;
+    return;
+  }
+
+  tb.innerHTML = rows.map((d,i) => `
+    <tr style="${i%2===1?'background:#f9fafb;':''}">
+      <td style="padding:8px 12px;font-size:12px;color:#aaa;">${i+1}</td>
+      <td style="padding:8px 12px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#2563eb);display:flex;align-items:center;justify-content:center;font-family:'Kanit',sans-serif;font-weight:900;font-size:11px;color:#fff;flex-shrink:0;">${(d.nick||'?')[0].toUpperCase()}</div>
+          <strong style="cursor:pointer;color:var(--green);text-decoration:underline;font-size:13px;" onclick="closeMember();setTimeout(()=>openMember('${d.nick}'),100)">${d.nick}</strong>
+        </div>
+      </td>
+      <td style="padding:8px 12px;text-align:right;font-family:'Kanit',sans-serif;font-weight:700;font-size:12px;color:#15803d;">${Number(d.balance||0).toLocaleString()} ฿</td>
+      <td style="padding:8px 12px;text-align:right;font-size:11px;color:#aaa;">${fmtDate(d.created_at)}</td>
+    </tr>`).join('');
+}
+
 // ===== MEMBER TXN TIMELINE =====
 // เก็บข้อมูลไว้ใน window เพื่อ filter ซ้ำโดยไม่ต้อง fetch ใหม่
 window._mdTxnData = [];
@@ -2139,10 +2275,10 @@ function showFlagSqlHelper() { showFlagSqlModal(); }
 
 // ===== MEMBERS =====
 async function loadMembers() {
-  // โหลดสมาชิก + ยอดเติมเงินสะสม (approved) ทุกคน
-  const [memRes, depRes] = await Promise.all([
+  const [memRes, depRes, withRes] = await Promise.all([
     sb.from('members').select('*').order('created_at',{ascending:false}),
     sb.from('deposits').select('nick,amount').eq('status','approved'),
+    sb.from('withdrawals').select('nick,amount').eq('status','approved'),
   ]);
   allMembers = memRes.data || [];
 
@@ -2151,8 +2287,17 @@ async function loadMembers() {
   (depRes.data||[]).forEach(d => {
     depMap[d.nick] = (depMap[d.nick]||0) + Number(d.amount||0);
   });
-  // แนบ total_deposit เข้าแต่ละสมาชิก
-  allMembers = allMembers.map(m => ({ ...m, _totalDep: depMap[m.nick]||0 }));
+  // รวมยอดถอนสะสมต่อ nick
+  const withMap = {};
+  (withRes.data||[]).forEach(w => {
+    withMap[w.nick] = (withMap[w.nick]||0) + Number(w.amount||0);
+  });
+  // แนบเข้าแต่ละสมาชิก
+  allMembers = allMembers.map(m => ({
+    ...m,
+    _totalDep:  depMap[m.nick]  || 0,
+    _totalWith: withMap[m.nick] || 0,
+  }));
 
   document.getElementById('members-count').textContent = `(${allMembers.length} คน)`;
   filterMembers();
@@ -2170,31 +2315,70 @@ function filterMembers() {
   updateDateTag('mem');
   document.getElementById('members-count').textContent = `(${rows.length} คน)`;
   const tb = document.getElementById('members-tbody');
-  if (!rows.length) { tb.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:#aaa;">ไม่พบข้อมูล</td></tr>'; return; }
-  tb.innerHTML = rows.map(m => {
-    const vip  = getVipLevel(m._totalDep||0);
-    const next = getVipNext(m._totalDep||0);
-    const pct  = next ? Math.min(100, Math.round((m._totalDep - vip.min) / (next - vip.min) * 100)) : 100;
-    return `<tr>
-      <td>
-        <strong style="cursor:pointer;color:var(--green);text-decoration:underline;" onclick="openMember('${m.nick}')">${m.nick||'—'}</strong>
-        ${(m.flags||[]).length ? `<div class="flags-row">${(m.flags||[]).map(f=>buildFlagBadgeHtml(f)).join('')}</div>` : ''}
-        ${m.admin_note ? `<div style="font-size:10px;color:#aaa;margin-top:2px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${m.admin_note}">📝 ${m.admin_note}</div>` : ''}
+  if (!rows.length) {
+    tb.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:24px;color:#aaa;">ไม่พบข้อมูล</td></tr>';
+    return;
+  }
+  tb.innerHTML = rows.map((m, i) => {
+    const vip     = getVipLevel(m._totalDep||0);
+    const next    = getVipNext(m._totalDep||0);
+    const pct     = next ? Math.min(100, Math.round((m._totalDep - vip.min) / (next - vip.min) * 100)) : 100;
+    const dep     = Number(m._totalDep  || 0);
+    const wit     = Number(m._totalWith || 0);
+    const net     = dep - wit;
+    const netColor  = net > 0 ? '#1d4ed8' : net < 0 ? '#dc2626' : '#888';
+    const netSign   = net > 0 ? '+' : '';
+    const rowBg     = i % 2 === 1 ? 'background:#fafaf8;' : '';
+    const hasFlags  = (m.flags||[]).length > 0;
+    const flagLeft  = hasFlags ? 'border-left:3px solid #fca5a5;' : '';
+
+    return `<tr style="${rowBg}${flagLeft}">
+      <!-- Nick + flags + note -->
+      <td style="padding:10px 12px;">
+        <strong style="cursor:pointer;color:var(--green);text-decoration:underline;font-size:13px;" onclick="openMember('${m.nick}')">${m.nick||'—'}</strong>
+        ${hasFlags ? `<div class="flags-row" style="margin-top:3px;">${(m.flags||[]).map(f=>buildFlagBadgeHtml(f)).join('')}</div>` : ''}
+        ${m.admin_note ? `<div style="font-size:10px;color:#bbb;margin-top:2px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${m.admin_note}">📝 ${m.admin_note}</div>` : ''}
       </td>
-      <td>
+      <!-- VIP badge + progress -->
+      <td style="padding:10px 12px;">
         <span class="vip-badge vip-${vip.tier}">${vip.icon} ${vip.name}</span>
-        <div class="vip-progress-wrap" title="${pct}% ถึงระดับถัดไป">
+        <div class="vip-progress-wrap" title="${pct}% ถึงระดับถัดไป" style="margin-top:4px;">
           <div class="vip-progress-bar" style="width:${pct}%;background:${vip.color};"></div>
         </div>
       </td>
-      <td>${m.fname||''} ${m.lname||''}</td>
-      <td>${m.phone||'—'}</td>
-      <td style="font-family:'Kanit',sans-serif;font-weight:700;color:var(--green);">${Number(m.balance||0).toLocaleString()} ฿</td>
-      <td style="font-family:'Kanit',sans-serif;font-weight:700;color:#854d0e;">${Number(m._totalDep||0).toLocaleString()} ฿</td>
-      <td style="font-size:12px;color:#aaa;">${fmtDate(m.created_at)}</td>
-      <td style="display:flex;gap:4px;">
-        <button class="btn btn-gold" onclick="openMember('${m.nick}')">👁 ดูข้อมูล</button>
-        <button class="btn btn-red" onclick="deleteMember('${m.id}','${m.nick}')">ลบ</button>
+      <!-- ชื่อ -->
+      <td style="padding:10px 12px;font-size:13px;">${m.fname||''} ${m.lname||''}</td>
+      <!-- เบอร์ -->
+      <td style="padding:10px 12px;font-size:12px;color:#666;">${m.phone||'—'}</td>
+      <!-- ยอดเงินคงเหลือ -->
+      <td style="padding:10px 12px;text-align:right;font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;color:var(--green);">
+        ${Number(m.balance||0).toLocaleString()}
+        <span style="font-size:10px;font-weight:400;color:#aaa;">฿</span>
+      </td>
+      <!-- เติมสะสม -->
+      <td style="padding:10px 12px;text-align:right;font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;color:#16a34a;">
+        ${dep > 0 ? '+' : ''}${dep.toLocaleString()}
+        <span style="font-size:10px;font-weight:400;color:#aaa;">฿</span>
+      </td>
+      <!-- ถอนสะสม -->
+      <td style="padding:10px 12px;text-align:right;font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;color:#dc2626;">
+        ${wit > 0 ? '−' : ''}${wit.toLocaleString()}
+        <span style="font-size:10px;font-weight:400;color:#aaa;">฿</span>
+      </td>
+      <!-- เติม − ถอน -->
+      <td style="padding:10px 12px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:${netColor};
+        ${Math.abs(net) > 0 ? `background:${net>0?'#eff6ff':'#fff5f5'};border-radius:6px;` : ''}">
+        ${netSign}${net.toLocaleString()}
+        <span style="font-size:10px;font-weight:400;color:#aaa;">฿</span>
+      </td>
+      <!-- สมัครเมื่อ -->
+      <td style="padding:10px 12px;text-align:right;font-size:11px;color:#aaa;">${fmtDate(m.created_at)}</td>
+      <!-- จัดการ -->
+      <td style="padding:10px 12px;">
+        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+          <button class="btn btn-gold" onclick="openMember('${m.nick}')" style="font-size:11px;padding:5px 10px;">👁</button>
+          <button class="btn btn-red" onclick="deleteMember('${m.id}','${m.nick}')" style="font-size:11px;padding:5px 10px;">🗑</button>
+        </div>
       </td>
     </tr>`;
   }).join('');
@@ -3320,61 +3504,330 @@ async function saveSettings(type) {
 
 
 // ===== REFERRAL PANEL =====
+let _allRefLogs = []; // cache สำหรับ filter
+
 async function loadReferralPanel() {
-  const [logsRes, settingsRes] = await Promise.all([
-    sb.from('referral_logs').select('*').order('created_at',{ascending:false}).limit(100),
-    sb.from('settings').select('value').eq('key','refRate').maybeSingle(),
+  // reset tbody ให้แสดง loading
+  const setLoading = (id, cols) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = `<tr><td colspan="${cols}" style="text-align:center;padding:28px;color:#aaa;">กำลังโหลด...</td></tr>`;
+  };
+  setLoading('ref-summary-tbody', 8);
+  setLoading('ref-logs-tbody2', 8);
+
+  // ดึง logs ทั้งหมด (ทั้ง first_deposit + bet commission)
+  const [logsRes, membersRes] = await Promise.all([
+    sb.from('referral_logs').select('*').order('created_at',{ascending:false}).limit(500),
+    sb.from('members').select('nick,referred_by,created_at').order('created_at',{ascending:false}),
   ]);
-  const logs = logsRes.data || [];
-  const refRate = settingsRes.data?.value?.rate ?? 5;
 
-  // สถิติรวม
-  const totalCom = logs.reduce((s,l)=>s+Number(l.commission||0),0);
-  const el_m = document.getElementById('ref-total-members');
-  const el_c = document.getElementById('ref-total-commission');
-  const el_l = document.getElementById('ref-total-logs');
-  if (el_m) el_m.textContent = logs.length;
-  if (el_c) el_c.textContent = totalCom.toLocaleString();
-  if (el_l) el_l.textContent = logs.length;
+  _allRefLogs = logsRes.data || [];
+  const members = membersRes.data || [];
 
-  // ตาราง logs
-  const tb = document.getElementById('ref-logs-tbody');
-  if (tb) {
-    if (!logs.length) {
-      tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#aaa;">ยังไม่มีประวัติครับ</td></tr>';
-    } else {
-      tb.innerHTML = logs.map(l => `<tr>
-        <td><strong style="cursor:pointer;color:var(--green);text-decoration:underline;" onclick="openMember('${l.referrer_nick}')">${l.referrer_nick}</strong></td>
-        <td><strong style="cursor:pointer;color:var(--green);text-decoration:underline;" onclick="openMember('${l.new_member_nick}')">${l.new_member_nick}</strong></td>
-        <td style="font-family:'Kanit',sans-serif;font-weight:700;">${Number(l.deposit_amount||0).toLocaleString()} ฿</td>
-        <td style="font-family:'Kanit',sans-serif;font-weight:700;color:#60a5fa;">+${Number(l.commission||0).toLocaleString()} ฿</td>
-        <td>${(l.ref_rate||refRate)}%</td>
-        <td style="font-size:12px;color:#aaa;">${fmtDate(l.created_at)}</td>
-      </tr>`).join('');
-    }
-  }
+  // ── stat cards ──
+  const referredMembers = members.filter(m => m.referred_by).length;
+  const uniqueReferrers = new Set(members.filter(m=>m.referred_by).map(m=>m.referred_by)).size;
+  const totalCom = _allRefLogs.reduce((s,l)=>s+Number(l.commission||0),0);
+  const setEl = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  setEl('ref-total-referrers',  uniqueReferrers.toLocaleString());
+  setEl('ref-total-members',    referredMembers.toLocaleString());
+  setEl('ref-total-commission', totalCom.toLocaleString());
+  setEl('ref-total-logs',       _allRefLogs.length.toLocaleString());
 
-  // Top referrers
-  const topMap = new Map();
-  logs.forEach(l => {
-    topMap.set(l.referrer_nick, (topMap.get(l.referrer_nick)||0) + Number(l.commission||0));
+  // ── สร้าง summary map: referrer → { count, countL1, countL2plus, totalCom, lastDate, nicks[] } ──
+  window._refSummaryMap = new Map();
+
+  // นับจากตาราง members (referred_by)
+  members.filter(m=>m.referred_by).forEach(m => {
+    const k = m.referred_by;
+    if (!window._refSummaryMap.has(k)) window._refSummaryMap.set(k, { nick:k, count:0, countL1:0, countL2plus:0, totalCom:0, lastDate:'', nicks:[] });
+    const r = window._refSummaryMap.get(k);
+    r.count++;
+    r.countL1++;
+    if (m.created_at > r.lastDate) r.lastDate = m.created_at;
+    r.nicks.push(m.nick);
   });
-  const top = [...topMap.entries()].sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const topEl = document.getElementById('ref-top-list');
-  if (topEl) {
-    if (!top.length) {
-      topEl.innerHTML = '<div style="text-align:center;padding:20px;color:#aaa;">ยังไม่มีข้อมูลครับ</div>';
-    } else {
-      topEl.innerHTML = top.map(([nick,total],i)=>`
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0f0f0;">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:${i===0?'#F5A800':i===1?'#aaa':i===2?'#cd7f32':'#ccc'};">${i+1}</span>
-            <strong style="cursor:pointer;color:var(--green);text-decoration:underline;" onclick="openMember('${nick}')">${nick}</strong>
-          </div>
-          <span style="font-family:'Kanit',sans-serif;font-weight:700;color:#60a5fa;">+${total.toLocaleString()} ฿</span>
-        </div>`).join('');
+
+  // เพิ่มข้อมูลชั้น 2+ จาก referral_logs
+  _allRefLogs.filter(l=>Number(l.level||1)>1).forEach(l => {
+    const k = l.referrer_nick;
+    if (!window._refSummaryMap.has(k)) window._refSummaryMap.set(k, { nick:k, count:0, countL1:0, countL2plus:0, totalCom:0, lastDate:'', nicks:[] });
+    const r = window._refSummaryMap.get(k);
+    r.countL2plus++;
+  });
+
+  // รวมค่าคอมฯ
+  _allRefLogs.forEach(l => {
+    const k = l.referrer_nick;
+    if (window._refSummaryMap.has(k)) {
+      const r = window._refSummaryMap.get(k);
+      r.totalCom += Number(l.commission||0);
+      if ((l.created_at||'') > r.lastDate) r.lastDate = l.created_at;
     }
+  });
+
+  // render ตาราง summary
+  filterReferralSummary();
+  // render ตาราง logs
+  filterReferralLogs();
+}
+
+function filterReferralSummary() {
+  const q    = (document.getElementById('ref-search-nick')?.value||'').toLowerCase();
+  const sort = document.getElementById('ref-sort-by')?.value || 'count';
+  const tb   = document.getElementById('ref-summary-tbody');
+  if (!tb || !window._refSummaryMap) return;
+
+  let rows = [...window._refSummaryMap.values()];
+  if (q) rows = rows.filter(r => r.nick.toLowerCase().includes(q));
+
+  if (sort==='commission') rows.sort((a,b)=>b.totalCom-a.totalCom);
+  else if (sort==='nick')  rows.sort((a,b)=>a.nick.localeCompare(b.nick));
+  else                     rows.sort((a,b)=>b.count-a.count);
+
+  const footer = document.getElementById('ref-summary-footer');
+  if (footer) footer.textContent = `แสดง ${rows.length} ผู้แนะนำ จากทั้งหมด ${window._refSummaryMap.size} คน`;
+
+  if (!rows.length) {
+    tb.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:28px;color:#aaa;"><div style="font-size:28px;margin-bottom:6px;">🤝</div>ยังไม่มีข้อมูลผู้แนะนำครับ</td></tr>';
+    return;
   }
+
+  const rankColors = ['#F5A800','#aaa','#cd7f32'];
+  tb.innerHTML = rows.map((r,i) => `
+    <tr style="${i%2===1?'background:#fafaf8;':''}">
+      <td style="text-align:center;font-family:'Kanit',sans-serif;font-weight:900;font-size:14px;color:${rankColors[i]||'#ddd'};">${i+1}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1B6B2F,#27943F);display:flex;align-items:center;justify-content:center;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:#fff;flex-shrink:0;">${(r.nick||'?')[0].toUpperCase()}</div>
+          <strong style="cursor:pointer;color:var(--green);text-decoration:underline;font-size:13px;" onclick="openMember('${r.nick}')">${r.nick}</strong>
+        </div>
+      </td>
+      <td style="text-align:center;">
+        <span style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:#1B6B2F;cursor:pointer;text-decoration:underline;border-bottom:2px dashed #1B6B2F;"
+          onclick="showDownlinePopup('${r.nick}')" title="คลิกดูรายชื่อ">${r.count}</span>
+        <span style="font-size:10px;color:#aaa;margin-left:2px;">คน</span>
+      </td>
+      <td style="text-align:center;">
+        <span style="font-family:'Kanit',sans-serif;font-weight:700;font-size:14px;color:#0ea5e9;cursor:pointer;" onclick="showDownlinePopup('${r.nick}')">${r.countL1}</span>
+      </td>
+      <td style="text-align:center;">
+        <span style="font-family:'Kanit',sans-serif;font-weight:700;font-size:14px;color:#8b5cf6;">${r.countL2plus}</span>
+      </td>
+      <td style="text-align:right;font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;color:#16a34a;">+${r.totalCom.toLocaleString()}</td>
+      <td style="text-align:right;font-size:11px;color:#aaa;">${fmtDate(r.lastDate)}</td>
+      <td style="text-align:center;">
+        <button class="btn btn-primary" onclick="showReferralDetail('${r.nick}')" style="font-size:11px;padding:4px 10px;">👁 ดูสาย</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function showDownlinePopup(referrerNick) {
+  // ลบ popup เก่าก่อน
+  document.getElementById('downline-popup')?.remove();
+
+  // สร้าง popup skeleton ก่อน (แสดงทันที ข้อมูลโหลดทีหลัง)
+  const pop = document.createElement('div');
+  pop.id = 'downline-popup';
+  pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10002;display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeInBg .2s ease;';
+  pop.innerHTML = `
+    <div style="background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden;">
+      <!-- header -->
+      <div style="padding:16px 20px;background:linear-gradient(135deg,#1B6B2F,#27943F);color:#fff;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+        <div>
+          <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:16px;">👥 ลูกทีมของ ${referrerNick}</div>
+          <div style="font-size:11px;opacity:.7;margin-top:2px;">สมาชิกชั้นที่ 1 ที่ ${referrerNick} แนะนำมาโดยตรง</div>
+        </div>
+        <button onclick="document.getElementById('downline-popup').remove()"
+          style="background:rgba(255,255,255,.2);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;flex-shrink:0;">✕</button>
+      </div>
+
+      <!-- stats strip -->
+      <div id="dl-pop-stats" style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #f0f0ee;flex-shrink:0;">
+        <div style="padding:10px;text-align:center;border-right:1px solid #f0f0ee;">
+          <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:#1B6B2F;" id="dl-pop-count">—</div>
+          <div style="font-size:10px;color:#aaa;">ลูกทีมทั้งหมด</div>
+        </div>
+        <div style="padding:10px;text-align:center;border-right:1px solid #f0f0ee;">
+          <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:#16a34a;" id="dl-pop-balance">—</div>
+          <div style="font-size:10px;color:#aaa;">ยอดเงินรวม (฿)</div>
+        </div>
+        <div style="padding:10px;text-align:center;">
+          <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:#8b5cf6;" id="dl-pop-com">—</div>
+          <div style="font-size:10px;color:#aaa;">คอมฯ รวม (฿)</div>
+        </div>
+      </div>
+
+      <!-- search -->
+      <div style="padding:10px 14px;border-bottom:1px solid #f0f0ee;flex-shrink:0;">
+        <input id="dl-pop-search" placeholder="🔍 ค้นหาชื่อ Nick..." oninput="_filterDlPop()"
+          style="width:100%;padding:8px 12px;border:1px solid #e0e0e0;border-radius:8px;font-family:'Kanit',sans-serif;font-size:13px;box-sizing:border-box;">
+      </div>
+
+      <!-- list -->
+      <div style="overflow-y:auto;flex:1;" id="dl-pop-list">
+        <div style="text-align:center;padding:32px;color:#aaa;font-family:'Kanit',sans-serif;">กำลังโหลด...</div>
+      </div>
+
+      <!-- footer -->
+      <div id="dl-pop-footer" style="padding:8px 14px;border-top:1px solid #f0f0ee;font-size:11px;color:#aaa;flex-shrink:0;"></div>
+    </div>`;
+
+  pop.addEventListener('click', e => { if (e.target === pop) pop.remove(); });
+  document.body.appendChild(pop);
+  document.getElementById('dl-pop-search')?.focus();
+
+  // โหลดข้อมูลจริง
+  const [membersRes, comRes] = await Promise.all([
+    sb.from('members').select('nick,fname,lname,balance,created_at,flags').eq('referred_by', referrerNick).order('created_at',{ascending:false}),
+    sb.from('referral_logs').select('commission').eq('referrer_nick', referrerNick).eq('level', 1),
+  ]);
+  window._dlPopData = membersRes.data || [];
+  const totalCom = (comRes.data||[]).reduce((s,r)=>s+Number(r.commission||0),0);
+  const totalBal = window._dlPopData.reduce((s,m)=>s+Number(m.balance||0),0);
+
+  // stats
+  const setEl = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  setEl('dl-pop-count',   window._dlPopData.length.toLocaleString());
+  setEl('dl-pop-balance', totalBal.toLocaleString());
+  setEl('dl-pop-com',     totalCom.toLocaleString());
+
+  _filterDlPop();
+}
+
+function _filterDlPop() {
+  const q    = (document.getElementById('dl-pop-search')?.value||'').toLowerCase();
+  const list = document.getElementById('dl-pop-list');
+  const footer = document.getElementById('dl-pop-footer');
+  if (!list) return;
+
+  const all  = window._dlPopData || [];
+  const rows = all.filter(m => !q || m.nick.toLowerCase().includes(q) || (m.fname||'').toLowerCase().includes(q) || (m.lname||'').toLowerCase().includes(q));
+
+  if (footer) footer.textContent = q ? `แสดง ${rows.length} / ${all.length} คน` : `ทั้งหมด ${all.length} คน`;
+
+  if (!rows.length) {
+    list.innerHTML = `<div style="text-align:center;padding:32px;color:#aaa;font-family:'Kanit',sans-serif;"><div style="font-size:28px;margin-bottom:8px;">🔍</div>ไม่พบ "${q}"</div>`;
+    return;
+  }
+
+  list.innerHTML = `<table style="width:100%;border-collapse:collapse;">
+    <thead>
+      <tr style="background:#fafaf8;position:sticky;top:0;">
+        <th style="padding:9px 12px;text-align:left;font-family:'Kanit',sans-serif;font-size:11px;color:#888;border-bottom:1px solid #f0f0ee;">#</th>
+        <th style="padding:9px 12px;text-align:left;font-family:'Kanit',sans-serif;font-size:11px;color:#888;border-bottom:1px solid #f0f0ee;">Nick / ชื่อ</th>
+        <th style="padding:9px 12px;text-align:right;font-family:'Kanit',sans-serif;font-size:11px;color:#888;border-bottom:1px solid #f0f0ee;">ยอดเงิน</th>
+        <th style="padding:9px 12px;text-align:right;font-family:'Kanit',sans-serif;font-size:11px;color:#888;border-bottom:1px solid #f0f0ee;">สมัครเมื่อ</th>
+        <th style="padding:9px 12px;border-bottom:1px solid #f0f0ee;"></th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows.map((m,i) => {
+        const hasFlags = (m.flags||[]).length > 0;
+        return `<tr style="${i%2===1?'background:#fafaf8;':''}${hasFlags?'border-left:3px solid #fca5a5;':''}">
+          <td style="padding:9px 12px;font-size:12px;color:#aaa;">${i+1}</td>
+          <td style="padding:9px 12px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#2563eb);display:flex;align-items:center;justify-content:center;font-family:'Kanit',sans-serif;font-weight:900;font-size:12px;color:#fff;flex-shrink:0;">${(m.nick||'?')[0].toUpperCase()}</div>
+              <div>
+                <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;">${m.nick}</div>
+                ${(m.fname||m.lname) ? `<div style="font-size:11px;color:#aaa;">${m.fname||''} ${m.lname||''}</div>` : ''}
+              </div>
+            </div>
+          </td>
+          <td style="padding:9px 12px;text-align:right;font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;color:#15803d;">${Number(m.balance||0).toLocaleString()} ฿</td>
+          <td style="padding:9px 12px;text-align:right;font-size:11px;color:#aaa;white-space:nowrap;">${fmtDate(m.created_at)}</td>
+          <td style="padding:9px 12px;text-align:center;">
+            <button class="btn btn-gold" style="font-size:11px;padding:3px 9px;white-space:nowrap;"
+              onclick="document.getElementById('downline-popup').remove();openMember('${m.nick}')">👁</button>
+          </td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table>`;
+}
+function filterReferralLogs() {
+  const q     = (document.getElementById('ref-log-search')?.value||'').toLowerCase();
+  const from  = document.getElementById('ref-log-from2')?.value||'';
+  const to    = document.getElementById('ref-log-to2')?.value||'';
+  const level = document.getElementById('ref-log-level2')?.value||'';
+  const tb    = document.getElementById('ref-logs-tbody2');
+  if (!tb) return;
+
+  let rows = (_allRefLogs||[]).filter(l => {
+    const dt = (l.created_at||'').slice(0,10);
+    if (from && dt<from) return false;
+    if (to   && dt>to)   return false;
+    if (level && String(l.level||1)!==level) return false;
+    if (q && !l.referrer_nick?.toLowerCase().includes(q) && !l.new_member_nick?.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  const totalCom = rows.reduce((s,l)=>s+Number(l.commission||0),0);
+  const footer = document.getElementById('ref-logs-footer2');
+  const countEl = document.getElementById('ref-log-count');
+  if (footer) footer.textContent = `แสดง ${rows.length} รายการ · คอมฯ รวม ${totalCom.toLocaleString()} ฿`;
+  if (countEl) countEl.textContent = `${rows.length} รายการ`;
+
+  if (!rows.length) {
+    tb.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:28px;color:#aaa;">ไม่พบรายการ</td></tr>';
+    return;
+  }
+
+  const lvColors = ['','#0ea5e9','#16a34a','#d97706','#9333ea','#e11d48'];
+  const lvLabels = ['','🥇1','🥈2','🥉3','4️⃣4','5️⃣5'];
+  const typeLabel = l => l.commission_type==='bet' ? '🎯 เดิมพัน' : '💰 เติมเงิน';
+
+  tb.innerHTML = rows.map((l,i) => {
+    const lv = l.level||1;
+    return `<tr style="${i%2===1?'background:#fafaf8;':''}">
+      <td style="color:#aaa;font-size:12px;">${i+1}</td>
+      <td style="text-align:center;">
+        <span style="font-family:'Kanit',sans-serif;font-weight:700;font-size:11px;color:${lvColors[lv]||'#888'};">ชั้น ${lvLabels[lv]||lv}</span>
+      </td>
+      <td><strong style="cursor:pointer;color:var(--green);text-decoration:underline;font-size:13px;" onclick="openMember('${l.referrer_nick}')">${l.referrer_nick||'—'}</strong></td>
+      <td><span style="cursor:pointer;color:#555;text-decoration:underline;font-size:12px;" onclick="openMember('${l.new_member_nick}')">${l.new_member_nick||'—'}</span></td>
+      <td style="text-align:right;font-family:'Kanit',sans-serif;font-size:12px;">${Number(l.deposit_amount||0).toLocaleString()}</td>
+      <td style="text-align:right;font-family:'Kanit',sans-serif;font-weight:700;color:#16a34a;font-size:13px;">+${Number(l.commission||0).toLocaleString()}</td>
+      <td style="text-align:center;font-size:11px;color:#888;">${l.ref_rate||0}%</td>
+      <td style="text-align:right;font-size:11px;color:#aaa;">${fmtDate(l.created_at)}</td>
+    </tr>`;
+  }).join('');
+} // end filterReferralLogs
+
+// แสดงรายละเอียดสายงานของ referrer
+function showReferralDetail(referrerNick) {
+  if (!window._refSummaryMap?.has(referrerNick)) return;
+  const r = window._refSummaryMap.get(referrerNick);
+  const logs = (_allRefLogs||[]).filter(l=>l.referrer_nick===referrerNick);
+  const total = logs.reduce((s,l)=>s+Number(l.commission||0),0);
+
+  showToast(`👥 ${referrerNick} แนะนำ ${r.count} คน — คอมฯ รวม ${total.toLocaleString()} ฿`);
+  // ตั้ง filter ให้แสดงเฉพาะ nick นี้
+  const searchEl = document.getElementById('ref-log-search');
+  if (searchEl) { searchEl.value = referrerNick; filterReferralLogs(); }
+  // scroll ไปตาราง logs
+  document.getElementById('ref-logs-tbody2')?.closest('.card')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// date helpers
+function _refLogToday() {
+  const t = todayStr();
+  const f = document.getElementById('ref-log-from2'); if(f) f.value=t;
+  const to = document.getElementById('ref-log-to2');  if(to) to.value=t;
+  filterReferralLogs();
+}
+function _refLogMonth() {
+  const now=new Date(), y=now.getFullYear(), m=String(now.getMonth()+1).padStart(2,'0');
+  const last=new Date(y,now.getMonth()+1,0).getDate();
+  const f=document.getElementById('ref-log-from2'); if(f) f.value=`${y}-${m}-01`;
+  const to=document.getElementById('ref-log-to2');  if(to) to.value=`${y}-${m}-${String(last).padStart(2,'0')}`;
+  filterReferralLogs();
+}
+function _refLogClear() {
+  ['ref-log-from2','ref-log-to2','ref-log-search'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  const lv=document.getElementById('ref-log-level2');if(lv)lv.value='';
+  filterReferralLogs();
 }
 
 // จ่ายค่าคอมฯ แนะนำสมาชิก (เรียกจาก approveDeposit)
@@ -3548,19 +4001,21 @@ async function openMember(nick) {
   document.getElementById('md-content').style.display = 'none';
 
   // โหลดข้อมูลทั้งหมดพร้อมกัน
-  const [memRes, depRes, withRes, betRes, refRes] = await Promise.all([
+  const [memRes, depRes, withRes, betRes, refRes, downlineRes] = await Promise.all([
     sb.from('members').select('*').eq('nick', nick).maybeSingle(),
     sb.from('deposits').select('*').eq('nick', nick).order('created_at',{ascending:false}).limit(200),
     sb.from('withdrawals').select('*').eq('nick', nick).order('created_at',{ascending:false}).limit(200),
     sb.from('bets').select('*, matches(round,name_a,name_b,code)').eq('nick', nick).order('created_at',{ascending:false}).limit(200),
     sb.from('referral_logs').select('*').eq('referrer_nick', nick).order('created_at',{ascending:false}).limit(200),
+    sb.from('members').select('nick,created_at,balance,referred_by').eq('referred_by', nick).order('created_at',{ascending:false}),
   ]);
 
-  const m     = memRes.data;
-  const deps  = depRes.data  || [];
-  const withs = withRes.data || [];
-  const bets  = betRes.data  || [];
-  const refs  = refRes.data  || [];
+  const m        = memRes.data;
+  const deps     = depRes.data     || [];
+  const withs    = withRes.data    || [];
+  const bets     = betRes.data     || [];
+  const refs     = refRes.data     || [];
+  const downline = downlineRes.data || [];
 
   if (!m) { document.getElementById('md-overlay').style.display='none'; showToast('ไม่พบข้อมูลสมาชิก','error'); return; }
 
@@ -3577,6 +4032,10 @@ async function openMember(nick) {
 
   // สร้าง TXN rows ไว้ล่วงหน้า เพื่อ filter ต่อใน tab
   window._mdTxnData = _buildTxnRows(deps, withs, bets, refs);
+  // เก็บ downline ไว้สำหรับ search ใน info tab
+  window._mdDownline = downline;
+  // คอมฯ รวมที่ได้รับ (จาก referral_logs)
+  const totalRefCom = refs.reduce((s,r)=>s+Number(r.commission||0),0);
 
   // VIP คำนวณ
   const vip     = getVipLevel(totalDep);
@@ -3790,10 +4249,71 @@ async function openMember(nick) {
         </div>
 
         <!-- metadata -->
-        <div style="background:#f9f9f9;border-radius:8px;padding:12px;font-size:12px;color:#aaa;display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <div style="background:#f9f9f9;border-radius:8px;padding:12px;font-size:12px;color:#aaa;display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px;">
           <div>🆔 ID: <span style="word-break:break-all;color:#bbb;">${m.id||'—'}</span></div>
           <div>📅 สมัครเมื่อ: <span style="color:#bbb;">${fmtDate(m.created_at)}</span></div>
           <div>🕐 แก้ไขล่าสุด: <span style="color:#bbb;">${fmtDate(m.updated_at)}</span></div>
+          <div>🎁 ผู้แนะนำ: <span style="color:var(--green);cursor:pointer;text-decoration:underline;font-weight:700;"
+            onclick="closeMember();setTimeout(()=>openMember('${m.referred_by||''}'),100)">${m.referred_by||'—'}</span></div>
+        </div>
+
+        <!-- ── สายงาน (Downline) ── -->
+        <div class="me-section-title" style="border-color:#60a5fa;color:#1d4ed8;background:#eff6ff;">🌐 สายงาน / ลูกทีม (ชั้นที่ 1)</div>
+
+        <!-- summary strip -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 12px;">
+          <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:11px 14px;text-align:center;">
+            <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:22px;color:#1d4ed8;">${downline.length}</div>
+            <div style="font-size:11px;color:#60a5fa;margin-top:1px;">ลูกทีมทั้งหมด</div>
+          </div>
+          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:11px 14px;text-align:center;">
+            <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:22px;color:#15803d;">${refs.filter(r=>r.commission_type==='bet'||!r.commission_type).length}</div>
+            <div style="font-size:11px;color:#16a34a;margin-top:1px;">รายการคอมฯ</div>
+          </div>
+          <div style="background:#fdf4ff;border:1px solid #e9d5ff;border-radius:10px;padding:11px 14px;text-align:center;">
+            <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:22px;color:#6b21a8;">${totalRefCom.toLocaleString()}</div>
+            <div style="font-size:11px;color:#9333ea;margin-top:1px;">คอมฯ รวม (฿)</div>
+          </div>
+        </div>
+
+        <!-- search downline -->
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <input id="downline-search" placeholder="🔍 ค้นหาชื่อลูกทีม..." oninput="filterDownline()"
+            style="flex:1;padding:8px 12px;border:1px solid #e0e0e0;border-radius:8px;font-family:'Kanit',sans-serif;font-size:13px;">
+          <span id="downline-count" style="font-size:11px;color:#aaa;align-self:center;white-space:nowrap;"></span>
+        </div>
+
+        <!-- downline table -->
+        <div style="max-height:260px;overflow-y:auto;border:1px solid #e5e5e0;border-radius:10px;" id="downline-wrap">
+          ${downline.length === 0 ? `
+            <div style="text-align:center;padding:28px;color:#aaa;font-family:'Kanit',sans-serif;">
+              <div style="font-size:28px;margin-bottom:6px;">🌱</div>
+              ยังไม่มีลูกทีมครับ
+            </div>` : `
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:#f0f4ff;position:sticky;top:0;">
+                <th style="padding:8px 12px;text-align:left;font-family:'Kanit',sans-serif;font-size:12px;color:#1d4ed8;border-bottom:1px solid #dbeafe;">#</th>
+                <th style="padding:8px 12px;text-align:left;font-family:'Kanit',sans-serif;font-size:12px;color:#1d4ed8;border-bottom:1px solid #dbeafe;">Nick</th>
+                <th style="padding:8px 12px;text-align:right;font-family:'Kanit',sans-serif;font-size:12px;color:#1d4ed8;border-bottom:1px solid #dbeafe;">ยอดเงิน</th>
+                <th style="padding:8px 12px;text-align:right;font-family:'Kanit',sans-serif;font-size:12px;color:#1d4ed8;border-bottom:1px solid #dbeafe;">สมัครเมื่อ</th>
+              </tr>
+            </thead>
+            <tbody id="downline-tbody">
+              ${downline.map((d,i) => `
+                <tr style="${i%2===1?'background:#f9fafb;':''}" class="downline-row">
+                  <td style="padding:8px 12px;font-size:12px;color:#aaa;">${i+1}</td>
+                  <td style="padding:8px 12px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#2563eb);display:flex;align-items:center;justify-content:center;font-family:'Kanit',sans-serif;font-weight:900;font-size:11px;color:#fff;flex-shrink:0;">${(d.nick||'?')[0].toUpperCase()}</div>
+                      <strong style="cursor:pointer;color:var(--green);text-decoration:underline;font-size:13px;" onclick="closeMember();setTimeout(()=>openMember('${d.nick}'),100)">${d.nick}</strong>
+                    </div>
+                  </td>
+                  <td style="padding:8px 12px;text-align:right;font-family:'Kanit',sans-serif;font-weight:700;font-size:12px;color:#15803d;">${Number(d.balance||0).toLocaleString()} ฿</td>
+                  <td style="padding:8px 12px;text-align:right;font-size:11px;color:#aaa;">${fmtDate(d.created_at)}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>`}
         </div>
       </div>
 
