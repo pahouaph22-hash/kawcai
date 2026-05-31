@@ -1760,7 +1760,164 @@ function buildFlagBadgeHtml(key) {
 
 // ===== FLAG COLUMN AUTO-INIT =====
 // เรียกครั้งเดียวตอน login เพื่อสร้าง column flags + admin_note ถ้ายังไม่มี
-// ===== FLAG COLUMN AUTO-INIT (v2 — REST schema check) =====
+// ===== MEMBER TXN TIMELINE =====
+// เก็บข้อมูลไว้ใน window เพื่อ filter ซ้ำโดยไม่ต้อง fetch ใหม่
+window._mdTxnData = [];
+
+function _buildTxnRows(deps, withs, bets, refs) {
+  const rows = [];
+
+  // deposits
+  deps.forEach(d => {
+    const bank = d.bank || '';
+    let type = 'deposit', icon = '💰', label = 'เติมเงิน', color = '#16a34a';
+    if (bank.startsWith('กิจกรรม:')) { type='reward'; icon='🎉'; label='รางวัลกิจกรรม: '+bank.replace('กิจกรรม:','').trim(); color='#8b5cf6'; }
+    else if (bank.startsWith('คอมฯ')||bank.includes('commission')||bank.includes('referral')||bank.includes('แนะนำ')) { type='commission'; icon='🎁'; label='ค่าคอมมิชชัน'; color='#0ea5e9'; }
+    else if (bank.startsWith('ค่าบริการ')) { type='fee'; icon='🏦'; label='ค่าบริการ'; color='#854d0e'; }
+    rows.push({
+      ts: d.created_at || d.approved_at || '',
+      type, icon, label,
+      amount: Number(d.amount||0),
+      sign: '+', color,
+      status: d.status,
+      detail: bank || '—',
+      txn: d.txn || '',
+    });
+  });
+
+  // withdrawals
+  withs.forEach(w => {
+    rows.push({
+      ts: w.created_at || '',
+      type: 'withdraw', icon: '🏧', label: 'ถอนเงิน',
+      amount: Number(w.amount||0),
+      sign: '−', color: '#dc2626',
+      status: w.status,
+      detail: `${w.bank||'—'} · ${w.acc_no||''}`,
+      txn: w.txn || '',
+    });
+  });
+
+  // bets
+  bets.forEach(b => {
+    const matchInfo = b.matches ? `${b.matches.round||''} (${b.matches.code||''})` : '';
+    const statusColor = b.status==='won'?'#16a34a':b.status==='lost'?'#dc2626':'#aaa';
+    const statusLabel = b.status==='won'?'✅ ชนะ':b.status==='lost'?'❌ แพ้':'⏳ รอผล';
+    rows.push({
+      ts: b.created_at || '',
+      type: 'bet', icon: '🎯', label: 'เดิมพัน P2P',
+      amount: Number(b.amount||0),
+      sign: '', color: '#f59e0b',
+      status: b.status,
+      statusLabel, statusColor,
+      detail: `${b.side_name||'—'} · ${matchInfo}`,
+      txn: '',
+    });
+  });
+
+  // referral commission (received)
+  refs.forEach(r => {
+    rows.push({
+      ts: r.created_at || '',
+      type: 'commission', icon: '🎁', label: `ค่าคอมฯ ชั้น ${r.level||1} (จาก ${r.new_member_nick||'—'})`,
+      amount: Number(r.commission||0),
+      sign: '+', color: '#0ea5e9',
+      status: 'approved',
+      detail: `เดิมพัน ${Number(r.deposit_amount||0).toLocaleString()} ฿ · ${r.ref_rate||0}%`,
+      txn: '',
+    });
+  });
+
+  // เรียงตาม timestamp ใหม่→เก่า
+  rows.sort((a,b) => (b.ts||'').localeCompare(a.ts||''));
+  return rows;
+}
+
+function renderTxnTimeline() {
+  const rows     = window._mdTxnData || [];
+  const from     = document.getElementById('txn-date-from')?.value || '';
+  const to       = document.getElementById('txn-date-to')?.value   || '';
+  const typeF    = document.getElementById('txn-type-filter')?.value || '';
+  const timeline = document.getElementById('txn-timeline');
+  if (!timeline) return;
+
+  let filtered = rows.filter(r => {
+    const dt = (r.ts||'').slice(0,10);
+    if (from && dt < from) return false;
+    if (to   && dt > to)   return false;
+    if (typeF && r.type !== typeF) return false;
+    return true;
+  });
+
+  // summary
+  const sumDep    = filtered.filter(r=>r.type==='deposit'&&r.status==='approved').reduce((s,r)=>s+r.amount,0);
+  const sumWith   = filtered.filter(r=>r.type==='withdraw'&&r.status==='approved').reduce((s,r)=>s+r.amount,0);
+  const sumBet    = filtered.filter(r=>r.type==='bet').reduce((s,r)=>s+r.amount,0);
+  const sumReward = filtered.filter(r=>['reward','commission'].includes(r.type)).reduce((s,r)=>s+r.amount,0);
+  const setEl = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  setEl('txn-sum-dep',    sumDep.toLocaleString());
+  setEl('txn-sum-with',   sumWith.toLocaleString());
+  setEl('txn-sum-bet',    sumBet.toLocaleString());
+  setEl('txn-sum-reward', sumReward.toLocaleString());
+
+  const badge = document.getElementById('txn-count-badge');
+  if (badge) badge.textContent = `แสดง ${filtered.length} รายการ`;
+
+  if (!filtered.length) {
+    timeline.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa;font-family:\'Kanit\',sans-serif;"><div style="font-size:28px;margin-bottom:8px;">📋</div>ไม่พบรายการในช่วงเวลาที่เลือก</div>';
+    return;
+  }
+
+  const statusBadge = (r) => {
+    if (r.type === 'bet') return `<span style="font-size:10px;font-family:'Kanit',sans-serif;font-weight:700;color:${r.statusColor};">${r.statusLabel}</span>`;
+    if (r.status === 'approved') return '<span style="font-size:10px;color:#16a34a;font-weight:700;">✅ สำเร็จ</span>';
+    if (r.status === 'pending')  return '<span style="font-size:10px;color:#f59e0b;font-weight:700;">⏳ รอ</span>';
+    if (r.status === 'rejected') return '<span style="font-size:10px;color:#dc2626;font-weight:700;">❌ ปฏิเสธ</span>';
+    return '';
+  };
+
+  timeline.innerHTML = filtered.map((r,i) => `
+    <div style="display:flex;gap:12px;padding:10px 0;${i<filtered.length-1?'border-bottom:1px solid #f0f0ee;':''}align-items:flex-start;">
+      <!-- icon circle -->
+      <div style="width:36px;height:36px;border-radius:50%;background:${r.color}18;border:1.5px solid ${r.color}44;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-top:2px;">${r.icon}</div>
+      <!-- content -->
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">
+          <span style="font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;">${r.label}</span>
+          ${statusBadge(r)}
+        </div>
+        <div style="font-size:11px;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.detail}</div>
+        ${r.txn ? `<div style="font-size:10px;color:#ccc;margin-top:1px;">TXN: ${r.txn}</div>` : ''}
+      </div>
+      <!-- amount + time -->
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:14px;color:${r.color};">
+          ${r.sign}${r.amount.toLocaleString()} ฿
+        </div>
+        <div style="font-size:10px;color:#bbb;white-space:nowrap;">${fmtDate(r.ts)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function _txnSetToday() {
+  const t = todayStr();
+  const f = document.getElementById('txn-date-from'); if(f) f.value=t;
+  const to = document.getElementById('txn-date-to');  if(to) to.value=t;
+  renderTxnTimeline();
+}
+function _txnSetMonth() {
+  const now = new Date();
+  const y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0');
+  const last = new Date(y,now.getMonth()+1,0).getDate();
+  const f = document.getElementById('txn-date-from'); if(f) f.value=`${y}-${m}-01`;
+  const to = document.getElementById('txn-date-to');  if(to) to.value=`${y}-${m}-${String(last).padStart(2,'0')}`;
+  renderTxnTimeline();
+}
+function _txnClear() {
+  ['txn-date-from','txn-date-to'].forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
+  const tf = document.getElementById('txn-type-filter'); if(tf) tf.value='';
+  renderTxnTimeline();
+}
 // ใช้ REST API เพื่อเช็ค column จริง ไม่ใช่ update dummy
 async function ensureFlagColumns() {
   try {
@@ -3391,17 +3548,19 @@ async function openMember(nick) {
   document.getElementById('md-content').style.display = 'none';
 
   // โหลดข้อมูลทั้งหมดพร้อมกัน
-  const [memRes, depRes, withRes, betRes] = await Promise.all([
+  const [memRes, depRes, withRes, betRes, refRes] = await Promise.all([
     sb.from('members').select('*').eq('nick', nick).maybeSingle(),
-    sb.from('deposits').select('*').eq('nick', nick).order('created_at',{ascending:false}).limit(30),
-    sb.from('withdrawals').select('*').eq('nick', nick).order('created_at',{ascending:false}).limit(30),
-    sb.from('bets').select('*, matches(round,name_a,name_b,code)').eq('nick', nick).order('created_at',{ascending:false}).limit(30),
+    sb.from('deposits').select('*').eq('nick', nick).order('created_at',{ascending:false}).limit(200),
+    sb.from('withdrawals').select('*').eq('nick', nick).order('created_at',{ascending:false}).limit(200),
+    sb.from('bets').select('*, matches(round,name_a,name_b,code)').eq('nick', nick).order('created_at',{ascending:false}).limit(200),
+    sb.from('referral_logs').select('*').eq('referrer_nick', nick).order('created_at',{ascending:false}).limit(200),
   ]);
 
-  const m   = memRes.data;
-  const deps = depRes.data  || [];
+  const m     = memRes.data;
+  const deps  = depRes.data  || [];
   const withs = withRes.data || [];
   const bets  = betRes.data  || [];
+  const refs  = refRes.data  || [];
 
   if (!m) { document.getElementById('md-overlay').style.display='none'; showToast('ไม่พบข้อมูลสมาชิก','error'); return; }
 
@@ -3415,6 +3574,9 @@ async function openMember(nick) {
 
   document.getElementById('md-loading').style.display = 'none';
   document.getElementById('md-content').style.display = 'block';
+
+  // สร้าง TXN rows ไว้ล่วงหน้า เพื่อ filter ต่อใน tab
+  window._mdTxnData = _buildTxnRows(deps, withs, bets, refs);
 
   // VIP คำนวณ
   const vip     = getVipLevel(totalDep);
@@ -3476,6 +3638,7 @@ async function openMember(nick) {
       <button class="md-tab active" onclick="switchMdTab('dep',this)">💰 เติมเงิน (${deps.length})</button>
       <button class="md-tab" onclick="switchMdTab('with',this)">🏧 ถอนเงิน (${withs.length})</button>
       <button class="md-tab" onclick="switchMdTab('bet',this)">🎯 เดิมพัน (${bets.length})</button>
+      <button class="md-tab" onclick="switchMdTab('txn',this)">📋 การทำธุรกรรม</button>
       <button class="md-tab" onclick="switchMdTab('info',this)">👤 ข้อมูล</button>
       <button class="md-tab" onclick="switchMdTab('flag',this)" style="color:#dc2626;">🚩 ติดป้ายเตือน</button>
     </div>
@@ -3634,7 +3797,57 @@ async function openMember(nick) {
         </div>
       </div>
 
-      <!-- FLAG TAB -->
+      <!-- TXN PANEL -->
+      <div id="mdt-txn" class="md-panel" style="display:none;padding:0;">
+
+        <!-- date filter bar -->
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:14px 18px 10px;border-bottom:1px solid #f0f0ee;background:#fafaf8;">
+          <label style="font-size:12px;color:#888;font-family:'Kanit',sans-serif;">📅</label>
+          <input type="date" id="txn-date-from" onchange="renderTxnTimeline()" style="padding:5px 10px;border:1px solid #e0e0e0;border-radius:7px;font-size:12px;">
+          <label style="font-size:12px;color:#888;font-family:'Kanit',sans-serif;">ถึง</label>
+          <input type="date" id="txn-date-to" onchange="renderTxnTimeline()" style="padding:5px 10px;border:1px solid #e0e0e0;border-radius:7px;font-size:12px;">
+          <button onclick="_txnSetToday()" style="font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 11px;border:1px solid #1B6B2F;border-radius:7px;background:#f0faf4;color:#1B6B2F;cursor:pointer;">วันนี้</button>
+          <button onclick="_txnSetMonth()" style="font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 11px;border:1px solid #3b82f6;border-radius:7px;background:#f0f4ff;color:#3b82f6;cursor:pointer;">เดือนนี้</button>
+          <button onclick="_txnClear()" style="font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 11px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#aaa;cursor:pointer;">✕ ล้าง</button>
+          <select id="txn-type-filter" onchange="renderTxnTimeline()" style="padding:5px 10px;border:1px solid #e0e0e0;border-radius:7px;font-size:12px;font-family:'Kanit',sans-serif;">
+            <option value="">ทุกประเภท</option>
+            <option value="deposit">💰 เติมเงิน</option>
+            <option value="withdraw">🏧 ถอนเงิน</option>
+            <option value="bet">🎯 เดิมพัน</option>
+            <option value="reward">🎉 รางวัล/กิจกรรม</option>
+            <option value="commission">🎁 ค่าคอมมิชชัน</option>
+          </select>
+          <span id="txn-count-badge" style="font-family:'Kanit',sans-serif;font-size:11px;color:#aaa;margin-left:auto;"></span>
+        </div>
+
+        <!-- summary strip -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid #f0f0ee;">
+          <div style="padding:10px 14px;text-align:center;border-right:1px solid #f0f0ee;">
+            <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:16px;color:#16a34a;" id="txn-sum-dep">—</div>
+            <div style="font-size:10px;color:#aaa;margin-top:1px;">เติมรวม (฿)</div>
+          </div>
+          <div style="padding:10px 14px;text-align:center;border-right:1px solid #f0f0ee;">
+            <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:16px;color:#dc2626;" id="txn-sum-with">—</div>
+            <div style="font-size:10px;color:#aaa;margin-top:1px;">ถอนรวม (฿)</div>
+          </div>
+          <div style="padding:10px 14px;text-align:center;border-right:1px solid #f0f0ee;">
+            <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:16px;color:#f59e0b;" id="txn-sum-bet">—</div>
+            <div style="font-size:10px;color:#aaa;margin-top:1px;">เดิมพันรวม (฿)</div>
+          </div>
+          <div style="padding:10px 14px;text-align:center;">
+            <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:16px;color:#8b5cf6;" id="txn-sum-reward">—</div>
+            <div style="font-size:10px;color:#aaa;margin-top:1px;">รางวัล/คอมฯ (฿)</div>
+          </div>
+        </div>
+
+        <!-- timeline -->
+        <div id="txn-timeline" style="max-height:480px;overflow-y:auto;padding:10px 16px;">
+          <div style="text-align:center;padding:32px;color:#aaa;font-family:'Kanit',sans-serif;">กำลังโหลด...</div>
+        </div>
+
+      </div>
+
+      <!-- FLAG PANEL -->
       <div id="mdt-flag" class="md-panel" style="display:none;padding:18px 20px;">
 
         <!-- ป้ายที่ติดอยู่แล้ว -->
@@ -3721,6 +3934,10 @@ function switchMdTab(id, btn) {
   if (id === 'flag') {
     const hint = document.getElementById('flag-sql-helper-hint');
     if (hint) hint.style.display = window._flagColumnMissing ? 'block' : 'none';
+  }
+  // render TXN timeline เมื่อเปิด tab
+  if (id === 'txn') {
+    renderTxnTimeline();
   }
 }
 
