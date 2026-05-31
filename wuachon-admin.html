@@ -1165,16 +1165,34 @@ tr:hover td{background:#fafafa;}
           </div>
           <div id="ref-preview-result" style="display:none;margin-top:12px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 14px;font-size:12px;"></div>
         </div>
-        <div class="card">
-          <div class="card-title">🏦 บัญชีรับเงิน</div>
-          <div class="form-row">
-            <div class="fg"><label>ธนาคาร</label><input id="sf-bank" placeholder="เช่น กสิกรไทย, ธนาคารลาว..."></div>
-            <div class="fg"><label>เลขบัญชี</label><input id="sf-accno" placeholder="XXX-X-XXXXX-X"></div>
+        <div class="card" style="border-left:4px solid #F5A800;">
+          <div class="card-title">🏦 บัญชีรับเงิน
+            <button onclick="loadBankAccounts()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">🔄 รีเฟรช</button>
           </div>
-          <div class="form-row">
-            <div class="fg"><label>ชื่อบัญชี</label><input id="sf-accname" placeholder="ชื่อเจ้าของบัญชี"></div>
+          <div style="font-size:12px;color:#888;margin-bottom:14px;">เพิ่มบัญชีรับเงินได้ไม่จำกัด · บัญชีที่เปิดใช้งานจะแสดงในหน้าเติมเงินของลูกค้า</div>
+
+          <!-- รายการบัญชีที่มีอยู่ -->
+          <div id="bank-accounts-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+            <div style="text-align:center;padding:20px;color:#aaa;font-family:'Kanit',sans-serif;">กำลังโหลด...</div>
           </div>
-          <button class="save-btn" onclick="saveSettings('bank')">💾 บันทึกบัญชี</button>
+
+          <!-- ฟอร์มเพิ่มบัญชีใหม่ -->
+          <div style="background:#fafaf8;border:1px solid #e5e5e0;border-radius:10px;padding:16px;">
+            <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;color:#1a1a1a;margin-bottom:12px;">➕ เพิ่มบัญชีใหม่</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+              <div class="fg"><label>ธนาคาร / ชื่อช่องทาง</label><input id="new-bank-name" placeholder="เช่น BCEL, KBank, PromptPay..."></div>
+              <div class="fg"><label>เลขบัญชี / เบอร์พร้อมเพย์</label><input id="new-bank-accno" placeholder="XXX-X-XXXXX-X"></div>
+              <div class="fg"><label>ชื่อบัญชี</label><input id="new-bank-accname" placeholder="ชื่อเจ้าของบัญชี"></div>
+              <div class="fg"><label>หมายเหตุ (ไม่บังคับ)</label><input id="new-bank-note" placeholder="เช่น สำรอง, หลัก"></div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+                <input type="checkbox" id="new-bank-active" checked>
+                <span style="font-family:'Kanit',sans-serif;font-weight:700;color:#16a34a;">เปิดใช้งานทันที</span>
+              </label>
+              <button class="save-btn" onclick="addBankAccount()" style="flex:1;margin:0;padding:10px;">💾 เพิ่มบัญชีนี้</button>
+            </div>
+          </div>
         </div>
         <div class="card">
           <div class="card-title">📞 ข้อมูลติดต่อ</div>
@@ -3290,11 +3308,20 @@ function clearHeroBull() {
 
 // helper: UPDATE settings ก่อน ถ้าไม่มี row ค่อย INSERT
 async function safeUpsertSettings(key, value) {
-  const { error: eUpd } = await sb.from('settings').update({ value }).eq('key', key);
-  if (eUpd) {
-    // row ไม่มี — ลอง insert
-    const { error: eIns } = await sb.from('settings').insert({ key, value });
-    return eIns;
+  // ใช้ upsert จริง — ถ้า key มีอยู่แล้ว update, ถ้าไม่มี insert
+  const { error } = await sb.from('settings')
+    .upsert({ key, value }, { onConflict: 'key' });
+  if (error) {
+    // fallback: ลอง update ตาม key โดยตรง
+    const { error: eUpd } = await sb.from('settings')
+      .update({ value })
+      .eq('key', key);
+    if (eUpd) {
+      // ยังไม่มี row — insert ใหม่
+      const { error: eIns } = await sb.from('settings').insert({ key, value });
+      if (eIns) console.error('[Settings] save error:', key, eIns.message);
+      return eIns;
+    }
   }
   return null;
 }
@@ -3334,8 +3361,140 @@ async function saveNewsEdit(id) {
   loadNews();
 }
 
-// ===== SETTINGS =====
+// ===== MULTI BANK ACCOUNTS =====
+let _bankAccounts = []; // cache
+
+async function loadBankAccounts() {
+  const { data } = await sb.from('settings').select('value').eq('key','bankAccounts').maybeSingle();
+  if (data?.value?.accounts) {
+    _bankAccounts = data.value.accounts;
+  } else {
+    // migrate จาก bankAccount เดิม
+    const { data: old } = await sb.from('settings').select('value').eq('key','bankAccount').maybeSingle();
+    if (old?.value?.bankName) {
+      _bankAccounts = [{ id: Date.now(), bankName: old.value.bankName, accNo: old.value.accNo, accName: old.value.accName, note: '', active: true }];
+      await safeUpsertSettings('bankAccounts', { accounts: _bankAccounts });
+    } else {
+      _bankAccounts = [];
+    }
+  }
+  renderBankAccounts();
+}
+
+function renderBankAccounts() {
+  const wrap = document.getElementById('bank-accounts-list');
+  if (!wrap) return;
+  if (!_bankAccounts.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:24px;color:#aaa;font-family:\'Kanit\',sans-serif;"><div style="font-size:28px;margin-bottom:6px;">🏦</div>ยังไม่มีบัญชีรับเงิน — เพิ่มด้านล่างได้เลยครับ</div>';
+    return;
+  }
+  wrap.innerHTML = _bankAccounts.map((b, idx) => `
+    <div style="border:1.5px solid ${b.active?'#86efac':'#e5e5e0'};border-radius:10px;padding:14px 16px;background:${b.active?'#f0fdf4':'#fafaf8'};transition:all .2s;">
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <!-- toggle + icon -->
+        <div style="flex-shrink:0;margin-top:2px;">
+          <label style="position:relative;display:inline-block;width:42px;height:24px;cursor:pointer;" title="${b.active?'คลิกปิดใช้งาน':'คลิกเปิดใช้งาน'}">
+            <input type="checkbox" ${b.active?'checked':''} onchange="toggleBankAccount(${idx},this.checked)"
+              style="opacity:0;width:0;height:0;position:absolute;">
+            <span style="position:absolute;inset:0;border-radius:999px;background:${b.active?'#16a34a':'#d1d5db'};transition:.2s;"></span>
+            <span style="position:absolute;top:3px;left:${b.active?'21':'3'}px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);"></span>
+          </label>
+        </div>
+        <!-- info -->
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+            <span style="font-family:'Kanit',sans-serif;font-weight:900;font-size:14px;">${b.bankName||'—'}</span>
+            ${b.active
+              ? '<span style="font-family:\'Kanit\',sans-serif;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:#dcfce7;color:#15803d;border:1px solid #86efac;">✅ เปิดใช้งาน</span>'
+              : '<span style="font-family:\'Kanit\',sans-serif;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:#f5f5f2;color:#aaa;border:1px solid #e5e5e0;">⏸ ปิดใช้งาน</span>'}
+            ${b.note ? `<span style="font-size:11px;color:#aaa;">${b.note}</span>` : ''}
+          </div>
+          <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:16px;color:#1a1a1a;letter-spacing:.5px;">${b.accNo||'—'}</div>
+          <div style="font-size:12px;color:#666;margin-top:2px;">ชื่อบัญชี: <strong>${b.accName||'—'}</strong></div>
+        </div>
+        <!-- actions -->
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <button onclick="editBankAccount(${idx})" style="font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 10px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">✏️ แก้ไข</button>
+          <button onclick="deleteBankAccount(${idx})" style="font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 10px;border:1px solid #fca5a5;border-radius:7px;background:#fff5f5;color:#dc2626;cursor:pointer;">🗑</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function addBankAccount() {
+  const bankName = document.getElementById('new-bank-name')?.value.trim();
+  const accNo    = document.getElementById('new-bank-accno')?.value.trim();
+  const accName  = document.getElementById('new-bank-accname')?.value.trim();
+  const note     = document.getElementById('new-bank-note')?.value.trim() || '';
+  const active   = document.getElementById('new-bank-active')?.checked ?? true;
+
+  if (!bankName || !accNo || !accName) {
+    showToast('⚠️ กรุณากรอกธนาคาร, เลขบัญชี และชื่อบัญชีครับ', 'error'); return;
+  }
+
+  _bankAccounts.push({ id: Date.now(), bankName, accNo, accName, note, active });
+  const err = await safeUpsertSettings('bankAccounts', { accounts: _bankAccounts });
+  if (err) { showToast('❌ บันทึกไม่สำเร็จ: ' + err.message, 'error'); return; }
+
+  // compat: อัปเดต bankAccount เดิมถ้าบัญชีนี้ active
+  if (active) _syncLegacyBank();
+
+  // reset form
+  ['new-bank-name','new-bank-accno','new-bank-accname','new-bank-note'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  const cb = document.getElementById('new-bank-active'); if(cb) cb.checked=true;
+  renderBankAccounts();
+  showToast(`✅ เพิ่มบัญชี "${bankName}" แล้วครับ${active?' · เปิดใช้งานทันที':''}`);
+}
+
+async function toggleBankAccount(idx, active) {
+  if (!_bankAccounts[idx]) return;
+  _bankAccounts[idx].active = active;
+  await safeUpsertSettings('bankAccounts', { accounts: _bankAccounts });
+  _syncLegacyBank();
+  renderBankAccounts();
+  showToast(active ? `✅ เปิดใช้งาน "${_bankAccounts[idx].bankName}" แล้วครับ` : `⏸ ปิดใช้งาน "${_bankAccounts[idx].bankName}" แล้วครับ`);
+}
+
+async function deleteBankAccount(idx) {
+  const b = _bankAccounts[idx];
+  if (!b) return;
+  if (!confirm(`ลบบัญชี "${b.bankName} · ${b.accNo}" ใช่ไหมครับ?`)) return;
+  _bankAccounts.splice(idx, 1);
+  await safeUpsertSettings('bankAccounts', { accounts: _bankAccounts });
+  _syncLegacyBank();
+  renderBankAccounts();
+  showToast('✅ ลบบัญชีแล้วครับ');
+}
+
+async function editBankAccount(idx) {
+  const b = _bankAccounts[idx];
+  if (!b) return;
+  // ใส่ค่าเดิมลง form
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.value=val||''; };
+  set('new-bank-name',    b.bankName);
+  set('new-bank-accno',   b.accNo);
+  set('new-bank-accname', b.accName);
+  set('new-bank-note',    b.note||'');
+  const cb = document.getElementById('new-bank-active'); if(cb) cb.checked=b.active;
+  // ลบอันเดิมออก
+  _bankAccounts.splice(idx, 1);
+  renderBankAccounts();
+  document.getElementById('new-bank-name')?.focus();
+  showToast('✏️ แก้ไขข้อมูลได้เลย แล้วกด "เพิ่มบัญชีนี้" อีกครั้งครับ');
+}
+
+// sync bankAccount เดิม (ใช้บัญชีแรกที่ active)
+function _syncLegacyBank() {
+  const active = _bankAccounts.find(b => b.active);
+  if (active) {
+    safeUpsertSettings('bankAccount', { bankName: active.bankName, accNo: active.accNo, accName: active.accName });
+  }
+}
+
 async function loadSettings() {
+  loadBankAccounts();
   const {data} = await sb.from('settings').select('*');
   if (!data) return;
   const bank    = data.find(s=>s.key==='bankAccount')?.value || {};
@@ -3835,17 +3994,32 @@ function _refLogClear() {
 
 async function loadRefRateLevels() {
   const { data } = await sb.from('settings').select('value').eq('key','refRateLevels').maybeSingle();
-  const levels = data?.value?.levels || [5, 3, 2, 1, 0.5];
-  for (let i = 1; i <= 5; i++) {
-    const inp = document.getElementById(`sf-ref-rate-${i}`);
-    if (inp) inp.value = levels[i-1] ?? 0;
-  }
-  // compat: โหลด refRate เดิมถ้ายังมี
-  if (!data) {
+
+  if (data?.value?.levels?.length === 5) {
+    // ✅ มีข้อมูลครบ 5 ชั้น — ใช้ค่านี้เลย
+    const levels = data.value.levels;
+    for (let i = 1; i <= 5; i++) {
+      const inp = document.getElementById(`sf-ref-rate-${i}`);
+      if (inp) inp.value = levels[i-1] ?? 0;
+    }
+    window._savedRefLevels = [...levels];
+  } else if (data?.value?.levels) {
+    // มีบางส่วน — เติมที่หายไปด้วย 0
+    const levels = data.value.levels;
+    for (let i = 1; i <= 5; i++) {
+      const inp = document.getElementById(`sf-ref-rate-${i}`);
+      if (inp) inp.value = levels[i-1] ?? 0;
+    }
+  } else {
+    // ยังไม่มีข้อมูลเลย — ลอง migrate จาก refRate เดิม (ชั้น 1 เท่านั้น)
     const { data: old } = await sb.from('settings').select('value').eq('key','refRate').maybeSingle();
-    if (old?.value?.rate) {
-      const inp = document.getElementById('sf-ref-rate-1');
-      if (inp) inp.value = old.value.rate;
+    const rate1 = old?.value?.rate ?? '';
+    const inp1 = document.getElementById('sf-ref-rate-1');
+    if (inp1) inp1.value = rate1;
+    // ชั้น 2-5 เว้นว่างไว้ให้ admin กรอกเอง (ไม่ใส่ default)
+    for (let i = 2; i <= 5; i++) {
+      const inp = document.getElementById(`sf-ref-rate-${i}`);
+      if (inp) inp.value = '';
     }
   }
 }
@@ -3853,13 +4027,38 @@ async function loadRefRateLevels() {
 async function saveRefRateLevels() {
   const levels = [];
   for (let i = 1; i <= 5; i++) {
-    const v = parseFloat(document.getElementById(`sf-ref-rate-${i}`)?.value || '0') || 0;
-    levels.push(v);
+    const raw = document.getElementById(`sf-ref-rate-${i}`)?.value ?? '';
+    const v   = raw === '' ? 0 : parseFloat(raw);
+    levels.push(isNaN(v) ? 0 : v);
   }
-  await safeUpsertSettings('refRateLevels', { levels });
-  // compat: อัปเดต refRate เดิมด้วย (ชั้น 1)
+
+  // บันทึกลง Supabase
+  const err = await safeUpsertSettings('refRateLevels', { levels });
+  if (err) {
+    showToast(`❌ บันทึกไม่สำเร็จ: ${err.message}`, 'error');
+    return;
+  }
+  // compat: อัปเดต refRate ชั้น 1 ด้วย
   await safeUpsertSettings('refRate', { rate: levels[0] });
-  showToast('✅ บันทึกค่าคอมมิชชัน 5 ชั้นแล้วครับ!');
+
+  // อัปเดต _vipLevels cache
+  window._savedRefLevels = [...levels];
+
+  // โหลดกลับมาจาก DB เพื่อยืนยันว่าบันทึกสำเร็จจริง
+  const { data: verify } = await sb.from('settings').select('value').eq('key','refRateLevels').maybeSingle();
+  const saved = verify?.value?.levels || [];
+
+  if (saved.length === 5 && saved.every((v,i) => Math.abs(v - levels[i]) < 0.001)) {
+    showToast(`✅ บันทึกค่าคอมมิชชัน 5 ชั้นสำเร็จแล้วครับ! (${levels.map((v,i)=>`ชั้น${i+1}:${v}%`).join(', ')})`);
+  } else {
+    // ค่าไม่ตรง — แสดง warning + ใส่ค่าที่บันทึกได้จริงลง input
+    showToast(`⚠️ บันทึกสำเร็จแต่ค่าบางชั้นอาจไม่ตรง กรุณาตรวจสอบอีกครั้ง`, 'error');
+    // ใส่ค่าจาก DB กลับ
+    saved.forEach((v, i) => {
+      const inp = document.getElementById(`sf-ref-rate-${i+1}`);
+      if (inp) inp.value = v;
+    });
+  }
 }
 
 function previewRefExample() {
@@ -3888,8 +4087,22 @@ function previewRefExample() {
 }
 
 async function getRefRateLevels() {
+  // ใช้ cache ถ้ามี
+  if (window._savedRefLevels?.length === 5) return window._savedRefLevels;
   const { data } = await sb.from('settings').select('value').eq('key','refRateLevels').maybeSingle();
-  return data?.value?.levels || [5, 3, 2, 1, 0.5];
+  const levels = data?.value?.levels;
+  if (Array.isArray(levels) && levels.length > 0) {
+    // เติม 0 ถ้าน้อยกว่า 5 ชั้น
+    while (levels.length < 5) levels.push(0);
+    window._savedRefLevels = levels;
+    return levels;
+  }
+  // fallback: ดึง refRate เก่า (ชั้น 1 เท่านั้น)
+  const { data: old } = await sb.from('settings').select('value').eq('key','refRate').maybeSingle();
+  const rate1 = old?.value?.rate ?? 0;
+  const fallback = [rate1, 0, 0, 0, 0];
+  window._savedRefLevels = fallback;
+  return fallback;
 }
 
 // จ่ายค่าคอม 5 ชั้น จากยอดเดิมพัน

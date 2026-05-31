@@ -3935,10 +3935,18 @@ fns.forEach(function(fn){
       if (contact.fbName)    { const el = document.getElementById('contact-fb-name');     if(el) el.textContent = contact.fbName; }
       if (contact.hoursTime) { const el = document.getElementById('contact-phone-hours'); if(el) el.textContent = contact.hoursTime; }
 
-      // Bank account (ในหน้าเติมเงิน)
-      if (bank.bankName) { const el = document.getElementById('dep-bank-name'); if(el) el.textContent = bank.bankName; }
-      if (bank.accNo)    { const el = document.getElementById('dep-acc-no');    if(el) el.textContent = bank.accNo; }
-      if (bank.accName)  { const el = document.getElementById('dep-acc-name');  if(el) el.textContent = bank.accName; }
+      // Bank accounts (หลายบัญชี)
+      const banksData = data.find(s => s.key === 'bankAccounts')?.value?.accounts || [];
+      const activeBanks = banksData.filter(b => b.active);
+      if (activeBanks.length > 0) {
+        _renderDepBankAccounts(activeBanks);
+      } else {
+        // fallback: บัญชีเดิม
+        const bank = data.find(s => s.key === 'bankAccount')?.value || {};
+        if (bank.bankName) {
+          _renderDepBankAccounts([{ bankName: bank.bankName, accNo: bank.accNo, accName: bank.accName, active: true }]);
+        }
+      }
     }
     loadSettings();
 
@@ -5393,9 +5401,60 @@ fns.forEach(function(fn){
     document.getElementById('dep-step3').style.display = 'block';
   }
 
+  // ── หลายบัญชีรับเงิน ──
+  let _depBanks = [], _depBankIdx = 0;
+
+  function _renderDepBankAccounts(banks) {
+    _depBanks = banks; _depBankIdx = 0;
+    if (banks.length === 0) return;
+    // เพิ่ม tab selector ถ้ามีหลายบัญชี
+    const tabAnchor = document.getElementById('dep-step2');
+    if (!tabAnchor) { _showDepBank(0); return; }
+    let tabWrap = document.getElementById('dep-bank-tabs');
+    if (!tabWrap) {
+      tabWrap = document.createElement('div');
+      tabWrap.id = 'dep-bank-tabs';
+      tabWrap.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;padding:0 0 12px;';
+      const anchor = tabAnchor.querySelector('[style*="border-radius:12px"]');
+      if (anchor) anchor.parentNode.insertBefore(tabWrap, anchor);
+    }
+    if (banks.length > 1) {
+      tabWrap.innerHTML = banks.map((b,i) => `
+        <button id="dep-btab-${i}" onclick="_selectDepBank(${i})"
+          style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer;transition:all .15s;
+          ${i===0?'background:var(--gold);color:#1a1a1a;border:1px solid var(--gold);':'background:transparent;color:rgba(240,255,232,.6);border:1px solid rgba(240,255,232,.2);'}">
+          🏦 ${b.bankName}</button>`).join('');
+    }
+    _showDepBank(0);
+  }
+
+  window._selectDepBank = function(idx) {
+    _depBankIdx = idx;
+    _depBanks.forEach((_,i) => {
+      const btn = document.getElementById(`dep-btab-${i}`);
+      if (!btn) return;
+      if (i===idx) { btn.style.background='var(--gold)'; btn.style.color='#1a1a1a'; btn.style.border='1px solid var(--gold)'; }
+      else { btn.style.background='transparent'; btn.style.color='rgba(240,255,232,.6)'; btn.style.border='1px solid rgba(240,255,232,.2)'; }
+    });
+    _showDepBank(idx);
+  };
+
+  function _showDepBank(idx) {
+    const b = _depBanks[idx]; if (!b) return;
+    const setTxt = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v||'—'; };
+    setTxt('dep-bank-name', b.bankName);
+    setTxt('dep-acc-no',    b.accNo);
+    setTxt('dep-acc-name',  b.accName);
+  }
+
   function copyDepAccNo() {
-    const accno = document.getElementById('dep-acc-no').textContent;
-    navigator.clipboard?.writeText(accno).then(() => alert('คัดลอกเลขบัญชีแล้วครับ: ' + accno));
+    const b = _depBanks[_depBankIdx];
+    const accno = b?.accNo || document.getElementById('dep-acc-no')?.textContent || '';
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(accno).then(() => showFEToast(`✅ คัดลอก ${accno} แล้วครับ`));
+    } else {
+      alert('เลขบัญชี: ' + accno);
+    }
   }
 
   window.setWithAmount = window._real_setWithAmount = function setWithAmount(n) { document.getElementById('with-amount').value = n; }
