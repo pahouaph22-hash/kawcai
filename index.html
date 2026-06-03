@@ -5252,6 +5252,11 @@ function applyLang() {
   function loadCardPhoto(input, imgId, phId) {
     const file = input.files[0];
     if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      showFEToast('⚠️ ไฟล์ใหญ่เกิน 5MB กรุณาเลือกใหม่ครับ');
+      input.value = '';
+      return;
+    }
     const reader = new FileReader();
     reader.onload = e => {
       const img = document.getElementById(imgId);
@@ -5266,6 +5271,11 @@ function applyLang() {
   function loadModalPhoto(input, imgId, phId) {
     const file = input.files[0];
     if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      showFEToast('⚠️ ไฟล์ใหญ่เกิน 5MB กรุณาเลือกใหม่ครับ');
+      input.value = '';
+      return;
+    }
     const reader = new FileReader();
     reader.onload = e => {
       const img = document.getElementById(imgId);
@@ -6552,8 +6562,8 @@ function applyLang() {
   // ── สมัครสมาชิก ──
   window.submitRegister = window._real_submitRegister = async function submitRegister() {
     const fname     = document.getElementById('r-fname').value.trim();
-    const lname     = document.getElementById('r-lname').value.trim();
-    const nick      = document.getElementById('r-nick').value.trim();
+    const lname     = sanitizeFE(document.getElementById('r-lname').value.trim());
+    const nick      = sanitizeFE(document.getElementById('r-nick').value.trim());
     const phone     = document.getElementById('r-phone').value.trim();
     const password  = document.getElementById('r-password').value;
     const password2 = document.getElementById('r-password2').value;
@@ -6571,9 +6581,11 @@ function applyLang() {
       errEl.textContent = '⚠️ เบอร์โทรศัพท์ไม่ถูกต้องครับ';
       return;
     }
-    if (password.length < 6) {
+    // ตรวจรหัสผ่านแข็งแรง
+    const pwErr = _validatePassword(password);
+    if (pwErr) {
       errEl.style.display = 'block';
-      errEl.textContent = '⚠️ รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษรครับ';
+      errEl.textContent = '⚠️ ' + pwErr;
       return;
     }
     if (password !== password2) {
@@ -6664,8 +6676,73 @@ function applyLang() {
   }
 
   // ── Login ──
+
+// ===== SECURITY SYSTEM — Frontend =====
+
+// ── Brute Force Protection (Login) ──
+const _feLoginAttempts = {};
+const FE_MAX_ATTEMPTS  = 5;
+const FE_LOCKOUT_MS    = 10 * 60 * 1000; // 10 นาที
+
+function _feCheckAttempts(id) {
+  const now = Date.now();
+  const r = _feLoginAttempts[id];
+  if (!r) return true;
+  if (r.lockUntil && now < r.lockUntil) {
+    const rem = Math.ceil((r.lockUntil - now) / 60000);
+    return `🔒 ล็อคชั่วคราว กรุณารอ ${rem} นาทีครับ`;
+  }
+  return true;
+}
+function _feRecordFail(id) {
+  if (!_feLoginAttempts[id]) _feLoginAttempts[id] = { count:0, lockUntil:null };
+  _feLoginAttempts[id].count++;
+  if (_feLoginAttempts[id].count >= FE_MAX_ATTEMPTS) {
+    _feLoginAttempts[id].lockUntil = Date.now() + FE_LOCKOUT_MS;
+    _feLoginAttempts[id].count = 0;
+  }
+}
+function _feClearAttempts(id) { delete _feLoginAttempts[id]; }
+
+// ── Session Expiry (8 ชั่วโมง) ──
+const FE_SESSION_MS = 8 * 60 * 60 * 1000;
+
+function _setSessionExpiry() {
+  sessionStorage.setItem('bw_session_exp', Date.now() + FE_SESSION_MS);
+}
+function _checkSessionExpiry() {
+  const exp = parseInt(sessionStorage.getItem('bw_session_exp') || '0');
+  if (exp && Date.now() > exp) {
+    logout();
+    showFEToast('⏰ เซสชันหมดอายุ กรุณา Login ใหม่ครับ');
+    return false;
+  }
+  return true;
+}
+
+// ── Input Sanitization ──
+function sanitizeFE(str) {
+  if (typeof str !== 'string') return str;
+  return str.replace(/[<>"'&]/g, c =>
+    ({'<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#x27;','&':'&amp;'}[c])
+  ).trim();
+}
+
+// ── Register: ตรวจรหัสผ่านแข็งแรง ──
+function _validatePassword(pw) {
+  if (pw.length < 6) return 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษรครับ';
+  if (/^[0-9]+$/.test(pw)) return 'รหัสผ่านไม่ควรเป็นตัวเลขล้วนครับ';
+  return null;
+}
+
+// ── Check session expiry ทุก 5 นาที ──
+setInterval(() => {
+  if (currentUser) _checkSessionExpiry();
+}, 5 * 60 * 1000);
+
+
   window.submitLogin = window._real_submitLogin = async function submitLogin() {
-    const loginInput = document.getElementById('l-phone').value.trim().replace(/-/g,'');
+    const loginInput = sanitizeFE(document.getElementById('l-phone').value.trim().replace(/-/g,''));
     const password   = document.getElementById('l-password').value;
     const errEl      = document.getElementById('login-error');
     const btn        = document.querySelector('#form-login .reg-submit');
@@ -6675,6 +6752,15 @@ function applyLang() {
       errEl.textContent = '⚠️ กรุณากรอกเบอร์โทร/ชื่อบัญชี และรหัสผ่านครับ';
       return;
     }
+
+    // ── Brute Force Check ──
+    const bruteCheck = _feCheckAttempts(loginInput);
+    if (bruteCheck !== true) {
+      errEl.style.display = 'block';
+      errEl.textContent = bruteCheck;
+      return;
+    }
+
     errEl.style.display = 'none';
     btn.disabled = true;
     btn.textContent = 'กำลังตรวจสอบ...';
@@ -6715,10 +6801,20 @@ function applyLang() {
     const pwHashAlt = btoa(phone + ':' + password);
 
     if (data.password !== pwHash && data.password !== pwHashAlt) {
+      // บันทึก failed attempt
+      _feRecordFail(loginInput);
+      const attempts = _feLoginAttempts[loginInput]?.count || 0;
+      const remaining = FE_MAX_ATTEMPTS - attempts;
       errEl.style.display = 'block';
-      errEl.textContent = '❌ รหัสผ่านไม่ถูกต้องครับ';
+      errEl.textContent = remaining > 0
+        ? `❌ รหัสผ่านไม่ถูกต้อง (เหลืออีก ${remaining} ครั้ง)`
+        : '🔒 Login ผิดเกินกำหนด — ถูกล็อค 10 นาทีครับ';
       return;
     }
+
+    // Login สำเร็จ — clear attempts + set session expiry
+    _feClearAttempts(loginInput);
+    _setSessionExpiry();
 
     // บันทึก session
     currentUser = data;
@@ -7506,6 +7602,11 @@ function applyLang() {
     let slip_url = '';
     const slipFile = document.getElementById('dep-slip-file')?.files?.[0];
     if (slipFile) {
+      // ตรวจขนาดไฟล์ไม่เกิน 5MB
+      if (slipFile.size > 5 * 1024 * 1024) {
+        showFEToast('⚠️ ไฟล์สลิปใหญ่เกิน 5MB กรุณาเลือกไฟล์ใหม่ครับ');
+        return;
+      }
       const ext      = slipFile.name.split('.').pop() || 'jpg';
       const filePath = `slips/dep_${nick}_${Date.now()}.${ext}`;
       const { data: upData, error: upErr } = await sb.storage
@@ -7515,7 +7616,6 @@ function applyLang() {
         const { data: urlData } = sb.storage.from('slips').getPublicUrl(filePath);
         slip_url = urlData?.publicUrl || '';
       }
-      // ถ้า upload ไม่สำเร็จ (bucket ไม่มี) ก็ยังส่งคำขอได้ แค่ไม่มี URL
     }
 
     // ✅ บันทึกลง Supabase deposits
