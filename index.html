@@ -3712,39 +3712,40 @@ input, textarea, select, button {
           <div id="dep-bank-tabs" style="display:none;gap:6px;flex-wrap:wrap;margin-bottom:10px;"></div>
 
           <!-- กล่องแสดงบัญชีที่เลือก -->
-          <div style="background:var(--dark3);border:1px solid rgba(245,200,66,0.2);border-radius:12px;overflow:hidden;">
-            <div style="background:rgba(245,200,66,0.08);padding:12px 16px;border-bottom:1px solid rgba(245,200,66,0.15);display:flex;align-items:center;justify-content:space-between;">
-              <div style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-weight:700;font-size:13px;color:var(--gold);" id="dep-bank-header">🏦 บัญชีรับเงิน</div>
-              <div id="dep-bank-badge" style="display:none;font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:10px;font-weight:700;padding:2px 9px;border-radius:999px;background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3);">✅ เปิดใช้งาน</div>
-            </div>
-            <div style="padding:16px;">
-              <div style="display:flex;align-items:center;gap:14px;">
-                <!-- QR Code -->
-                <div id="dep-qr-wrap" style="flex-shrink:0;width:100px;height:100px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                  <div id="dep-qr-placeholder" style="text-align:center;padding:8px;">
-                    <div style="font-size:28px;">📷</div>
-                    <div style="font-size:9px;color:#aaa;font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;margin-top:3px;">QR Code</div>
+          <div id="dep-bank-info-wrap">
+            <div style="background:var(--dark3);border:1px solid rgba(245,200,66,0.2);border-radius:12px;overflow:hidden;">
+              <div style="background:rgba(245,200,66,0.08);padding:12px 16px;border-bottom:1px solid rgba(245,200,66,0.15);display:flex;align-items:center;justify-content:space-between;">
+                <div style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-weight:700;font-size:13px;color:var(--gold);" id="dep-bank-header">🏦 บัญชีรับเงิน</div>
+                <div id="dep-bank-badge" style="display:none;font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:10px;font-weight:700;padding:2px 9px;border-radius:999px;background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3);">✅ เปิดใช้งาน</div>
+              </div>
+              <div style="padding:16px;">
+                <div style="display:flex;align-items:center;gap:14px;">
+                  <!-- QR Code -->
+                  <div id="dep-qr-wrap" style="flex-shrink:0;width:100px;height:100px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                    <div id="dep-qr-placeholder" style="text-align:center;padding:8px;">
+                      <div style="font-size:28px;">📷</div>
+                      <div style="font-size:9px;color:#aaa;font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;margin-top:3px;">QR Code</div>
+                    </div>
+                    <img id="dep-qr-img" src="" style="display:none;width:100%;height:100%;object-fit:contain;">
                   </div>
-                  <img id="dep-qr-img" src="" style="display:none;width:100%;height:100%;object-fit:contain;">
-                </div>
-                <!-- ข้อมูลบัญชี -->
-                <div style="flex:1;">
-                  <div style="font-size:11px;color:rgba(240,255,232,0.4);font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;margin-bottom:4px;">ธนาคาร / ช่องทาง</div>
-                  <div style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-weight:700;font-size:15px;color:var(--cream);" id="dep-bank-name">—</div>
-                  <div style="font-size:11px;color:rgba(240,255,232,0.4);font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;margin-top:8px;margin-bottom:4px;">เลขบัญชี</div>
-                  <div style="display:flex;align-items:center;gap:8px;">
-                    <div style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-weight:900;font-size:18px;color:var(--gold);letter-spacing:1px;" id="dep-acc-no">—</div>
-                    <button onclick="copyDepAccNo()" style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid rgba(245,200,66,0.3);background:transparent;color:var(--gold);cursor:pointer;">📋 คัดลอก</button>
+                  <!-- ข้อมูลบัญชี -->
+                  <div style="flex:1;">
+                    <div style="font-size:11px;color:rgba(240,255,232,0.4);font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;margin-bottom:4px;">ธนาคาร / ช่องทาง</div>
+                    <div style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-weight:700;font-size:15px;color:var(--cream);" id="dep-bank-name">—</div>
+                    <div style="font-size:11px;color:rgba(240,255,232,0.4);font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;margin-top:8px;margin-bottom:4px;">เลขบัญชี</div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <div style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-weight:900;font-size:18px;color:var(--gold);letter-spacing:1px;" id="dep-acc-no">—</div>
+                      <button onclick="copyDepAccNo()" style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid rgba(245,200,66,0.3);background:transparent;color:var(--gold);cursor:pointer;">📋 คัดลอก</button>
+                    </div>
+                    <div style="font-size:11px;color:rgba(240,255,232,0.4);font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;margin-top:6px;">
+                      ชื่อบัญชี: <span style="color:var(--cream);font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-weight:500;" id="dep-acc-name">—</span>
+                    </div>
+                    <div id="dep-bank-note-wrap" style="display:none;font-size:11px;color:rgba(240,255,232,0.35);margin-top:4px;"></div>
                   </div>
-                  <div style="font-size:11px;color:rgba(240,255,232,0.4);font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;margin-top:6px;">
-                    ชื่อบัญชี: <span style="color:var(--cream);font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-weight:500;" id="dep-acc-name">—</span>
-                  </div>
-                  <div id="dep-bank-note-wrap" style="display:none;font-size:11px;color:rgba(240,255,232,0.35);margin-top:4px;" id="dep-acc-note"></div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </div><!-- /dep-bank-info-wrap -->
 
         <!-- คำแนะนำ -->
         <div class="acc-notice" style="margin-bottom:14px;">
@@ -5045,18 +5046,14 @@ function applyLang() {
       if (contact.fbName)    { const el = document.getElementById('contact-fb-name');     if(el) el.textContent = contact.fbName; }
       if (contact.hoursTime) { const el = document.getElementById('contact-phone-hours'); if(el) el.textContent = contact.hoursTime; }
 
-      // Bank accounts (หลายบัญชี)
-      const banksData = data.find(s => s.key === 'bankAccounts')?.value?.accounts || [];
-      const activeBanks = banksData.filter(b => b.active);
+      // ── Bank accounts — แสดงเฉพาะที่ active=true เท่านั้น ──
+      // (จะโหลดซ้ำเมื่อเปิด deposit tab ผ่าน loadDepBanks())
+      const banksData   = data.find(s => s.key === 'bankAccounts')?.value?.accounts || [];
+      const activeBanks = banksData.filter(b => b.active === true);
       if (activeBanks.length > 0) {
         _renderDepBankAccounts(activeBanks);
-      } else {
-        // fallback: บัญชีเดิม
-        const bank = data.find(s => s.key === 'bankAccount')?.value || {};
-        if (bank.bankName) {
-          _renderDepBankAccounts([{ bankName: bank.bankName, accNo: bank.accNo, accName: bank.accName, active: true }]);
-        }
       }
+      // ถ้าไม่มีบัญชี active ไม่ต้องแตะ UI ตรงนี้ — loadDepBanks() จะจัดการตอนเปิด tab
     }
     loadSettings();
 
@@ -5251,6 +5248,24 @@ function applyLang() {
           if (rl) rl.innerHTML = `${n1}<span>${n2}</span>`;
           if (si.pageTitle) document.title = si.pageTitle;
           else document.title = `${n1}${n2}`;
+        }
+        // ── อัปเดตบัญชีธนาคารทันทีเมื่อ Admin เปิด/ปิด ──
+        if (payload.new?.key === 'bankAccounts') {
+          const accounts = payload.new.value?.accounts || [];
+          const active   = accounts.filter(b => b.active === true);
+          if (active.length > 0) {
+            _renderDepBankAccounts(active);
+          } else {
+            _renderDepBankAccounts([]);
+            const wrap = document.getElementById('dep-bank-info-wrap');
+            if (wrap) {
+              wrap.innerHTML = `
+                <div style="text-align:center;padding:20px;background:rgba(255,255,255,0.04);border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
+                  <div style="font-size:28px;margin-bottom:8px;">🔒</div>
+                  <div style="font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:13px;color:rgba(240,255,232,0.5);">ขณะนี้ยังไม่มีบัญชีรับเงินที่เปิดใช้งาน<br>กรุณาติดต่อ Admin ครับ</div>
+                </div>`;
+            }
+          }
         }
       })
       .subscribe();
@@ -6974,18 +6989,10 @@ setInterval(() => {
   window.goToMyAccount = window._real_goToMyAccount = async function goToMyAccount() {
     if (!currentUser) return;
 
-    // ดึงข้อมูลล่าสุดจาก Supabase
-    const { data } = await sb.from('members').select('*').eq('nick', currentUser.nick).maybeSingle();
-    if (data) {
-      currentUser = { ...currentUser, ...data };
-      currentUser.flags = Array.isArray(data.flags) ? data.flags : [];
-      sessionStorage.setItem('bw_user', JSON.stringify(currentUser));
-    }
-
     const nick = currentUser.nick || '';
-    // แสดง avatar
+
+    // ── แสดงหน้า Account ทันทีจากข้อมูลที่มีอยู่ใน session ──
     renderAvatar(currentUser);
-    // apply flag UI ทุกครั้งที่เข้าหน้า My Account
     applyFlagUI(currentUser.flags || []);
     document.getElementById('acc-nick').textContent          = nick;
     document.getElementById('acc-fullname').textContent      = `${currentUser.fname||''} ${currentUser.lname||''} · ${currentUser.phone||''}`;
@@ -6996,26 +7003,58 @@ setInterval(() => {
     document.getElementById('acc-info-id').textContent       = currentUser.id || '—';
     const addrEl = document.getElementById('acc-info-addr'); if(addrEl) addrEl.textContent = '—';
     updateAccBalance(currentUser.balance || 0);
-    // สร้าง referral_code ถ้ายังไม่มี (สมาชิกเก่า)
-    if (!currentUser.referral_code) {
-      const autoCode = currentUser.nick.toUpperCase().slice(0,4) + Math.floor(1000+Math.random()*9000);
-      await sb.from('members').update({ referral_code: autoCode }).eq('nick', currentUser.nick);
-      currentUser.referral_code = autoCode;
-      sessionStorage.setItem('bw_user', JSON.stringify(currentUser));
+    if (currentUser.referral_code) {
+      const refCodeEl = document.getElementById('my-ref-code');
+      if (refCodeEl) {
+        refCodeEl.textContent = currentUser.referral_code;
+        const refLinkEl = document.getElementById('my-ref-link');
+        if (refLinkEl) refLinkEl.textContent = location.origin + location.pathname + '?ref=' + currentUser.referral_code;
+      }
     }
-    // แสดง referral code
-    const refCodeEl = document.getElementById('my-ref-code');
-    if (refCodeEl) {
-      refCodeEl.textContent = currentUser.referral_code;
-      const refLinkEl = document.getElementById('my-ref-link');
-      if (refLinkEl) refLinkEl.textContent = location.origin + location.pathname + '?ref=' + currentUser.referral_code;
-    }
+
+    // แสดงหน้าก่อน
+    showMyAccount();
+    // reset deposit กลับ step1 เสมอ
+    const _s1 = document.getElementById('dep-step1');
+    const _s2 = document.getElementById('dep-step2');
+    const _s3 = document.getElementById('dep-step3');
+    if (_s1) _s1.style.display = 'block';
+    if (_s2) _s2.style.display = 'none';
+    if (_s3) _s3.style.display = 'none';
     loadDashboard();
+    loadDepBanks();
+
+    // ── โหลดข้อมูลล่าสุดจาก Supabase ใน background ──
+    try {
+      const { data } = await sb.from('members').select('*').eq('nick', currentUser.nick).maybeSingle();
+      if (data) {
+        currentUser = { ...currentUser, ...data };
+        currentUser.flags = Array.isArray(data.flags) ? data.flags : [];
+        sessionStorage.setItem('bw_user', JSON.stringify(currentUser));
+        updateAccBalance(currentUser.balance || 0);
+        applyFlagUI(currentUser.flags);
+        renderAvatar(currentUser);
+        // สร้าง referral_code ถ้ายังไม่มี
+        if (!currentUser.referral_code) {
+          const autoCode = currentUser.nick.toUpperCase().slice(0,4) + Math.floor(1000+Math.random()*9000);
+          await sb.from('members').update({ referral_code: autoCode }).eq('nick', currentUser.nick);
+          currentUser.referral_code = autoCode;
+          sessionStorage.setItem('bw_user', JSON.stringify(currentUser));
+        }
+        const refCodeEl = document.getElementById('my-ref-code');
+        if (refCodeEl) {
+          refCodeEl.textContent = currentUser.referral_code || '';
+          const refLinkEl = document.getElementById('my-ref-link');
+          if (refLinkEl) refLinkEl.textContent = location.origin + location.pathname + '?ref=' + (currentUser.referral_code||'');
+        }
+      }
+    } catch(_) {}
+
+    // โหลด history ทั้งหมดใน background
     loadTxnHistory();
     loadDepHistory();
     loadWithHistory();
     loadWithdrawPanel();
-    showMyAccount();
   }
 
   function updateAccBalance(amount) {
@@ -7043,6 +7082,36 @@ setInterval(() => {
       show.textContent = amt.toLocaleString() + ' ₭';
     } else {
       preview.style.display = 'none';
+    }
+  }
+
+  // ── โหลด Bank Accounts เมื่อเปิด deposit tab ──
+  async function loadDepBanks() {
+    try {
+      const { data, error } = await sb.from('settings').select('value').eq('key','bankAccounts').maybeSingle();
+      if (error || !data) return; // ถ้าโหลดไม่ได้ ไม่ต้องทำอะไร (ไม่ทำลาย UI)
+
+      const banksData   = data.value?.accounts || [];
+      const activeBanks = banksData.filter(b => b.active === true);
+
+      if (activeBanks.length > 0) {
+        _renderDepBankAccounts(activeBanks);
+      } else {
+        // ไม่มีบัญชี active — แสดงข้อความใน dep-bank-info-wrap เท่านั้น ไม่แตะ step1/step3
+        _depBanks = [];
+        const wrap = document.getElementById('dep-bank-info-wrap');
+        if (wrap) {
+          wrap.innerHTML = `
+            <div style="text-align:center;padding:20px;background:rgba(255,255,255,0.04);border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
+              <div style="font-size:28px;margin-bottom:8px;">🔒</div>
+              <div style="font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:13px;color:rgba(240,255,232,0.5);">
+                ขณะนี้ยังไม่มีบัญชีรับเงินที่เปิดใช้งาน<br>กรุณาติดต่อ Admin ครับ
+              </div>
+            </div>`;
+        }
+      }
+    } catch(_) {
+      // ถ้า error ใดๆ ไม่กระทบ UI
     }
   }
 
@@ -7550,7 +7619,17 @@ setInterval(() => {
     }
     if (id === 'dashboard') loadDashboard();
     if (id === 'txn')       loadTxnHistory();
-    if (id === 'deposit')   loadDepHistory();
+    if (id === 'deposit') {
+      // reset กลับ step1 เสมอเมื่อเปิด tab เติมเงิน
+      const s1 = document.getElementById('dep-step1');
+      const s2 = document.getElementById('dep-step2');
+      const s3 = document.getElementById('dep-step3');
+      if (s1) s1.style.display = 'block';
+      if (s2) s2.style.display = 'none';
+      if (s3) s3.style.display = 'none';
+      loadDepHistory();
+      loadDepBanks();
+    }
     if (id === 'withdraw')  { loadWithdrawPanel(); loadWithHistory(); }
     if (id === 'bet')       loadBetHistory();
     if (id === 'notifications') {
