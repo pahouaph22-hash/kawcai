@@ -3767,14 +3767,19 @@ input, textarea, select, button {
         </div>
 
         <select class="acc-input" id="dep-bank-from">
-          <option value="">ธนาคารที่โอนจาก</option>
-          <option>กสิกรไทย (KBank)</option>
-          <option>ไทยพาณิชย์ (SCB)</option>
-          <option>กรุงเทพ (BBL)</option>
-          <option>กรุงศรีอยุธยา (BAY)</option>
-          <option>กรุงไทย (KTB)</option>
-          <option>ทหารไทยธนชาต (TTB)</option>
-          <option>อื่นๆ</option>
+          <option value="">— เลือกธนาคารที่โอนจาก —</option>
+          <optgroup label="🇱🇦 ธนาคารลาว">
+            <option value="BCEL">ທະນາຄານການຄ້າຕ່າງປະເທດລາວ (BCEL)</option>
+            <option value="LDB">ທະນາຄານພັດທະນາລາວ (LDB)</option>
+            <option value="LVB">ທະນາຄານລາວ-ຫວຽດ (LVB)</option>
+            <option value="APB">ທະນາຄານສົ່ງເສີມກະສິກຳ (APB)</option>
+            <option value="JCBL">ທະນາຄານຮ່ວມທຸລະກິດລາວ-ຈີນ (JCBL)</option>
+            <option value="BIC">ທະນາຄານລົງທຶນ ແລະ ການຄ້າ (BIC)</option>
+            <option value="LaoVietBank">ລາວ ຫວຽດ ແບງ (Lao Viet Bank)</option>
+          </optgroup>
+          <optgroup label="💳 อื่น ๆ">
+            <option value="other">อื่น ๆ / ອື່ນໆ / Other</option>
+          </optgroup>
         </select>
 
         <div class="slip-upload" id="dep-slip-box" onclick="document.getElementById('dep-slip-file').click()">
@@ -4340,6 +4345,7 @@ var I18N = {
     'acc.tab.referral': '🎁 แนะนำเพื่อน',
     'acc.tab.notif': '🔔 แจ้งเตือน',
     // DEPOSIT
+    'dep.bank.select': '— เลือกธนาคารที่โอนจาก —',
     'dep.title': '💰 เติมเงิน',
     'dep.amount': 'จำนวนเงิน',
     'dep.bank': 'บัญชีรับเงิน',
@@ -4511,6 +4517,7 @@ var I18N = {
     'acc.tab.referral': '🎁 ແນະນຳໝູ່',
     'acc.tab.notif': '🔔 ແຈ້ງເຕືອນ',
     // DEPOSIT
+    'dep.bank.select': '— ເລືອກທະນາຄານທີ່ໂອນຈາກ —',
     'dep.title': '💰 ເຕີມເງິນ',
     'dep.amount': 'ຈຳນວນເງິນ',
     'dep.bank': 'ບັນຊີຮັບເງິນ',
@@ -4682,6 +4689,7 @@ var I18N = {
     'acc.tab.referral': '🎁 Referral',
     'acc.tab.notif': '🔔 Notifications',
     // DEPOSIT
+    'dep.bank.select': '— Select source bank —',
     'dep.title': '💰 Deposit',
     'dep.amount': 'Amount',
     'dep.bank': 'Bank Account',
@@ -4849,6 +4857,9 @@ function applyLang() {
 
   // ── 5. Deposit panel ──
   setQS('#acc-deposit .panel-title, #acc-deposit .card-heading', t('dep.title'));
+  // bank-from dropdown — เปลี่ยน placeholder option แรก
+  const bankFrom = document.getElementById('dep-bank-from');
+  if (bankFrom && bankFrom.options[0]) bankFrom.options[0].text = t('dep.bank.select');
   setQS('#dep-bank-header', `🏦 ${t('dep.bank')}`);
   const copyBtn = document.querySelector('button[onclick="copyDepAccNo()"]');
   if (copyBtn) copyBtn.textContent = t('dep.copy');
