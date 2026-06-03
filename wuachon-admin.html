@@ -104,7 +104,8 @@ body{font-family:'Sarabun',sans-serif;background:#f4f4f0;color:#1a1a1a;min-heigh
 
 .flags-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
 .card{background:#fff;border-radius:12px;padding:20px;border:1px solid #e5e5e0;margin-bottom:16px;}
-.card-title{font-family:'Kanit',sans-serif;font-weight:700;font-size:15px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.staff-notice{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-family:'Kanit',sans-serif;font-size:12px;color:#92400e;}
+  .card-title{font-family:'Kanit',sans-serif;font-weight:700;font-size:15px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
 
 /* TABLE */
 table{width:100%;border-collapse:collapse;}
@@ -194,6 +195,7 @@ tr:hover td{background:#fafafa;}
     <div class="topbar-logo">🐂 <em>วัวชน</em>ไทย <small style="font-size:11px;font-weight:400;color:rgba(255,248,236,.35);margin-left:6px;">Admin</small></div>
     <div class="topbar-right">
       <span id="realtime-dot" style="width:8px;height:8px;border-radius:50%;background:#639922;display:inline-block;" title="Realtime connected"></span>
+      <span id="staff-badge"></span>
       <button class="notif-btn" onclick="switchPanel('deposits')">🔔<span id="notif-badge" id="notif-num">0</span></button>
       <button class="logout-btn" onclick="adminLogout()">ออกจากระบบ</button>
     </div>
@@ -214,6 +216,8 @@ tr:hover td{background:#fafafa;}
       <div class="sb-item" data-panel="activity" onclick="switchPanel('activity');loadActivityPanel();">🎉 กิจกรรม</div>
       <div class="sb-item" data-panel="news" onclick="switchPanel('news')">📰 ข่าวสาร</div>
       <div class="sb-item" data-panel="settings" onclick="switchPanel('settings')">⚙️ ตั้งค่า</div>
+      <!-- เมนูพนักงาน — เฉพาะ Super Admin -->
+      <div class="sb-item" id="sb-staff" data-panel="staff" onclick="switchPanel('staff');loadStaffPanel();" style="display:none;border-left:3px solid #8b5cf6;">👨‍💼 พนักงาน</div>
     </div>
 
     <div class="content-area">
@@ -606,8 +610,8 @@ tr:hover td{background:#fafafa;}
           </div>
           <div style="overflow-x:auto;">
             <table>
-              <thead><tr><th>Nick</th><th>จำนวน</th><th>ธนาคาร</th><th>TXN</th><th>เวลา</th><th>จัดการ</th></tr></thead>
-              <tbody id="dep-tbody"><tr><td colspan="6" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
+              <thead><tr><th>Nick</th><th style="text-align:right;">จำนวน (฿)</th><th>ธนาคาร</th><th>TXN</th><th style="text-align:center;">🧾 สลิป</th><th>เวลา</th><th>จัดการ</th></tr></thead>
+              <tbody id="dep-tbody"><tr><td colspan="7" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -1240,6 +1244,78 @@ tr:hover td{background:#fafafa;}
         </div>
       </div>
 
+      <!-- STAFF PANEL -->
+      <div class="panel" id="panel-staff">
+
+        <!-- stat cards -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:0;">
+          <div class="stat-card"><div class="ico">👨‍💼</div><div class="val" id="staff-total">—</div><div class="lbl">พนักงานทั้งหมด</div></div>
+          <div class="stat-card"><div class="ico">✅</div><div class="val" id="staff-active">—</div><div class="lbl">ใช้งานอยู่</div></div>
+          <div class="stat-card"><div class="ico">📋</div><div class="val" id="staff-logs-count">—</div><div class="lbl">Log ทั้งหมด</div></div>
+        </div>
+
+        <!-- เพิ่มพนักงาน -->
+        <div class="card" style="border-left:4px solid #8b5cf6;">
+          <div class="card-title">➕ เพิ่มพนักงานใหม่
+            <button onclick="loadStaffPanel()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">🔄 รีเฟรช</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div class="fg"><label>ชื่อ-นามสกุล</label><input id="new-staff-name" placeholder="ชื่อพนักงาน"></div>
+            <div class="fg"><label>Username</label><input id="new-staff-user" placeholder="staff01" style="text-transform:lowercase;"></div>
+            <div class="fg"><label>รหัสผ่าน</label><input id="new-staff-pass" type="password" placeholder="อย่างน้อย 6 ตัว"></div>
+            <div class="fg">
+              <label>ตำแหน่ง (Role)</label>
+              <select id="new-staff-role" style="width:100%;padding:9px 12px;border:1px solid #e5e5e0;border-radius:8px;font-family:'Kanit',sans-serif;font-size:13px;">
+                <option value="financial">💰 เติม-ถอนเงิน (Financial Staff)</option>
+                <option value="cs">🎯 บริการลูกค้า (Customer Service)</option>
+              </select>
+            </div>
+          </div>
+          <button class="save-btn" onclick="addStaff()">💾 เพิ่มพนักงาน</button>
+        </div>
+
+        <!-- รายชื่อพนักงาน -->
+        <div class="card">
+          <div class="card-title">👥 รายชื่อพนักงาน</div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead><tr>
+                <th>ชื่อ</th><th>Username</th><th>ตำแหน่ง</th>
+                <th style="text-align:center;">สถานะ</th>
+                <th>Login ล่าสุด</th><th>จัดการ</th>
+              </tr></thead>
+              <tbody id="staff-tbody">
+                <tr><td colspan="6" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="card">
+          <div class="card-title">📋 Activity Log — ประวัติการทำงาน
+            <button onclick="loadStaffLogs()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">🔄 รีเฟรช</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+            <input id="log-search-staff" placeholder="🔍 ค้นหา username..." oninput="filterStaffLogs()"
+              style="flex:1;min-width:150px;padding:7px 12px;border:1px solid #e0e0e0;border-radius:8px;font-family:'Kanit',sans-serif;font-size:12px;">
+            <input type="date" id="log-date-from" onchange="filterStaffLogs()" style="padding:7px 10px;border:1px solid #e0e0e0;border-radius:8px;font-size:12px;">
+            <input type="date" id="log-date-to" onchange="filterStaffLogs()" style="padding:7px 10px;border:1px solid #e0e0e0;border-radius:8px;font-size:12px;">
+            <button onclick="clearStaffLogFilter()" style="font-family:'Kanit',sans-serif;font-size:11px;padding:7px 12px;border:1px solid #e0e0e0;border-radius:8px;background:#fff;color:#aaa;cursor:pointer;">✕</button>
+          </div>
+          <div style="overflow-x:auto;">
+            <table style="table-layout:fixed;width:100%;">
+              <colgroup><col style="width:120px"><col style="width:100px"><col><col style="width:140px"></colgroup>
+              <thead><tr><th>พนักงาน</th><th>ตำแหน่ง</th><th>การกระทำ</th><th style="text-align:right;">เวลา</th></tr></thead>
+              <tbody id="staff-logs-tbody">
+                <tr><td colspan="4" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </div>
 </div>
@@ -1260,6 +1336,97 @@ let currentPanel = 'overview';
 let allMembers = [], allMatches = [], allDeposits = [], allWithdrawals = [], allBets = [];
 let notifCount = 0;
 
+// ── Staff Auth ──
+let currentStaff = null; // null = super admin, object = staff
+
+// ปุ่มที่แต่ละ role "ทำได้" (กดได้)
+const STAFF_CAN_DO = {
+  financial: ['deposits','withdrawals'],
+  cs:        ['matches','verdict','activity','referral','news','bets','members'],
+};
+
+// panel ที่ต้องการ action guard — คือ panel ที่ role นั้น "ทำไม่ได้"
+// แต่ "เห็นได้" — แค่ปุ่มจะถูกบล็อก
+function _getRoleBlockedPanels(role) {
+  const canDo = STAFF_CAN_DO[role] || [];
+  const all   = ['overview','members','matches','verdict','deposits','withdrawals','bets','referral','activity','news','settings'];
+  return all.filter(p => !canDo.includes(p));
+}
+
+function applyStaffPermissions(role) {
+  if (!currentStaff) return;
+
+  // เห็นทุกเมนู — แต่ซ่อนแค่ "พนักงาน" (เฉพาะ super admin จัดการได้)
+  const sbStaff = document.getElementById('sb-staff');
+  if (sbStaff) sbStaff.style.display = 'none';
+
+  // เพิ่ม banner บอก role ที่ด้านบนของแต่ละ panel ที่ทำไม่ได้
+  setTimeout(() => _applyActionBlocks(role), 800);
+}
+
+function _applyActionBlocks(role) {
+  if (!currentStaff) return;
+  const blockedPanels = _getRoleBlockedPanels(role);
+  const roleLabel = role === 'financial' ? '💰 เติม-ถอนเงิน' : '🎯 บริการลูกค้า';
+
+  document.querySelectorAll('.panel').forEach(panel => {
+    const panelId = panel.id.replace('panel-','');
+    if (!blockedPanels.includes(panelId)) return; // panel นี้ทำได้ ข้ามไป
+
+    // เพิ่ม notice banner (ถ้ายังไม่มี)
+    if (!panel.querySelector('.staff-notice')) {
+      const notice = document.createElement('div');
+      notice.className = 'staff-notice';
+      notice.style.cssText = 'background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-family:\'Kanit\',sans-serif;font-size:13px;color:#92400e;';
+      notice.innerHTML = `<span style="font-size:18px;">⚠️</span> <span>คุณเข้าสู่ระบบในฐานะ <strong>${roleLabel}</strong> — หน้านี้ <strong>ดูได้อย่างเดียว</strong> ไม่สามารถแก้ไขหรือดำเนินการได้ครับ</span>`;
+      panel.insertBefore(notice, panel.firstChild);
+    }
+
+    // บล็อกปุ่ม action ทั้งหมดใน panel นี้
+    const actionSelectors = [
+      'button.btn-green', 'button.btn-red', 'button.btn-gold',
+      '.save-btn', 'button[onclick*="approve"]', 'button[onclick*="reject"]',
+      'button[onclick*="confirm"]', 'button[onclick*="delete"]',
+      'button[onclick*="send"]', 'button[onclick*="update"]',
+      'button[onclick*="save"]', 'button[onclick*="add"]',
+    ].join(',');
+
+    panel.querySelectorAll(actionSelectors).forEach(btn => {
+      if (!btn.getAttribute('data-staff-blocked')) {
+        btn.setAttribute('data-staff-blocked', '1');
+        btn.setAttribute('title', '⛔ ไม่มีสิทธิ์ดำเนินการนี้ครับ');
+        btn.disabled = true;
+        btn.style.opacity = '0.35';
+        btn.style.cursor  = 'not-allowed';
+        btn.style.pointerEvents = 'none';
+        btn.onclick = e => { e.preventDefault(); e.stopPropagation(); showToast('⛔ ไม่มีสิทธิ์ดำเนินการนี้ครับ','error'); return false; };
+      }
+    });
+
+    // บล็อก input และ select ใน panel นี้ด้วย
+    panel.querySelectorAll('input:not([type=search]):not([type=date]):not([type=text][readonly]), select').forEach(el => {
+      if (!el.getAttribute('data-staff-blocked') && !el.closest('.date-filter') && !el.closest('.search-bar')) {
+        el.setAttribute('data-staff-blocked','1');
+        el.disabled = true;
+        el.style.opacity = '0.4';
+        el.style.cursor  = 'not-allowed';
+      }
+    });
+  });
+}
+
+// แสดง badge ตำแหน่งใน header
+function showStaffBadge() {
+  const badge = document.getElementById('staff-badge');
+  if (!badge) return;
+  if (!currentStaff) {
+    badge.innerHTML = '<span style="background:#8b5cf6;color:#fff;font-family:\'Kanit\',sans-serif;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;">👑 Super Admin</span>';
+  } else {
+    const roleLabel = currentStaff.role === 'financial' ? '💰 Financial' : '🎯 CS';
+    badge.innerHTML = `<span style="background:#1B6B2F;color:#fff;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;">${roleLabel}: ${currentStaff.full_name||currentStaff.username}</span>`;
+  }
+}
+
 // โหลดรหัสผ่าน Admin จาก Supabase
 async function loadAdminPass() {
   const { data } = await sb.from('settings').select('value').eq('key','admin_password').maybeSingle();
@@ -1272,22 +1439,51 @@ async function adminLogin() {
   const err  = document.getElementById('login-err');
   err.style.display = 'none';
   if (!user || !pass) { err.style.display = 'block'; err.textContent = '❌ กรุณากรอก Username และรหัสผ่านครับ'; return; }
-  // โหลดรหัสผ่านล่าสุดจาก Supabase ก่อน
+
   await loadAdminPass();
+
+  // ── ตรวจ Super Admin ก่อน ──
   if (user === 'admin' && pass === ADMIN_PASS) {
+    currentStaff = null;
     document.getElementById('login-page').style.display = 'none';
     document.getElementById('dashboard').style.display  = 'flex';
+    document.getElementById('sb-staff').style.display   = '';
+    showStaffBadge();
     loadAll();
-  } else {
-    err.style.display = 'block';
-    err.textContent = '❌ Username หรือรหัสผ่านไม่ถูกต้องครับ';
+    return;
   }
+
+  // ── ตรวจ Staff ──
+  const { data: staffRow } = await sb.from('staff')
+    .select('*').eq('username', user).eq('is_active', true).maybeSingle();
+
+  if (staffRow && staffRow.password === pass) {
+    currentStaff = staffRow;
+    await sb.from('staff').update({ last_login: new Date().toISOString() }).eq('id', staffRow.id);
+    await logStaffAction(staffRow.username, 'login', 'เข้าสู่ระบบ');
+
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('dashboard').style.display  = 'flex';
+    showStaffBadge();
+    // โหลดข้อมูลทั้งหมดเหมือน super admin
+    loadAll();
+    // apply permission หลัง DOM โหลดเสร็จ
+    applyStaffPermissions(staffRow.role);
+    return;
+  }
+
+  err.style.display = 'block';
+  err.textContent = '❌ Username หรือรหัสผ่านไม่ถูกต้องครับ';
 }
 
 function adminLogout() {
+  if (currentStaff) logStaffAction(currentStaff.username, 'logout', 'ออกจากระบบ');
+  currentStaff = null;
   document.getElementById('dashboard').style.display = 'none';
   document.getElementById('login-page').style.display = 'flex';
   document.getElementById('admin-pass').value = '';
+  // reset sidebar
+  document.querySelectorAll('.sb-item[data-panel]').forEach(el => el.style.display = '');
 }
 
 async function changeAdminPass() {
@@ -2817,20 +3013,60 @@ function filterDepReject() {
 function renderDepositsPending(rows) {
   const tb = document.getElementById('dep-tbody');
   if (!rows.length) {
-    tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#aaa;">ไม่มีรายการรอดำเนินการ</td></tr>';
+    tb.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:#aaa;">ไม่มีรายการรอดำเนินการ</td></tr>';
     return;
   }
-  tb.innerHTML = rows.map(d => `<tr id="dep-row-${d.id}">
-    <td><strong style="cursor:pointer;color:var(--green);text-decoration:underline;" onclick="openMember('${d.nick}')">${d.nick}</strong></td>
-    <td style="font-family:'Kanit',sans-serif;font-weight:700;color:var(--green);">${Number(d.amount).toLocaleString()} ฿</td>
-    <td>${d.bank||'—'}</td>
-    <td style="font-size:11px;color:#aaa;">${d.txn||'—'}</td>
-    <td style="font-size:12px;color:#aaa;">${fmtDate(d.created_at)}</td>
-    <td style="display:flex;gap:4px;flex-wrap:wrap;">
-      <button class="btn btn-green" onclick="approveDeposit('${d.id}','${d.nick}',${d.amount})">อนุมัติ</button>
-      <button class="btn btn-red" onclick="rejectDeposit('${d.id}','${d.nick}')">ปฏิเสธ</button>
-    </td>
-  </tr>`).join('');
+  tb.innerHTML = rows.map(d => {
+    // สลิป
+    const slipCell = d.slip_url
+      ? `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+           <img src="${d.slip_url}" alt="สลิป"
+             onclick="viewSlip('${d.slip_url}')"
+             style="width:52px;height:52px;object-fit:cover;border-radius:6px;cursor:pointer;border:1.5px solid #e5e5e0;transition:transform .15s;"
+             onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+           <div style="display:none;width:52px;height:52px;border-radius:6px;background:#f5f5f2;border:1px solid #e0e0e0;align-items:center;justify-content:center;font-size:18px;">🖼️</div>
+           <button onclick="viewSlip('${d.slip_url}')" style="font-family:'Kanit',sans-serif;font-size:10px;font-weight:700;padding:2px 7px;border:1px solid #e0e0e0;border-radius:5px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔍 ขยาย</button>
+         </div>`
+      : `<div style="text-align:center;color:#ccc;font-size:11px;font-family:'Kanit',sans-serif;">
+           <div style="font-size:20px;">📎</div>ไม่มีสลิป
+         </div>`;
+
+    return `<tr id="dep-row-${d.id}" style="vertical-align:middle;">
+      <td><strong style="cursor:pointer;color:var(--green);text-decoration:underline;" onclick="openMember('${d.nick}')">${d.nick}</strong></td>
+      <td style="text-align:right;font-family:'Kanit',sans-serif;font-weight:700;color:var(--green);">${Number(d.amount).toLocaleString()}</td>
+      <td style="font-size:12px;">${d.bank||'—'}</td>
+      <td style="font-size:11px;color:#aaa;">${d.txn||'—'}</td>
+      <td style="text-align:center;padding:6px 10px;">${slipCell}</td>
+      <td style="font-size:12px;color:#aaa;white-space:nowrap;">${fmtDate(d.created_at)}</td>
+      <td style="white-space:nowrap;">
+        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+          <button class="btn btn-green" onclick="approveDeposit('${d.id}','${d.nick}',${d.amount})">✅ อนุมัติ</button>
+          <button class="btn btn-red" onclick="rejectDeposit('${d.id}','${d.nick}')">❌ ปฏิเสธ</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── modal ดูสลิปขยาย ──
+function viewSlip(url) {
+  document.getElementById('slip-view-modal')?.remove();
+  const modal = document.createElement('div');
+  modal.id = 'slip-view-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10003;display:flex;align-items:center;justify-content:center;padding:16px;cursor:zoom-out;';
+  modal.innerHTML = `
+    <div style="position:relative;max-width:90vw;max-height:90vh;" onclick="event.stopPropagation()">
+      <img src="${url}" style="max-width:90vw;max-height:85vh;object-fit:contain;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5);display:block;">
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
+        <button onclick="document.getElementById('slip-view-modal').remove()"
+          style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;padding:8px 22px;border-radius:8px;border:none;background:#fff;color:#1a1a1a;cursor:pointer;">✕ ปิด</button>
+        <a href="${url}" target="_blank" download
+          style="font-family:'Kanit',sans-serif;font-size:13px;font-weight:700;padding:8px 22px;border-radius:8px;border:none;background:var(--green);color:#fff;cursor:pointer;text-decoration:none;display:inline-block;">⬇ ดาวน์โหลด</a>
+      </div>
+    </div>`;
+  modal.addEventListener('click', () => modal.remove());
+  document.body.appendChild(modal);
 }
 
 function renderDepositsDone(rows) {
@@ -2929,6 +3165,7 @@ async function approveDeposit(id, nick, amount) {
   }
 
   showToast(`✅ อนุมัติแล้ว! ${nick} ได้รับ +${Number(amount).toLocaleString()} ฿ ยอดใหม่: ${newBal.toLocaleString()} ฿`);
+  if (currentStaff) await logStaffAction(currentStaff.username, 'approve_deposit', `อนุมัติเติมเงิน +${Number(amount).toLocaleString()} ฿ ให้ ${nick}`);
   setTimeout(() => { filterDeposits(); loadDeposits(); loadOverview(); loadMembers(); }, 450);
 }
 
@@ -3073,6 +3310,8 @@ async function confirmSlipUpload() {
 
   // เช็คป้ายเตือนก่อนโอน
   if (!(await checkFlagBeforeWithdraw(nick))) return;
+
+  const btn = document.getElementById('slip-confirm-btn');
   btn.disabled = true;
   btn.textContent = '⏳ กำลังดำเนินการ...';
   errEl.style.display = 'none';
@@ -3150,6 +3389,7 @@ async function confirmSlipUpload() {
 
     closeSlipModal();
     showToast(`✅ โอนเงิน ${Number(amount).toLocaleString()} ฿ ให้ ${nick} สำเร็จ!`);
+    if (currentStaff) await logStaffAction(currentStaff.username, 'approve_withdrawal', `อนุมัติถอนเงิน ${Number(amount).toLocaleString()} ฿ ให้ ${nick}`);
 
     // ---- STEP 6: re-render จาก memory ก่อน แล้ว sync DB ----
     setTimeout(() => {
@@ -3491,6 +3731,138 @@ function _syncLegacyBank() {
   if (active) {
     safeUpsertSettings('bankAccount', { bankName: active.bankName, accNo: active.accNo, accName: active.accName });
   }
+}
+
+// ===== STAFF MANAGEMENT =====
+let _allStaff = [], _allStaffLogs = [];
+
+async function loadStaffPanel() {
+  const [staffRes, logRes] = await Promise.all([
+    sb.from('staff').select('*').order('created_at',{ascending:false}),
+    sb.from('staff_logs').select('*').order('created_at',{ascending:false}).limit(200),
+  ]);
+  _allStaff     = staffRes.data || [];
+  _allStaffLogs = logRes.data   || [];
+
+  const active = _allStaff.filter(s => s.is_active).length;
+  const setEl  = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  setEl('staff-total',      _allStaff.length);
+  setEl('staff-active',     active);
+  setEl('staff-logs-count', _allStaffLogs.length);
+  renderStaffTable();
+  filterStaffLogs();
+}
+
+function renderStaffTable() {
+  const tb = document.getElementById('staff-tbody');
+  if (!tb) return;
+  if (!_allStaff.length) {
+    tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#aaa;"><div style="font-size:28px;margin-bottom:6px;">👨‍💼</div>ยังไม่มีพนักงานครับ</td></tr>';
+    return;
+  }
+  const roleLabel = r => r === 'financial'
+    ? '<span style="background:#dcfce7;color:#15803d;font-family:\'Kanit\',sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;">💰 Financial</span>'
+    : '<span style="background:#eff6ff;color:#1d4ed8;font-family:\'Kanit\',sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;">🎯 CS</span>';
+
+  tb.innerHTML = _allStaff.map((s,i) => `
+    <tr style="${i%2===1?'background:#fafaf8;':''}">
+      <td style="font-family:'Kanit',sans-serif;font-weight:700;">${s.full_name||'—'}</td>
+      <td style="font-size:12px;color:#555;">${s.username}</td>
+      <td>${roleLabel(s.role)}</td>
+      <td style="text-align:center;">
+        <label style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+          <input type="checkbox" ${s.is_active?'checked':''} onchange="toggleStaffActive('${s.id}',this.checked)"
+            style="width:16px;height:16px;accent-color:#1B6B2F;">
+          <span style="font-size:11px;font-family:'Kanit',sans-serif;color:${s.is_active?'#16a34a':'#aaa'};">${s.is_active?'เปิด':'ปิด'}</span>
+        </label>
+      </td>
+      <td style="font-size:11px;color:#aaa;">${s.last_login ? fmtDate(s.last_login) : 'ยังไม่เคย'}</td>
+      <td>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-gold" onclick="editStaffPass('${s.id}','${s.username}')" style="font-size:11px;padding:4px 9px;">🔑 รีเซ็ต</button>
+          <button class="btn btn-red" onclick="deleteStaff('${s.id}','${s.username}')" style="font-size:11px;padding:4px 9px;">🗑</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+async function addStaff() {
+  const name = document.getElementById('new-staff-name')?.value.trim();
+  const user = document.getElementById('new-staff-user')?.value.trim().toLowerCase();
+  const pass = document.getElementById('new-staff-pass')?.value;
+  const role = document.getElementById('new-staff-role')?.value;
+  if (!name||!user||!pass) { showToast('⚠️ กรุณากรอกข้อมูลให้ครบครับ','error'); return; }
+  if (pass.length < 6)     { showToast('⚠️ รหัสผ่านต้องมีอย่างน้อย 6 ตัวครับ','error'); return; }
+  const { error } = await sb.from('staff').insert({ full_name:name, username:user, password:pass, role, is_active:true });
+  if (error) { showToast('❌ '+error.message,'error'); return; }
+  await logStaffAction('admin','add_staff',`เพิ่มพนักงาน ${user} (${role})`);
+  ['new-staff-name','new-staff-user','new-staff-pass'].forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
+  await loadStaffPanel();
+  showToast(`✅ เพิ่มพนักงาน "${name}" เรียบร้อยแล้วครับ`);
+}
+
+async function toggleStaffActive(id, active) {
+  await sb.from('staff').update({ is_active: active }).eq('id', id);
+  const s = _allStaff.find(s=>s.id===id);
+  await logStaffAction('admin', active?'enable_staff':'disable_staff', `${active?'เปิด':'ปิด'}ใช้งาน ${s?.username||id}`);
+  await loadStaffPanel();
+  showToast(active ? '✅ เปิดใช้งานแล้วครับ' : '⏸ ปิดใช้งานแล้วครับ');
+}
+
+async function editStaffPass(id, username) {
+  const newPass = prompt(`รีเซ็ตรหัสผ่านของ "${username}" — กรอกรหัสใหม่:`);
+  if (!newPass) return;
+  if (newPass.length < 6) { showToast('⚠️ ต้องมีอย่างน้อย 6 ตัวครับ','error'); return; }
+  await sb.from('staff').update({ password: newPass }).eq('id', id);
+  await logStaffAction('admin','reset_password',`รีเซ็ตรหัสผ่าน ${username}`);
+  showToast(`✅ รีเซ็ตรหัสผ่าน "${username}" แล้วครับ`);
+}
+
+async function deleteStaff(id, username) {
+  if (!confirm(`ลบพนักงาน "${username}" ออกจากระบบใช่ไหมครับ?`)) return;
+  await sb.from('staff').delete().eq('id', id);
+  await logStaffAction('admin','delete_staff',`ลบพนักงาน ${username}`);
+  await loadStaffPanel();
+  showToast(`✅ ลบ "${username}" แล้วครับ`);
+}
+
+function filterStaffLogs() {
+  const q    = document.getElementById('log-search-staff')?.value.toLowerCase() || '';
+  const from = document.getElementById('log-date-from')?.value || '';
+  const to   = document.getElementById('log-date-to')?.value   || '';
+  const tb   = document.getElementById('staff-logs-tbody');
+  if (!tb) return;
+  let logs = _allStaffLogs.filter(l => {
+    const dt = (l.created_at||'').slice(0,10);
+    if (from && dt<from) return false;
+    if (to   && dt>to)   return false;
+    if (q && !l.staff_username?.toLowerCase().includes(q) && !l.action?.includes(q) && !l.detail?.includes(q)) return false;
+    return true;
+  });
+  if (!logs.length) { tb.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:#aaa;">ไม่พบ Log</td></tr>'; return; }
+  const actionIcon = a => a==='login'?'🔑':a==='logout'?'🚪':a.includes('staff')?'👨‍💼':'📋';
+  tb.innerHTML = logs.map((l,i) => `
+    <tr style="${i%2===1?'background:#fafaf8;':''}">
+      <td style="font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;">${l.staff_username}</td>
+      <td style="font-size:11px;color:#888;">${_allStaff.find(s=>s.username===l.staff_username)?.role==='financial'?'💰 Financial':l.staff_username==='admin'?'👑 Admin':'🎯 CS'}</td>
+      <td style="font-size:12px;">${actionIcon(l.action)} ${l.detail||l.action}</td>
+      <td style="text-align:right;font-size:11px;color:#aaa;">${fmtDate(l.created_at)}</td>
+    </tr>`).join('');
+}
+
+function clearStaffLogFilter() {
+  ['log-search-staff','log-date-from','log-date-to'].forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
+  filterStaffLogs();
+}
+
+async function loadStaffLogs() {
+  const { data } = await sb.from('staff_logs').select('*').order('created_at',{ascending:false}).limit(200);
+  _allStaffLogs = data || [];
+  filterStaffLogs();
+}
+
+async function logStaffAction(username, action, detail='') {
+  try { await sb.from('staff_logs').insert({ staff_username: username, action, detail }); } catch(_) {}
 }
 
 async function loadSettings() {
@@ -5631,6 +6003,9 @@ async function loadFinanceTable() {
     ? (v/1000).toFixed(1) + 'K'
     : v.toLocaleString();
 
+  // แสดงตัวเลขเต็มพร้อม comma (ไม่ย่อ K/M)
+  const fmtFull = v => Number(v).toLocaleString('th-TH');
+
   const fmtMoney = v => {
     const sign = v < 0 ? '−' : '';
     return sign + fmt(Math.abs(v));
@@ -5656,13 +6031,13 @@ async function loadFinanceTable() {
         ${r.newMembers > 0 ? '+' : ''}${r.newMembers.toLocaleString()}
       </td>
       <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;${fontW}font-size:13px;color:#16a34a;">
-        ${r.depAmt > 0 ? '+' : ''}${fmtMoney(r.depAmt)}
+        ${r.depAmt > 0 ? '+' : ''}${fmtFull(r.depAmt)}
       </td>
       <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;${fontW}font-size:13px;color:#dc2626;">
-        ${r.withAmt > 0 ? '−' : ''}${fmt(r.withAmt)}
+        ${r.withAmt > 0 ? '−' : ''}${fmtFull(r.withAmt)}
       </td>
       <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;${fontW}font-size:13px;color:${netColor};">
-        ${r.netFlow >= 0 ? '+' : ''}${fmtMoney(r.netFlow)}
+        ${r.netFlow >= 0 ? '+' : ''}${fmtFull(r.netFlow)}
       </td>
       <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;${fontW}font-size:14px;color:${profColor};">
         <span style="display:inline-flex;align-items:center;gap:3px;">
@@ -5671,14 +6046,14 @@ async function loadFinanceTable() {
             : r.profitLoss < 0
             ? `<span style="font-size:10px;">▼</span>`
             : ''}
-          ${r.profitLoss >= 0 ? '+' : ''}${fmtMoney(r.profitLoss)}
+          ${r.profitLoss >= 0 ? '+' : ''}${fmtFull(r.profitLoss)}
         </span>
       </td>
       <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;${fontW}font-size:13px;color:#854d0e;">
-        ${r.feeAmt > 0 ? '+' : ''}${fmtMoney(r.feeAmt)}
+        ${r.feeAmt > 0 ? '+' : ''}${fmtFull(r.feeAmt)}
       </td>
       <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;${fontW}font-size:13px;color:#dc2626;">
-        ${r.rewardAmt > 0 ? '−' : ''}${fmt(r.rewardAmt)}
+        ${r.rewardAmt > 0 ? '−' : ''}${fmtFull(r.rewardAmt)}
       </td>
     </tr>`;
   }).join('');
@@ -5699,12 +6074,12 @@ async function loadFinanceTable() {
   tbody.innerHTML += `<tr style="background:#f0f4f8;border-top:2px solid #e5e5e0;">
     <td style="padding:12px 16px;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;">รวมทั้งหมด</td>
     <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:#3b82f6;">+${totals.newMembers.toLocaleString()}</td>
-    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:#16a34a;">+${fmtMoney(totals.depAmt)}</td>
-    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:#dc2626;">−${fmt(totals.withAmt)}</td>
-    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:${colorNet(totals.netFlow)};">${totals.netFlow>=0?'+':''}${fmtMoney(totals.netFlow)}</td>
-    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:14px;color:${colorProfit(totals.profitLoss)};">${totals.profitLoss>=0?'+':''}${fmtMoney(totals.profitLoss)}</td>
-    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:#854d0e;">+${fmtMoney(totals.feeAmt)}</td>
-    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:#dc2626;">${totals.rewardAmt>0?'−':''}${fmt(totals.rewardAmt)}</td>
+    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:#16a34a;">+${fmtFull(totals.depAmt)}</td>
+    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:#dc2626;">−${fmtFull(totals.withAmt)}</td>
+    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:${colorNet(totals.netFlow)};">${totals.netFlow>=0?'+':''}${fmtFull(totals.netFlow)}</td>
+    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:14px;color:${colorProfit(totals.profitLoss)};">${totals.profitLoss>=0?'+':''}${fmtFull(totals.profitLoss)}</td>
+    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:#854d0e;">+${fmtFull(totals.feeAmt)}</td>
+    <td style="padding:12px 14px;text-align:right;font-family:'Kanit',sans-serif;font-weight:900;font-size:13px;color:#dc2626;">${totals.rewardAmt>0?'−':''}${fmtFull(totals.rewardAmt)}</td>
   </tr>`;
 }
 </script>

@@ -3105,7 +3105,7 @@ fns.forEach(function(fn){
               <div style="font-family:'Kanit',sans-serif;font-weight:900;font-size:18px;color:var(--gold);" id="bet-expect-val-1">0 ฿</div>
             </div>
           </div>
-          <button class="bet-submit-btn" id="bet-submit-1">🎯 วางเดิมพันและรอจับคู่</button>
+          <button class="bet-submit-btn" id="bet-submit-1" onclick="placeBet(1, document.getElementById('btn-name-a').textContent, document.getElementById('btn-name-b').textContent)">🎯 วางเดิมพันและรอจับคู่</button>
           <div class="bet-matching-status" id="bet-status-1" style="display:none;"></div>
         </div>
 
@@ -5363,7 +5363,6 @@ fns.forEach(function(fn){
         provider: 'facebook',
         options: {
           redirectTo: window.location.href.split('?')[0],
-          scopes: 'email,public_profile',
         }
       });
       if (error) showFEToast('❌ เข้าสู่ระบบ Facebook ไม่สำเร็จ: ' + error.message);
@@ -5601,6 +5600,9 @@ fns.forEach(function(fn){
     // เช็ค oauth_pending เพื่อเชื่อมบัญชี OAuth
     const oauthPending = JSON.parse(sessionStorage.getItem('oauth_pending') || 'null');
 
+    // สร้าง referral_code ของตัวเอง
+    const myRefCode = nick.toUpperCase().slice(0,4) + Math.floor(1000 + Math.random() * 9000);
+
     // บันทึกลง Supabase
     const insertData = {
       fname, lname, nick, phone,
@@ -5731,6 +5733,8 @@ fns.forEach(function(fn){
     const navReg = document.getElementById('nav-register');
     if (navAcc) { navAcc.style.display = 'inline'; navAcc.textContent = `👤 ${nick}`; }
     if (navReg) navReg.style.display = 'none';
+    // expose currentUser ให้ functions นอก IIFE เข้าถึงได้
+    window._currentUser = currentUser;
   }
 
   // ── Logout ──
@@ -5740,6 +5744,7 @@ fns.forEach(function(fn){
     // remove flag CSS classes
     document.body.classList.remove('flag-no-game','flag-no-deposit','flag-no-withdraw','flag-no-reward','flag-blacklist');
     currentUser = null;
+    window._currentUser = null;
     sessionStorage.removeItem('bw_user');
     const navAcc = document.getElementById('nav-myaccount');
     const navReg = document.getElementById('nav-register');
@@ -6676,108 +6681,296 @@ fns.forEach(function(fn){
     });
   }
 
-  function placeBet(matchId, nameA, nameB) {
+  // ===== P2P BETTING — PARTIAL MATCH SYSTEM =====
+
+  async function placeBet(matchId, nameA, nameB) {
     const amount = parseFloat(document.getElementById(`bet-amount-${matchId}`)?.value) || 0;
     const odds   = parseFloat(document.getElementById(`bet-odds-${matchId}`)?.value) || 1.5;
     const side   = betSelections[matchId];
     const bal    = currentUser?.balance || 0;
 
-    if (!currentUser) { alert('กรุณาสมัครสมาชิกก่อนวางเดิมพันครับ'); return; }
-    // ── FLAG CHECK ──
+    if (!currentUser) { showFEToast('⚠️ กรุณาสมัครสมาชิกก่อนวางเดิมพันครับ'); return; }
     const _bflags = currentUser.flags || [];
-    if (_bflags.includes('no_game') || _bflags.includes('blacklist')) {
-      showFEToast('🚫 บัญชีของคุณถูกระงับสิทธิ์การเดิมพันครับ — กรุณาติดต่อ Admin');
-      return;
+    if (_bflags.includes('no_game') || _bflags.includes('blacklist') || _bflags.includes('cheater')) {
+      showFEToast('🚫 บัญชีของคุณถูกระงับสิทธิ์การเดิมพันครับ'); return;
     }
-    if (!side)  { alert('กรุณาเลือกวัวที่ต้องการเดิมพันก่อนครับ'); return; }
-    if (amount < 100) { alert('จำนวนเงินขั้นต่ำ 100 บาทครับ'); return; }
-    if (amount > bal) { alert(`ยอดเงินไม่เพียงพอครับ\nยอดคงเหลือ: ${bal.toLocaleString()} บาท`); return; }
+    if (!side)        { showFEToast('⚠️ กรุณาเลือกวัวที่ต้องการเดิมพันก่อนครับ'); return; }
+    if (amount < 100) { showFEToast('⚠️ จำนวนเงินขั้นต่ำ 100 บาทครับ'); return; }
+    if (amount > bal) { showFEToast(`⚠️ ยอดเงินไม่เพียงพอครับ (เหลือ ${bal.toLocaleString()} ฿)`); return; }
 
-    const sideName  = side === 'red' ? nameA : nameB;
-    const potential = (amount * odds).toLocaleString('th-TH', {maximumFractionDigits:0});
-    const txn       = '7' + Array.from({length:8},()=>Math.floor(Math.random()*10)).join('');
-    const nick      = currentUser.nick || 'คุณ';
-    const sideColor = side === 'red' ? 'red' : 'blue';
+    const sideName = side === 'red' ? nameA : nameB;
+    const txn      = '7' + Array.from({length:8},()=>Math.floor(Math.random()*10)).join('');
+    const nick     = currentUser.nick;
 
-    // หักยอดทันที
+    // หักยอดทันที + กักเงินไว้
+    await sb.from('members').update({ balance: bal - amount }).eq('nick', nick);
     updateAccBalance(bal - amount);
+    currentUser.balance = bal - amount;
+    window._currentUser = currentUser;
     updateBetBalanceHints();
 
-    // เพิ่มเข้า queue UI
-    const list = document.getElementById(`bet-queue-${matchId}`);
-    if (list) {
-      const itemId = `bq-${Date.now()}`;
-      const item   = document.createElement('div');
-      item.className = `bet-queue-item ${sideColor}-queue`;
-      item.id        = itemId;
-      item.style.animation = 'fadeUp .3s ease';
-      item.innerHTML = `
-        <span class="bet-queue-dot ${sideColor}-dot"></span>
-        <span class="bet-queue-name">${nick}</span>
-        <span class="bet-queue-side">${side==='red'?'🔴':'🔵'} ${sideName}</span>
-        <span class="bet-queue-odds">1 : ${odds}</span>
-        <span class="bet-queue-amount">${amount.toLocaleString()} ฿</span>
-        <span class="bet-queue-badge waiting">รอจับคู่</span>`;
-      list.insertBefore(item, list.firstChild);
-      // อัปเดตจำนวน
-      updateQueueCount(matchId);
+    // expires_at = 2 ชั่วโมงจากนี้ (ปรับได้)
+    const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
+
+    // บันทึก bet order ลง DB
+    const { data: betRow, error } = await sb.from('bets').insert({
+      nick, match_id: matchId,
+      side_name: sideName, side: side,
+      amount: amount, odds: odds, txn,
+      status: 'waiting',
+      match_status: 'waiting',
+      order_amount: amount,
+      matched_amount: 0,
+      remaining_amount: amount,
+      expires_at: expiresAt,
+    }).select().single();
+
+    if (error) {
+      // คืนเงินถ้า insert ไม่ได้
+      await sb.from('members').update({ balance: bal }).eq('nick', nick);
+      updateAccBalance(bal); currentUser.balance = bal;
+      showFEToast('❌ เกิดข้อผิดพลาด: ' + error.message); return;
     }
 
-    // แสดงสถานะ
+    // เพิ่มใน queue UI พร้อม progress bar
+    _addBetOrderToQueue(matchId, betRow, nick, sideName, side, amount, odds);
+
     showBetStatus(matchId, 'waiting',
-      `⏳ รอจับคู่เดิมพัน · เลือก <strong>${sideName}</strong> อัตรา 1:${odds} · ${amount.toLocaleString()} ฿<br><span style="font-size:11px;opacity:.7;">ยอดเงินถูกหักแล้ว · คาดจะได้รับ <strong style="color:var(--gold);">${potential} ฿</strong> หากชนะ</span>`
+      `⏳ <strong>รอจับคู่</strong> · เลือก <strong>${sideName}</strong> · ${amount.toLocaleString()} ฿<br>
+       <span style="font-size:11px;opacity:.7;">เงินถูกกักไว้ในระบบ · จะได้รับคืนหากหมดเวลาโดยไม่มีคนจับ</span>`
     );
 
-    // บันทึกประวัติ
-    addBetToHistory(sideName, side==='red'?nameB:nameA, amount, potential, txn, odds);
-
-    // reset
     const input = document.getElementById(`bet-amount-${matchId}`);
     if (input) input.value = '';
     const expectEl = document.getElementById(`bet-expect-${matchId}`);
     if (expectEl) expectEl.style.display = 'none';
+    addBetToHistory(sideName, side==='red'?nameB:nameA, amount, (amount*odds).toFixed(0), txn, odds);
   }
 
-  // จับคู่กับรายการที่มีอยู่
-  function joinBet(btn, itemId, matchId, opponentNick, opponentSide, amount, odds) {
-    const bal = currentUser?.balance || 0;
-    if (!currentUser) { alert('กรุณาสมัครสมาชิกก่อนครับ'); return; }
-    // ── FLAG CHECK ──
-    const _jflags = currentUser.flags || [];
-    if (_jflags.includes('no_game') || _jflags.includes('blacklist')) {
-      showFEToast('🚫 บัญชีของคุณถูกระงับสิทธิ์การเดิมพันครับ — กรุณาติดต่อ Admin');
-      return;
+  // เพิ่ม bet order เข้า queue พร้อม progress bar + custom join input
+  function _addBetOrderToQueue(matchId, betRow, ownerNick, sideName, side, amount, odds) {
+    const list = document.getElementById(`bet-queue-${matchId}`);
+    if (!list) return;
+    const itemId = `bq-${betRow.id}`;
+    const sideColor = side === 'red' ? 'red' : 'blue';
+    const item = document.createElement('div');
+    item.id = itemId;
+    item.className = `bet-queue-item ${sideColor}-queue`;
+    item.setAttribute('data-bet-id', betRow.id);
+    item.setAttribute('data-remaining', amount);
+    item.setAttribute('data-amount', amount);
+    item.setAttribute('data-odds', odds);
+    item.setAttribute('data-owner', ownerNick);
+    item.setAttribute('data-side', sideName);
+    item.style.animation = 'fadeUp .3s ease';
+    item.innerHTML = _renderBetOrderHTML(betRow.id, ownerNick, sideName, side, amount, 0, amount, odds, matchId);
+    list.insertBefore(item, list.firstChild);
+    updateQueueCount(matchId);
+  }
+
+  function _renderBetOrderHTML(betId, ownerNick, sideName, side, totalAmt, matchedAmt, remainAmt, odds, matchId) {
+    const pct = Math.round((matchedAmt / totalAmt) * 100);
+    const sideEmoji = side === 'red' ? '🔴' : '🔵';
+    const isFullyMatched = remainAmt <= 0;
+    const statusBadge = isFullyMatched
+      ? '<span style="font-size:10px;font-family:\'Kanit\',sans-serif;font-weight:700;padding:2px 7px;border-radius:999px;background:rgba(74,222,128,.2);color:#4ade80;border:1px solid rgba(74,222,128,.3);">🟢 จับครบแล้ว</span>'
+      : matchedAmt > 0
+        ? '<span style="font-size:10px;font-family:\'Kanit\',sans-serif;font-weight:700;padding:2px 7px;border-radius:999px;background:rgba(245,200,66,.15);color:var(--gold);border:1px solid rgba(245,200,66,.3);">🟡 จับบางส่วน</span>'
+        : '<span style="font-size:10px;font-family:\'Kanit\',sans-serif;font-weight:700;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,.08);color:rgba(240,255,232,.5);border:1px solid rgba(255,255,255,.1);">⏳ รอจับคู่</span>';
+
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="bet-queue-dot ${side==='red'?'red':'blue'}-dot"></span>
+          <span class="bet-queue-name" style="font-family:'Kanit',sans-serif;font-weight:700;">${ownerNick}</span>
+          <span class="bet-queue-side">${sideEmoji} ${sideName}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="bet-queue-odds">1 : ${odds}</span>
+          <span class="bet-queue-amount">${Number(totalAmt).toLocaleString()} ฿</span>
+          ${statusBadge}
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div style="margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(240,255,232,.4);font-family:'Kanit',sans-serif;margin-bottom:3px;">
+          <span>จับแล้ว ${Number(matchedAmt).toLocaleString()} ฿ (${pct}%)</span>
+          <span>เหลือ ${Number(remainAmt).toLocaleString()} ฿</span>
+        </div>
+        <div style="width:100%;height:6px;background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#4ade80,#22c55e);border-radius:999px;transition:width .5s ease;"></div>
+        </div>
+      </div>
+
+      ${!isFullyMatched ? `
+      <!-- Custom Join Amount -->
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;" id="join-row-${betId}">
+        <div style="position:relative;flex:1;min-width:100px;">
+          <input type="number" id="join-amt-${betId}" min="100" max="${remainAmt}" value="${Math.min(remainAmt, currentUser?.balance||0)}"
+            placeholder="จำนวนที่จะจับ"
+            style="width:100%;padding:7px 36px 7px 10px;border:1px solid rgba(245,200,66,.3);border-radius:8px;background:rgba(255,255,255,.06);color:#fff;font-family:'Kanit',sans-serif;font-size:13px;box-sizing:border-box;">
+          <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11px;color:rgba(240,255,232,.4);">฿</span>
+        </div>
+        <button onclick="_setJoinMax('${betId}',${remainAmt})"
+          style="font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:7px 12px;border-radius:8px;border:1px solid rgba(245,200,66,.4);background:rgba(245,200,66,.1);color:var(--gold);cursor:pointer;white-space:nowrap;">
+          Max
+        </button>
+        <button onclick="joinBetPartial('${betId}','${ownerNick}','${sideName}','${side}',${odds},${matchId})"
+          style="font-family:'Kanit',sans-serif;font-size:12px;font-weight:700;padding:7px 14px;border-radius:8px;border:none;background:linear-gradient(135deg,#1B6B2F,#27943F);color:#fff;cursor:pointer;white-space:nowrap;">
+          🎯 จับคู่
+        </button>
+      </div>` : ''}
+    `;
+  }
+
+  function _setJoinMax(betId, remainAmt) {
+    const inp = document.getElementById(`join-amt-${betId}`);
+    if (!inp) return;
+    const myBal = currentUser?.balance || 0;
+    inp.value = Math.min(remainAmt, myBal);
+  }
+
+  // Partial match join
+  async function joinBetPartial(betId, ownerNick, sideName, ownerSide, odds, matchId) {
+    if (!currentUser) { showFEToast('⚠️ กรุณาสมัครสมาชิกก่อนครับ'); return; }
+    if (currentUser.nick === ownerNick) { showFEToast('⚠️ ไม่สามารถจับคู่กับตัวเองได้ครับ'); return; }
+
+    const inp     = document.getElementById(`join-amt-${betId}`);
+    const joinAmt = parseFloat(inp?.value || 0);
+    const bal     = currentUser?.balance || 0;
+
+    if (joinAmt < 100)     { showFEToast('⚠️ จำนวนขั้นต่ำ 100 ฿ ครับ'); return; }
+    if (joinAmt > bal)     { showFEToast(`⚠️ ยอดเงินไม่พอครับ (เหลือ ${bal.toLocaleString()} ฿)`); return; }
+
+    // ดึงข้อมูล bet order ปัจจุบัน
+    const { data: order } = await sb.from('bets').select('*').eq('id', betId).maybeSingle();
+    if (!order) { showFEToast('❌ ไม่พบรายการเดิมพันครับ'); return; }
+    if (order.match_status === 'full' || order.remaining_amount <= 0) {
+      showFEToast('⚠️ รายการนี้จับคู่ครบแล้วครับ'); return;
     }
-    if (amount > bal) { alert(`ยอดเงินไม่เพียงพอครับ\nยอดคงเหลือ: ${bal.toLocaleString()} บาท`); return; }
 
-    const nick      = currentUser.nick || 'คุณ';
-    const mySide    = opponentSide.includes('เจ้าพายุ') ? 'ดำมหากาฬ' : 'เจ้าพายุ';
-    const potential = (amount * odds).toLocaleString('th-TH', {maximumFractionDigits:0});
-    const txn       = '7' + Array.from({length:8},()=>Math.floor(Math.random()*10)).join('');
+    const actualJoin = Math.min(joinAmt, order.remaining_amount);
+    const potential  = (actualJoin * odds).toFixed(0);
+    const mySide     = ownerSide === 'red' ? 'blue' : 'red';
+    const mySideName = ownerSide === 'red' ? order.side_name?.replace(order.side_name, '') || '🔵' : order.side_name;
+    const txn        = '7' + Array.from({length:8},()=>Math.floor(Math.random()*10)).join('');
+    const nick       = currentUser.nick;
 
-    if (!confirm(`ยืนยันจับคู่เดิมพัน?\n\nคุณเลือก: ${mySide}\nจำนวนเงิน: ${amount.toLocaleString()} ฿\nอัตราต่อรอง: 1:${odds}\nหากชนะจะได้รับ: ${potential} ฿`)) return;
+    if (!confirm(`ยืนยันจับคู่?\n\nจับ: ${ownerNick} (${sideName})\nจำนวน: ${actualJoin.toLocaleString()} ฿\nอัตรา: 1:${odds}\nหากชนะได้รับ: ${Number(potential).toLocaleString()} ฿`)) return;
 
-    // หักยอดเงิน
-    updateAccBalance(bal - amount);
+    // หักเงิน
+    await sb.from('members').update({ balance: bal - actualJoin }).eq('nick', nick);
+    updateAccBalance(bal - actualJoin);
+    currentUser.balance = bal - actualJoin;
+    window._currentUser = currentUser;
     updateBetBalanceHints();
 
-    // ลบรายการออกจาก queue ทันที (จับคู่สำเร็จ)
-    const queueItem = document.getElementById(itemId);
-    if (queueItem) {
-      queueItem.style.transition = 'all .3s ease';
-      queueItem.style.opacity    = '0';
-      queueItem.style.transform  = 'translateX(20px)';
-      setTimeout(() => { queueItem.remove(); updateQueueCount(matchId); }, 300);
+    // อัปเดต bet order หลัก
+    const newMatched   = Number(order.matched_amount || 0) + actualJoin;
+    const newRemaining = Number(order.order_amount) - newMatched;
+    const newStatus    = newRemaining <= 0 ? 'full' : newMatched > 0 ? 'partial' : 'waiting';
+
+    await sb.from('bets').update({
+      matched_amount: newMatched,
+      remaining_amount: Math.max(0, newRemaining),
+      match_status: newStatus,
+      status: newStatus === 'full' ? 'matched' : 'waiting',
+    }).eq('id', betId);
+
+    // สร้าง bet ของฝ่ายตรงข้าม (join bet)
+    await sb.from('bets').insert({
+      nick, match_id: matchId,
+      side_name: `ฝั่งตรงข้าม ${sideName}`, side: mySide,
+      amount: actualJoin, odds, txn,
+      status: 'matched',
+      match_status: 'full',
+      order_amount: actualJoin,
+      matched_amount: actualJoin,
+      remaining_amount: 0,
+      parent_bet_id: betId,
+    });
+
+    // อัปเดต UI: progress bar + status
+    const item = document.getElementById(`bq-${betId}`);
+    if (item) {
+      item.innerHTML = _renderBetOrderHTML(
+        betId, ownerNick, sideName, ownerSide,
+        order.order_amount, newMatched, Math.max(0, newRemaining), odds, matchId
+      );
     }
 
-    // แสดงสถานะ
-    showBetStatus(matchId, 'matched',
-      `✅ จับคู่สำเร็จ! กับ <strong>${opponentNick}</strong><br>คุณเลือก: <strong>${mySide}</strong> · อัตรา 1:${odds} · ${amount.toLocaleString()} ฿<br><span style="font-size:11px;">หากชนะจะได้รับ <strong style="color:var(--gold);">${potential} ฿</strong></span>`
-    );
+    // สถานะฝั่งผู้จับ
+    const statusMsg = newRemaining <= 0
+      ? `✅ <strong>จับคู่สำเร็จ!</strong> · กับ ${ownerNick} · ${actualJoin.toLocaleString()} ฿ · คาดได้รับ <strong style="color:var(--gold);">${Number(potential).toLocaleString()} ฿</strong>`
+      : `✅ จับบางส่วน ${actualJoin.toLocaleString()} ฿ · กับ ${ownerNick} · คาด <strong style="color:var(--gold);">${Number(potential).toLocaleString()} ฿</strong>`;
+    showBetStatus(matchId, 'matched', statusMsg);
+    addBetToHistory(sideName, ownerNick, actualJoin, potential, txn, odds);
+    showFEToast(`✅ จับคู่ ${actualJoin.toLocaleString()} ฿ กับ ${ownerNick} สำเร็จแล้วครับ!`);
+  }
 
-    // บันทึกประวัติ
-    addBetToHistory(mySide, opponentSide.replace(/🔴|🔵/g,'').trim(), amount, potential, txn, odds);
-    showToastFE(`✅ จับคู่กับ ${opponentNick} สำเร็จ! · TXN: ${txn}`);
+  // โหลด bet orders จาก DB เข้า queue (realtime)
+  async function loadBetQueue(matchId) {
+    const { data: orders } = await sb.from('bets')
+      .select('*')
+      .eq('match_id', matchId)
+      .in('match_status', ['waiting', 'partial'])
+      .order('created_at', { ascending: false });
+
+    const list = document.getElementById(`bet-queue-${matchId}`);
+    if (!list || !orders?.length) return;
+
+    // เคลียร์ mock items
+    list.querySelectorAll('[id^="bq-mock"]').forEach(el => el.remove());
+
+    orders.forEach(order => {
+      if (document.getElementById(`bq-${order.id}`)) return; // มีแล้ว
+      const side = order.side || (order.side_name?.includes('เจ้าพายุ') ? 'red' : 'blue');
+      const item = document.createElement('div');
+      item.id = `bq-${order.id}`;
+      item.className = `bet-queue-item ${side === 'red' ? 'red' : 'blue'}-queue`;
+      item.setAttribute('data-bet-id', order.id);
+      item.innerHTML = _renderBetOrderHTML(
+        order.id, order.nick, order.side_name, side,
+        order.order_amount, order.matched_amount, order.remaining_amount,
+        order.odds, matchId
+      );
+      list.appendChild(item);
+    });
+    updateQueueCount(matchId);
+  }
+
+  // ── Timeout Refund Checker (เรียกเมื่อเปิดหน้าตาราง) ──
+  async function checkBetTimeouts() {
+    if (!currentUser) return;
+    const now = new Date().toISOString();
+    const { data: expired } = await sb.from('bets')
+      .select('*')
+      .eq('nick', currentUser.nick)
+      .in('match_status', ['waiting', 'partial'])
+      .lt('expires_at', now);
+
+    for (const bet of (expired || [])) {
+      const refund = Number(bet.remaining_amount || 0);
+      if (refund <= 0) continue;
+
+      // คืนเงินส่วนที่ยังจับคู่ไม่ได้
+      const { data: mem } = await sb.from('members').select('balance').eq('nick', currentUser.nick).maybeSingle();
+      if (mem) {
+        await sb.from('members').update({ balance: mem.balance + refund }).eq('nick', currentUser.nick);
+        await sb.from('bets').update({
+          match_status: 'timeout',
+          remaining_amount: 0,
+          status: bet.matched_amount > 0 ? 'waiting' : 'refunded',
+        }).eq('id', bet.id);
+
+        addNotification('⏰', 'หมดเวลา — คืนเงินบางส่วน',
+          `คืน ${refund.toLocaleString()} ฿ เข้าบัญชีแล้วครับ (จับไปแล้ว ${Number(bet.matched_amount||0).toLocaleString()} ฿)`,
+          'info');
+        showFEToast(`⏰ หมดเวลา — คืนเงิน ${refund.toLocaleString()} ฿ แล้วครับ`);
+        refreshBalance();
+      }
+    }
   }
 
   function showBetStatus(matchId, type, html) {
@@ -6844,6 +7037,11 @@ fns.forEach(function(fn){
   };
 
   window.openMatchDetail = function openMatchDetail(matchId) {
+    // โหลด bet queue จาก DB
+    setTimeout(() => {
+      loadBetQueue(matchId);
+      checkBetTimeouts();
+    }, 500);
     const m = matchData[matchId] || {};
     // อัปเดต arena
     document.getElementById('detail-arena').innerHTML = `
@@ -6920,7 +7118,7 @@ fns.forEach(function(fn){
   }
   window.showSchedule = window._real_showSchedule = async function showSchedule() {
     // ── FLAG: no_game / blacklist → redirect ออกจาก schedule ──
-    const _sf = currentUser?.flags || [];
+    const _sf = (window.currentUser || window._currentUser)?.flags || [];
     if (_sf.includes('no_game') || _sf.includes('blacklist') || _sf.includes('cheater')) {
       showFEToast('🚫 บัญชีของคุณถูกระงับสิทธิ์การเดิมพัน — กรุณาติดต่อ Admin ครับ');
       return;
