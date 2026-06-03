@@ -751,6 +751,8 @@ fns.forEach(function(fn){
     position: sticky;
     top: 0;
     z-index: 100;
+    flex-wrap: wrap;
+    gap: 8px;
   }
   .nav-logo {
     font-family: 'Kanit', sans-serif;
@@ -2572,6 +2574,118 @@ fns.forEach(function(fn){
     .results-search-wrap { min-width: unset; width: 100%; }
     .results-date-wrap { width: 100%; }
     .results-date-input { flex: 1; min-width: 0; }
+  }
+
+  /* ======= RESPONSIVE — MOBILE FIRST ======= */
+  @media (max-width: 768px) {
+
+    /* ── NAV ── */
+    nav { padding: 12px 16px; }
+    .nav-links { display: none; }
+
+    /* ── ACCOUNT SECTION ── */
+    .account-section { padding: 16px 12px 40px; }
+    .account-back { margin-bottom: 16px; }
+
+    /* ── ACCOUNT BANNER ── */
+    .account-banner { padding: 16px; gap: 14px; flex-wrap: wrap; }
+    .account-avatar { width: 60px; height: 60px; font-size: 24px; }
+    .account-nick { font-size: 20px; }
+    .account-balance-val { font-size: 26px; }
+    .account-balance-box { width: 100%; text-align: left; margin-top: 8px; }
+
+    /* ── ACCOUNT TABS → horizontal scroll ── */
+    .account-tabs {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      flex-wrap: nowrap;
+      padding: 4px;
+      gap: 4px;
+    }
+    .acc-tab { font-size: 11px; padding: 8px 10px; flex-shrink: 0; }
+
+    /* ── DEPOSIT PANEL ── */
+    #dep-step2 { padding: 14px; }
+    .dep-method-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    /* ── BET PANEL ── */
+    .bet-side-selector { flex-direction: column; gap: 8px; }
+    .bet-side-btn { padding: 14px; }
+
+    /* ── BET QUEUE ITEMS ── */
+    .bet-queue-item { padding: 10px 12px; }
+    .bc-head { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .bc-join { flex-wrap: wrap; }
+    .bc-join-input { min-width: 80px; }
+
+    /* ── SCHEDULE CARDS ── */
+    .match-card { padding: 14px; }
+    .match-body { gap: 8px; }
+    .team-name { font-size: 14px; }
+
+    /* ── DASHBOARD STATS ── */
+    .dash-stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .dash-stat-card { padding: 12px; }
+    .dash-stat-val { font-size: 20px; }
+
+    /* ── REGISTER / LOGIN FORM ── */
+    .reg-grid { grid-template-columns: 1fr !important; }
+    .reg-box { padding: 24px 16px; margin: 12px; }
+
+    /* ── NOTIFICATIONS ── */
+    .notif-item { padding: 12px; }
+    .notif-item-icon { width: 34px; height: 34px; font-size: 18px; }
+
+    /* ── POPUPS / MODALS → full screen ── */
+    #reward-popup > div,
+    #withdraw-slip-popup > div,
+    #email-oauth-modal > div {
+      border-radius: 16px 16px 0 0 !important;
+      max-width: 100% !important;
+      width: 100% !important;
+    }
+    #reward-popup,
+    #withdraw-slip-popup,
+    #email-oauth-modal {
+      align-items: flex-end !important;
+    }
+
+    /* ── TXN HISTORY ── */
+    .txn-item { padding: 10px 12px; gap: 10px; }
+    .txn-info { min-width: 0; }
+    .txn-label { font-size: 13px; }
+    .txn-amount { font-size: 14px; }
+
+    /* ── REFERRAL TAB ── */
+    .ref-stats-grid { grid-template-columns: 1fr 1fr; }
+
+    /* ── SUPPORT TAB ── */
+    .support-form { padding: 14px; }
+  }
+
+  @media (max-width: 480px) {
+    /* ── Extra small phones ── */
+    .account-tabs { padding: 3px; }
+    .acc-tab { font-size: 10px; padding: 7px 9px; }
+    .account-nick { font-size: 18px; }
+    .account-balance-val { font-size: 22px; }
+    nav { padding: 10px 12px; }
+
+    /* ── Bet panel ── */
+    .bet-amount-row { flex-direction: column; }
+    .bet-odds-input { width: 100%; }
+
+    /* ── Deposit bank tabs ── */
+    #dep-bank-tabs { gap: 4px; }
+    #dep-bank-tabs button { font-size: 11px; padding: 5px 10px; }
+
+    /* ── Account banner compact ── */
+    .account-banner { padding: 12px; }
+    .account-avatar { width: 52px; height: 52px; font-size: 20px; }
+
+    /* ── Notif filter chips ── */
+    #notif-filter-chips { gap: 4px; }
+    .notif-chip { font-size: 10px; padding: 4px 10px; }
   }
 
 </style>
