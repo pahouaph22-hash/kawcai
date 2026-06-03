@@ -7123,7 +7123,7 @@ setInterval(() => {
 
   function goDepStep2() {
     const amt = parseInt(document.getElementById('dep-amount').value) || 0;
-    if (amt < 100) { alert('กรุณาระบุจำนวนเงินขั้นต่ำ 100 ₭ครับ'); return; }
+    if (amt < 100) { showFEToast('⚠️ กรุณาระบุจำนวนเงินขั้นต่ำ 100 ₭ครับ'); return; }
     const fmt = amt.toLocaleString() + ' ₭';
     document.getElementById('dep-confirm-amount').textContent  = fmt;
     document.getElementById('dep-notice-amount').textContent   = amt.toLocaleString() + ' ₭';
@@ -7674,10 +7674,10 @@ setInterval(() => {
     const amount  = parseInt(document.getElementById('dep-amount').value);
     const bank    = document.getElementById('dep-bank-from').value;
     const hasSlip = document.getElementById('dep-slip-preview').style.display !== 'none';
-    if (!amount || amount < 100) { alert('กรุณาระบุจำนวนเงินขั้นต่ำ 100 ₭ครับ'); return; }
-    if (!bank)    { alert('กรุณาเลือกธนาคารที่โอนจากครับ'); return; }
-    if (!hasSlip) { alert('กรุณาแนบสลิปการโอนเงินครับ'); return; }
-    if (!currentUser) { alert('กรุณา Login ก่อนครับ'); return; }
+    if (!amount || amount < 100) { showFEToast('⚠️ กรุณาระบุจำนวนเงินขั้นต่ำ 100 ₭ครับ'); return; }
+    if (!bank)    { showFEToast('⚠️ กรุณาเลือกธนาคารที่โอนจากครับ'); return; }
+    if (!hasSlip) { showFEToast('⚠️ กรุณาแนบสลิปการโอนเงินครับ'); return; }
+    if (!currentUser) { showFEToast('⚠️ กรุณา Login ก่อนครับ'); return; }
     // ── FLAG CHECK ──
     const flags = currentUser.flags || [];
     if (flags.includes('no_deposit') || flags.includes('blacklist')) {
@@ -7737,7 +7737,7 @@ setInterval(() => {
     document.getElementById('dep-amount-preview').style.display = 'none';
     goDepStep1();
 
-    alert(`✅ ส่งคำขอเติมเงินสำเร็จแล้วครับ!\nTXN: ${txn}\nAdmin จะตรวจสอบและอนุมัติโดยเร็วที่สุดครับ`);
+    showFEToast(`✅ ส่งคำขอเติมเงินสำเร็จ! TXN: ${txn} — Admin จะตรวจสอบโดยเร็วครับ`);
     loadDepHistory();
   }
 
