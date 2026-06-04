@@ -3680,7 +3680,7 @@ input, textarea, select, button {
         </div>
 
         <label style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;color:rgba(240,255,232,0.45);letter-spacing:.5px;margin-bottom:6px;display:block;">ระบุจำนวนเงินที่ต้องการเติม</label>
-        <input class="acc-input" type="number" id="dep-amount" placeholder="ขั้นต่ำ 100 ₭" min="100" oninput="updateDepAmount()">
+        <input class="acc-input" type="number" id="dep-amount" placeholder="ขั้นต่ำ 100 ₭" min="1" oninput="updateDepAmount()">
 
         <!-- Quick amount -->
         <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
@@ -3844,15 +3844,22 @@ input, textarea, select, button {
           <div style="text-align:left;">
             <div style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;color:rgba(240,255,232,0.45);margin-bottom:6px;letter-spacing:.5px;">ผูกบัญชีธนาคาร</div>
             <select class="acc-input" id="bind-bank-name" style="margin-bottom:8px;">
-              <option value="">เลือกธนาคาร</option>
-              <option>กสิกรไทย (KBank)</option>
-              <option>ไทยพาณิชย์ (SCB)</option>
-              <option>กรุงเทพ (BBL)</option>
-              <option>กรุงศรีอยุธยา (BAY)</option>
-              <option>กรุงไทย (KTB)</option>
-              <option>ทหารไทยธนชาต (TTB)</option>
-              <option>PromptPay / พร้อมเพย์</option>
-              <option>อื่นๆ</option>
+              <option value="">ເລືອກທະນາຄານ / เลือกธนาคาร</option>
+              <optgroup label="🇱🇦 ທະນາຄານລາວ">
+                <option value="BCEL">ທະນາຄານການຄ້າຕ່າງປະເທດລາວ (BCEL)</option>
+                <option value="LDB">ທະນາຄານພັດທະນາລາວ (LDB)</option>
+                <option value="LVB">ທະນາຄານລາວ-ຫວຽດ (LVB)</option>
+                <option value="APB">ທະນາຄານສົ່ງເສີມກະສິກຳ (APB)</option>
+                <option value="JCBL">ທະນາຄານຮ່ວມທຸລະກິດລາວ-ຈີນ (JCBL)</option>
+                <option value="BIC">ທະນາຄານລົງທຶນ ແລະ ການຄ້າ (BIC)</option>
+                <option value="LaoVietBank">ທະນາຄານລາວ ຫວຽດ (Lao Viet Bank)</option>
+                <option value="MARUHAN">ທະນາຄານມາຣູຮານ ຈາປັນ ລາວ (MARUHAN)</option>
+                <option value="ACLEDA">ທະນາຄານ ACLEDA ລາວ</option>
+                <option value="PHONGSAVANH">ທະນາຄານໂພນສະຫວັນ (Phongsavanh Bank)</option>
+              </optgroup>
+              <optgroup label="💳 ອື່ນໆ / อื่นๆ">
+                <option value="other">ອື່ນໆ / อื่นๆ / Other</option>
+              </optgroup>
             </select>
             <input class="acc-input" type="text" id="bind-bank-accno" placeholder="เลขบัญชี เช่น 123-4-56789-0" style="margin-bottom:8px;">
             <input class="acc-input" type="text" id="bind-bank-accname" placeholder="ชื่อเจ้าของบัญชี (ตรงกับสมุดบัญชี)" style="margin-bottom:12px;">
@@ -3883,7 +3890,7 @@ input, textarea, select, button {
         <!-- ฟอร์มถอนเงิน -->
         <div class="money-form" style="background:transparent;padding:0;">
           <label style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;color:rgba(240,255,232,0.45);letter-spacing:.5px;margin-bottom:6px;display:block;">จำนวนเงินที่ต้องการถอน</label>
-          <input class="acc-input" type="number" id="with-amount" placeholder="ขั้นต่ำ 100 ₭" min="100">
+          <input class="acc-input" type="number" id="with-amount" placeholder="ขั้นต่ำ 100 ₭" min="1">
           <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
             <button onclick="setWithAmount(100)" style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:12px;font-weight:700;padding:6px 14px;border-radius:7px;border:1px solid rgba(248,113,113,0.3);background:transparent;color:rgba(240,255,232,0.6);cursor:pointer;">100</button>
             <button onclick="setWithAmount(500)" style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:12px;font-weight:700;padding:6px 14px;border-radius:7px;border:1px solid rgba(248,113,113,0.3);background:transparent;color:rgba(240,255,232,0.6);cursor:pointer;">500</button>
@@ -6222,6 +6229,24 @@ function applyLang() {
   let notifications  = [];
   let _depBanks      = [];   // บัญชีรับเงินที่ active
   let _depBankIdx    = 0;    // index ที่เลือกอยู่
+
+  // ── TX LIMITS ──
+  let _txLimits = { depMin:100, depMax:0, withMin:100, withMax:0 };
+
+  async function _loadTxLimits() {
+    try {
+      const { data } = await sb.from('settings').select('value').eq('key','txLimits').maybeSingle();
+      if (data?.value) {
+        _txLimits = { depMin:100, depMax:0, withMin:100, withMax:0, ...data.value };
+        // อัปเดต placeholder
+        const dEl = document.getElementById('dep-amount');
+        const wEl = document.getElementById('with-amount');
+        if (dEl) dEl.placeholder = `ขั้นต่ำ ${(_txLimits.depMin||100).toLocaleString()} ₭`;
+        if (wEl) wEl.placeholder = `ขั้นต่ำ ${(_txLimits.withMin||100).toLocaleString()} ₭`;
+      }
+    } catch(_) {}
+  }
+
   let _notifFilter   = '';
 
   window.toggleNotifCenter = window._real_toggleNotifCenter = function toggleNotifCenter() {
@@ -7068,6 +7093,7 @@ setInterval(() => {
 
     loadDashboard();
     loadDepBanks();
+    _loadTxLimits();
 
     // ── โหลดข้อมูลล่าสุดจาก Supabase ใน background ──
     try {
@@ -7136,8 +7162,8 @@ setInterval(() => {
       const { data, error } = await sb.from('settings').select('value').eq('key','bankAccounts').maybeSingle();
       if (error || !data) {
         console.warn('[loadDepBanks]', error?.message || 'no data');
-        const wrap = document.getElementById('dep-bank-info-wrap');
-        if (wrap) wrap.innerHTML = `<div style="text-align:center;padding:20px;background:rgba(248,113,113,0.08);border-radius:12px;border:1px solid rgba(248,113,113,0.2);"><div style="font-size:24px;margin-bottom:8px;">⚠️</div><div style="font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:13px;color:rgba(240,255,232,0.6);">ไม่สามารถโหลดบัญชีรับเงินได้<br>กรุณารีเฟรชหรือติดต่อ Admin ครับ</div></div>`;
+        const wrapNoData = document.getElementById('dep-bank-info-wrap');
+        if (wrapNoData) wrapNoData.innerHTML = '<div style="text-align:center;padding:20px;background:rgba(248,113,113,0.08);border-radius:12px;border:1px solid rgba(248,113,113,0.2);"><div style="font-size:24px;margin-bottom:8px;">⚠️</div><div style="font-family:Kanit,sans-serif;font-size:13px;color:rgba(240,255,232,0.6);">ไม่สามารถโหลดบัญชีรับเงินได้<br>กรุณารีเฟรชหรือติดต่อ Admin ครับ</div></div>';
         return;
       }
 
@@ -7163,7 +7189,7 @@ setInterval(() => {
     } catch(err) {
       console.error('[loadDepBanks]', err);
       const wrapErr = document.getElementById('dep-bank-info-wrap');
-      if (wrapErr) wrapErr.innerHTML = '<div style="text-align:center;padding:20px;"><div style="font-size:24px;">⚠️</div><div style="font-family:Kanit,sans-serif;font-size:13px;color:rgba(240,255,232,0.6);">โหลดข้อมูลบัญชีไม่สำเร็จ<br>กรุณาติดต่อ Admin ครับ</div></div>';
+      if (wrapErr) wrapErr.innerHTML = '<div style="text-align:center;padding:20px;background:rgba(248,113,113,0.08);border-radius:12px;border:1px solid rgba(248,113,113,0.2);"><div style="font-size:24px;margin-bottom:8px;">⚠️</div><div style="font-family:Kanit,sans-serif;font-size:13px;color:rgba(240,255,232,0.6);">โหลดบัญชีไม่สำเร็จ กรุณารีเฟรชหรือติดต่อ Admin ครับ</div></div>';
     }
     // ── ยืนยันว่า step1 ยังแสดงอยู่เสมอหลัง loadDepBanks ──
     const s1 = document.getElementById('dep-step1');
@@ -7177,8 +7203,11 @@ setInterval(() => {
   }
 
   function goDepStep2() {
-    const amt = parseInt(document.getElementById('dep-amount').value) || 0;
-    if (amt < 100) { showFEToast('⚠️ กรุณาระบุจำนวนเงินขั้นต่ำ 100 ₭ครับ'); return; }
+    const amt    = parseInt(document.getElementById('dep-amount').value) || 0;
+    const dMin   = _txLimits.depMin  || 100;
+    const dMax   = _txLimits.depMax  || 0;
+    if (amt < dMin) { showFEToast(`⚠️ จำนวนเงินขั้นต่ำสำหรับเติมเงินคือ ${dMin.toLocaleString()} ₭ ครับ`); return; }
+    if (dMax && amt > dMax) { showFEToast(`⚠️ จำนวนเงินสูงสุดสำหรับเติมเงินคือ ${dMax.toLocaleString()} ₭ ครับ`); return; }
     if (!_depBanks || _depBanks.length === 0) { showFEToast('⚠️ ยังไม่มีบัญชีรับเงิน กรุณาติดต่อ Admin ครับ'); return; }
     const fmt = amt.toLocaleString() + ' ₭';
     document.getElementById('dep-confirm-amount').textContent  = fmt;
@@ -7434,7 +7463,10 @@ setInterval(() => {
       return;
     }
     if (!currentUser.bank_accno) { showFEToast('⚠️ กรุณาผูกบัญชีธนาคารก่อนครับ'); return; }
-    if (!amount || amount < 100) { showFEToast('⚠️ กรุณาใส่จำนวนเงินขั้นต่ำ 100 ₭ครับ'); return; }
+    const wMin = _txLimits.withMin || 100;
+    const wMax = _txLimits.withMax || 0;
+    if (!amount || amount < wMin) { showFEToast(`⚠️ จำนวนเงินขั้นต่ำสำหรับถอนเงินคือ ${wMin.toLocaleString()} ₭ ครับ`); return; }
+    if (wMax && amount > wMax) { showFEToast(`⚠️ จำนวนเงินสูงสุดสำหรับถอนเงินคือ ${wMax.toLocaleString()} ₭ ครับ`); return; }
     if (amount > balance) { showFEToast(`❌ ยอดเงินไม่เพียงพอครับ (คงเหลือ: ${balance.toLocaleString()} ₭)`); return; }
 
     const txn  = genTxnFE(9);

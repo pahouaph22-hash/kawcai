@@ -269,6 +269,37 @@ tr:hover td{background:#fafafa;}
 input, textarea, select, button {
   font-family: 'Phetsarath', 'Noto Sans Lao', 'Kanit', sans-serif !important;
 }
+  /* ── Staff Profile Tabs ── */
+  .sp-tab { padding:10px 16px;border:none;border-bottom:3px solid transparent;background:transparent;font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;color:#888;transition:all .15s;white-space:nowrap; }
+  .sp-tab.active { color:#1B6B2F;border-bottom-color:#1B6B2F; }
+  .sp-tab:hover:not(.active) { color:#555;background:#f9f9f7; }
+  /* ── Worklog Tabs ── */
+  .wl-tab { padding:6px 14px;border:1px solid #ddd;border-radius:999px;background:#fff;font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;color:#555; }
+  .wl-tab.active { background:#1B6B2F;color:#fff;border-color:#1B6B2F; }
+  .wl-tab:hover:not(.active) { background:#f0f0ec; }
+
+  /* ── Settings Tabs ── */
+  .cfg-tab {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 11px 16px;
+    border: none;
+    background: transparent;
+    font-family: 'Phetsarath','Noto Sans Lao','Kanit',sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #666;
+    cursor: pointer;
+    text-align: left;
+    border-left: 3px solid transparent;
+    transition: all .15s;
+  }
+  .cfg-tab:hover { background: #efefed; color: #222; }
+  .cfg-tab.active { background: #fff; color: #1B6B2F; border-left-color: #1B6B2F; }
+  .cfg-pane { display: none; }
+  .cfg-pane.active { display: block; }
 </style>
 </head>
 <body>
@@ -319,7 +350,8 @@ input, textarea, select, button {
       <div class="sb-item" data-panel="referral" onclick="switchPanel('referral');loadReferralPanel();">🎁 แนะนำสมาชิก</div>
       <div class="sb-item" data-panel="activity" onclick="switchPanel('activity');loadActivityPanel();">🎉 กิจกรรม</div>
       <div class="sb-item" data-panel="news" onclick="switchPanel('news')">📰 ข่าวสาร</div>
-      <div class="sb-item" data-panel="settings" onclick="switchPanel('settings')">⚙️ ตั้งค่า</div>
+      <div class="sb-item" id="sb-worklog" data-panel="worklog" onclick="switchPanel('worklog');loadWorklogPanel();">📋 ประวัติการดำเนินงาน</div>
+      <div class="sb-item" data-panel="settings" id="sb-settings" onclick="switchPanel('settings')">⚙️ ตั้งค่า</div>
       <!-- เมนูพนักงาน — เฉพาะ Super Admin -->
       <div class="sb-item" id="sb-staff" data-panel="staff" onclick="switchPanel('staff');loadStaffPanel();" style="display:none;border-left:3px solid #8b5cf6;">👨‍💼 พนักงาน</div>
     </div>
@@ -1109,7 +1141,40 @@ input, textarea, select, button {
 
       <!-- SETTINGS -->
       <div class="panel" id="panel-settings">
-        <!-- ชื่อเว็บ & โลโก้ -->
+        <div style="display:grid;grid-template-columns:200px 1fr;gap:0;min-height:600px;background:#fff;border-radius:12px;border:1px solid #e5e5e0;overflow:hidden;">
+
+          <!-- ── Sidebar Tabs ── -->
+          <div style="background:#f7f7f5;border-right:1px solid #e5e5e0;padding:12px 0;">
+            <div style="font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;color:#aaa;letter-spacing:.08em;padding:8px 16px 12px;text-transform:uppercase;">⚙️ ตั้งค่าระบบ</div>
+        <button class="cfg-tab active" onclick="switchCfgTab('siteinfo')" id="cfg-tab-siteinfo">
+          <span style="font-size:18px;">🐂</span>
+          <span>ชื่อเว็บ & โลโก้</span>
+        </button>
+        <button class="cfg-tab " onclick="switchCfgTab('p2p')" id="cfg-tab-p2p">
+          <span style="font-size:18px;">💹</span>
+          <span>ค่าบริการ P2P</span>
+        </button>
+        <button class="cfg-tab " onclick="switchCfgTab('referral')" id="cfg-tab-referral">
+          <span style="font-size:18px;">🎁</span>
+          <span>ระบบแนะนำสมาชิก</span>
+        </button>
+        <button class="cfg-tab " onclick="switchCfgTab('bank')" id="cfg-tab-bank">
+          <span style="font-size:18px;">🏦</span>
+          <span>บัญชีรับเงิน</span>
+        </button>
+        <button class="cfg-tab " onclick="switchCfgTab('contact')" id="cfg-tab-contact">
+          <span style="font-size:18px;">📞</span>
+          <span>ข้อมูลติดต่อ</span>
+        </button>
+        <button class="cfg-tab " onclick="switchCfgTab('vip')" id="cfg-tab-vip">
+          <span style="font-size:18px;">👑</span>
+          <span>VIP & รหัสผ่าน</span>
+        </button>
+          </div>
+
+          <!-- ── Content Panes ── -->
+          <div style="padding:20px 24px;overflow-y:auto;max-height:80vh;">
+        <div class="cfg-pane active" id="cfg-pane-siteinfo">
         <div class="card" style="border-left:4px solid #C8102E;">
           <div class="card-title">🐂 ชื่อเว็บไซต์ & โลโก้</div>
 
@@ -1188,8 +1253,8 @@ input, textarea, select, button {
 
           <button id="btn-save-siteInfo" class="save-btn" onclick="saveSettings('siteInfo')" style="background:linear-gradient(135deg,#C8102E,#a50c24);font-size:15px;padding:14px;margin-top:8px;">💾 ยืนยันการเปลี่ยนแปลง</button>
         </div>
-
-        <!-- ค่าบริการ P2P -->
+        </div>
+        <div class="cfg-pane " id="cfg-pane-p2p">
         <div class="card" style="border-left:4px solid var(--gold);">
           <div class="card-title">💹 ค่าบริการการเดิมพัน P2P</div>
           <div class="form-row">
@@ -1210,6 +1275,8 @@ input, textarea, select, button {
           </div>
           <button class="save-btn" onclick="saveSettings('fee')">💾 บันทึกค่าบริการ</button>
         </div>
+        </div>
+        <div class="cfg-pane " id="cfg-pane-referral">
         <div class="card" style="border-left:4px solid #60a5fa;">
           <div class="card-title">🎁 ค่าคอมมิชชันระบบแนะนำสมาชิก (5 ชั้น)</div>
           <div style="font-size:12px;color:#888;margin-bottom:14px;">คำนวณจากยอดเดิมพัน ทุกครั้งที่สมาชิกในสายงานลงเดิมพัน — สมาชิก A แนะนำ B แนะนำ C … ไล่ขึ้นไป 5 ชั้น</div>
@@ -1273,10 +1340,57 @@ input, textarea, select, button {
           </div>
           <div id="ref-preview-result" style="display:none;margin-top:12px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 14px;font-size:12px;"></div>
         </div>
+        </div>
+        <div class="cfg-pane " id="cfg-pane-bank">
         <div class="card" style="border-left:4px solid #F5A800;">
           <div class="card-title">🏦 บัญชีรับเงิน
             <button onclick="loadBankAccounts()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">🔄 รีเฟรช</button>
+  
+        <!-- ── วงเงินเติม/ถอน ── -->
+        <div class="card" style="border-left:4px solid #0ea5e9;margin-top:16px;">
+          <div class="card-title">💱 วงเงินเติมเงิน & ถอนเงิน
+            <button onclick="loadTxLimits()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">🔄 โหลด</button>
           </div>
+          <div style="font-size:12px;color:#888;margin-bottom:16px;">กำหนดจำนวนเงินขั้นต่ำและสูงสุดที่ลูกค้าสามารถเติม/ถอนได้ในแต่ละครั้ง</div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+            <!-- เติมเงิน -->
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;">
+              <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;color:#16a34a;margin-bottom:12px;">💰 เติมเงิน</div>
+              <div class="fg" style="margin-bottom:8px;">
+                <label style="font-size:12px;">ขั้นต่ำ (₭)</label>
+                <input type="number" id="txl-dep-min" oninput="updateTxPreview()" min="0" placeholder="100"
+                  style="padding:8px 12px;border:1px solid #bbf7d0;border-radius:7px;font-family:'Kanit',sans-serif;font-size:14px;font-weight:700;width:100%;box-sizing:border-box;">
+              </div>
+              <div class="fg">
+                <label style="font-size:12px;">สูงสุด (₭) <span style="color:#aaa;font-weight:400;">0 = ไม่จำกัด</span></label>
+                <input type="number" id="txl-dep-max" oninput="updateTxPreview()" min="0" placeholder="0"
+                  style="padding:8px 12px;border:1px solid #bbf7d0;border-radius:7px;font-family:'Kanit',sans-serif;font-size:14px;font-weight:700;width:100%;box-sizing:border-box;">
+              </div>
+            </div>
+
+            <!-- ถอนเงิน -->
+            <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px;">
+              <div style="font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;color:#ea580c;margin-bottom:12px;">🏧 ถอนเงิน</div>
+              <div class="fg" style="margin-bottom:8px;">
+                <label style="font-size:12px;">ขั้นต่ำ (₭)</label>
+                <input type="number" id="txl-with-min" oninput="updateTxPreview()" min="0" placeholder="100"
+                  style="padding:8px 12px;border:1px solid #fed7aa;border-radius:7px;font-family:'Kanit',sans-serif;font-size:14px;font-weight:700;width:100%;box-sizing:border-box;">
+              </div>
+              <div class="fg">
+                <label style="font-size:12px;">สูงสุด (₭) <span style="color:#aaa;font-weight:400;">0 = ไม่จำกัด</span></label>
+                <input type="number" id="txl-with-max" oninput="updateTxPreview()" min="0" placeholder="0"
+                  style="padding:8px 12px;border:1px solid #fed7aa;border-radius:7px;font-family:'Kanit',sans-serif;font-size:14px;font-weight:700;width:100%;box-sizing:border-box;">
+              </div>
+            </div>
+          </div>
+
+          <!-- Preview -->
+          <div id="txl-preview" style="background:#f8f9fa;border:1px solid #e5e5e0;border-radius:8px;padding:10px 14px;font-size:12px;color:#555;margin-bottom:14px;display:none;"></div>
+
+          <button class="save-btn" onclick="saveTxLimits()" style="background:linear-gradient(135deg,#0ea5e9,#0284c7);">💾 บันทึกวงเงิน</button>
+        </div>
+        </div>
           <div style="font-size:12px;color:#888;margin-bottom:14px;">เพิ่มบัญชีรับเงินได้ไม่จำกัด · บัญชีที่เปิดใช้งานจะแสดงในหน้าเติมเงินของลูกค้า</div>
 
           <!-- รายการบัญชีที่มีอยู่ -->
@@ -1302,6 +1416,8 @@ input, textarea, select, button {
             </div>
           </div>
         </div>
+        </div>
+        <div class="cfg-pane " id="cfg-pane-contact">
         <div class="card">
           <div class="card-title">📞 ข้อมูลติดต่อ</div>
           <div class="form-row">
@@ -1314,6 +1430,8 @@ input, textarea, select, button {
           </div>
           <button class="save-btn" onclick="saveSettings('contact')">💾 บันทึกข้อมูลติดต่อ</button>
         </div>
+        </div>
+        <div class="cfg-pane " id="cfg-pane-vip">
         <div class="card" style="border-left:4px solid #8b5cf6;">
           <div class="card-title">👑 ระดับ VIP สมาชิก</div>
           <div style="font-size:12px;color:#888;margin-bottom:16px;">กำหนดเกณฑ์ยอดเติมเงินสะสม (₭) เพื่อขึ้นระดับ VIP — ระดับสูงขึ้นต้องมียอดมากกว่า</div>
@@ -1346,8 +1464,11 @@ input, textarea, select, button {
           </div>
           <button class="save-btn" onclick="changeAdminPass()">🔑 เปลี่ยนรหัสผ่าน</button>
         </div>
-      </div>
+        </div>
+          </div>
 
+        </div>
+      </div>
       <!-- Security Card -->
       <div class="card" style="border-left:4px solid #e24b4a;">
         <div class="card-title">🛡️ ความปลอดภัย (Security)
@@ -1356,7 +1477,55 @@ input, textarea, select, button {
         <div id="rls-status-banner" style="background:#f0fff4;border:1px solid #b7ebc8;border-radius:8px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:#1a7a3a;font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;line-height:1.7;">
           ✅ <strong>RLS เปิดใช้งานแล้ว</strong> — table staff และ staff_logs ได้รับการป้องกันแล้วครับ
         </div>
+      </div>
 
+
+      <!-- ═══════ PANEL: ประวัติการดำเนินงาน ═══════ -->
+      <div class="panel" id="panel-worklog">
+        <div class="panel-header"><h2 class="panel-title">📋 ประวัติการดำเนินงาน</h2></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px;background:#fafaf8;border:1px solid #e5e5e0;border-radius:10px;padding:12px 16px;">
+          <input type="text" id="wl-search" placeholder="🔍 ค้นหาชื่อพนักงาน..." oninput="renderWorklog()" style="padding:7px 12px;border:1px solid #ddd;border-radius:7px;font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:13px;min-width:180px;">
+          <select id="wl-staff" onchange="renderWorklog()" style="padding:7px 12px;border:1px solid #ddd;border-radius:7px;font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:13px;"><option value="">👤 พนักงานทุกคน</option></select>
+          <select id="wl-type" onchange="renderWorklog()" style="padding:7px 12px;border:1px solid #ddd;border-radius:7px;font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:13px;">
+            <option value="">📂 ทุกประเภทงาน</option>
+            <option value="deposit">💰 เติมเงิน</option>
+            <option value="withdrawal">🏧 ถอนเงิน</option>
+            <option value="match">🏆 คู่แข่งขัน</option>
+            <option value="verdict">⚖️ ตัดสินผล</option>
+            <option value="member">👥 สมาชิก</option>
+            <option value="system">🔑 ระบบ</option>
+          </select>
+          <input type="date" id="wl-from" onchange="renderWorklog()" style="padding:7px 10px;border:1px solid #ddd;border-radius:7px;font-size:13px;">
+          <span style="font-size:12px;color:#aaa;">ถึง</span>
+          <input type="date" id="wl-to" onchange="renderWorklog()" style="padding:7px 10px;border:1px solid #ddd;border-radius:7px;font-size:13px;">
+          <button onclick="clearWorklogFilter()" style="padding:7px 14px;border:1px solid #ddd;border-radius:7px;background:#fff;font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:12px;cursor:pointer;">✕ ล้าง</button>
+          <button onclick="loadWorklogPanel()" style="padding:7px 14px;border:none;border-radius:7px;background:#1B6B2F;color:#fff;font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:12px;cursor:pointer;">🔄 รีเฟรช</button>
+          <span id="wl-count" style="font-size:12px;color:#aaa;margin-left:auto;"></span>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
+          <button class="wl-tab active" data-type="" onclick="setWorklogTab(this,'')">📋 ทั้งหมด</button>
+          <button class="wl-tab" data-type="deposit" onclick="setWorklogTab(this,'deposit')">💰 เติมเงิน</button>
+          <button class="wl-tab" data-type="withdrawal" onclick="setWorklogTab(this,'withdrawal')">🏧 ถอนเงิน</button>
+          <button class="wl-tab" data-type="match" onclick="setWorklogTab(this,'match')">🏆 คู่แข่งขัน</button>
+          <button class="wl-tab" data-type="verdict" onclick="setWorklogTab(this,'verdict')">⚖️ ตัดสินผล</button>
+          <button class="wl-tab" data-type="member" onclick="setWorklogTab(this,'member')">👥 สมาชิก</button>
+          <button class="wl-tab" data-type="system" onclick="setWorklogTab(this,'system')">🔑 ระบบ</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <thead>
+              <tr style="background:#f5f5f0;text-align:left;">
+                <th style="padding:10px 12px;font-family:'Kanit',sans-serif;font-weight:700;border-bottom:2px solid #e5e5e0;white-space:nowrap;">👤 พนักงาน</th>
+                <th style="padding:10px 12px;font-family:'Kanit',sans-serif;font-weight:700;border-bottom:2px solid #e5e5e0;white-space:nowrap;">ตำแหน่ง</th>
+                <th style="padding:10px 12px;font-family:'Kanit',sans-serif;font-weight:700;border-bottom:2px solid #e5e5e0;white-space:nowrap;">📂 ประเภท</th>
+                <th style="padding:10px 12px;font-family:'Kanit',sans-serif;font-weight:700;border-bottom:2px solid #e5e5e0;">📝 รายละเอียด</th>
+                <th style="padding:10px 12px;font-family:'Kanit',sans-serif;font-weight:700;border-bottom:2px solid #e5e5e0;white-space:nowrap;text-align:right;">🕐 เวลา</th>
+              </tr>
+            </thead>
+            <tbody id="wl-tbody"><tr><td colspan="5" style="text-align:center;padding:32px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
+          </table>
+        </div>
+        <div id="wl-empty" style="display:none;text-align:center;padding:40px;color:#aaa;font-family:'Kanit',sans-serif;"><div style="font-size:40px;margin-bottom:12px;">📭</div><div>ไม่พบประวัติครับ</div></div>
       </div>
 
       <!-- STAFF PANEL -->
@@ -1383,6 +1552,7 @@ input, textarea, select, button {
               <select id="new-staff-role" style="width:100%;padding:9px 12px;border:1px solid #e5e5e0;border-radius:8px;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:13px;">
                 <option value="financial">💰 เติม-ถอนเงิน (Financial Staff)</option>
                 <option value="cs">🎯 บริการลูกค้า (Customer Service)</option>
+                <option value="all">⭐ พนักงานทั่วไป (Financial + CS)</option>
               </select>
             </div>
           </div>
@@ -1431,6 +1601,63 @@ input, textarea, select, button {
 
       </div>
 
+    </div>
+  </div>
+</div>
+
+
+<!-- ════ STAFF PROFILE MODAL ════ -->
+<div id="staff-profile-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);backdrop-filter:blur(2px);overflow-y:auto;">
+  <div style="max-width:860px;margin:32px auto;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.25);overflow:hidden;">
+    <div style="background:linear-gradient(135deg,#1B6B2F,#27943F);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div id="sp-avatar" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;font-family:'Kanit',sans-serif;flex-shrink:0;">S</div>
+        <div>
+          <div id="sp-name" style="font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:18px;font-weight:900;color:#fff;"></div>
+          <div style="display:flex;gap:8px;margin-top:4px;">
+            <span id="sp-role-badge" style="font-size:11px;font-weight:700;padding:2px 10px;border-radius:999px;background:rgba(255,255,255,0.2);color:#fff;font-family:'Kanit',sans-serif;"></span>
+            <span id="sp-status-badge" style="font-size:11px;font-weight:700;padding:2px 10px;border-radius:999px;background:rgba(255,255,255,0.2);color:#fff;font-family:'Kanit',sans-serif;"></span>
+          </div>
+        </div>
+      </div>
+      <button onclick="closeStaffProfile()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:20px;width:36px;height:36px;border-radius:50%;cursor:pointer;">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid #f0f0ec;">
+      <div style="padding:16px;text-align:center;border-right:1px solid #f0f0ec;"><div id="sp-stat-total" style="font-size:24px;font-weight:900;color:#1B6B2F;font-family:'Kanit',sans-serif;">—</div><div style="font-size:11px;color:#aaa;font-family:'Kanit',sans-serif;margin-top:2px;">กิจกรรมทั้งหมด</div></div>
+      <div style="padding:16px;text-align:center;border-right:1px solid #f0f0ec;"><div id="sp-stat-dep" style="font-size:24px;font-weight:900;color:#16a34a;font-family:'Kanit',sans-serif;">—</div><div style="font-size:11px;color:#aaa;font-family:'Kanit',sans-serif;margin-top:2px;">อนุมัติเติมเงิน</div></div>
+      <div style="padding:16px;text-align:center;border-right:1px solid #f0f0ec;"><div id="sp-stat-with" style="font-size:24px;font-weight:900;color:#dc2626;font-family:'Kanit',sans-serif;">—</div><div style="font-size:11px;color:#aaa;font-family:'Kanit',sans-serif;margin-top:2px;">อนุมัติถอนเงิน</div></div>
+      <div style="padding:16px;text-align:center;"><div id="sp-stat-last" style="font-size:13px;font-weight:700;color:#555;font-family:'Kanit',sans-serif;">—</div><div style="font-size:11px;color:#aaa;font-family:'Kanit',sans-serif;margin-top:2px;">กิจกรรมล่าสุด</div></div>
+    </div>
+    <div style="display:flex;gap:0;border-bottom:2px solid #f0f0ec;padding:0 24px;">
+      <button class="sp-tab active" data-tab="all"        onclick="switchSpTab(this,'all')">📋 ทั้งหมด</button>
+      <button class="sp-tab"        data-tab="deposit"    onclick="switchSpTab(this,'deposit')">💰 เติมเงิน</button>
+      <button class="sp-tab"        data-tab="withdrawal" onclick="switchSpTab(this,'withdrawal')">🏧 ถอนเงิน</button>
+      <button class="sp-tab"        data-tab="match"      onclick="switchSpTab(this,'match')">🏆 คู่แข่งขัน</button>
+      <button class="sp-tab"        data-tab="member"     onclick="switchSpTab(this,'member')">👥 สมาชิก</button>
+      <button class="sp-tab"        data-tab="system"     onclick="switchSpTab(this,'system')">🔑 ระบบ</button>
+    </div>
+    <div style="padding:20px 24px;">
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+        <input id="sp-search" type="text" placeholder="🔍 ค้นหารายละเอียด..." oninput="renderSpLogs()" style="flex:1;min-width:160px;padding:7px 12px;border:1px solid #e0e0e0;border-radius:8px;font-family:'Kanit',sans-serif;font-size:12px;">
+        <input id="sp-from" type="date" onchange="renderSpLogs()" style="padding:7px 10px;border:1px solid #e0e0e0;border-radius:8px;font-size:12px;">
+        <span style="font-size:11px;color:#aaa;">ถึง</span>
+        <input id="sp-to" type="date" onchange="renderSpLogs()" style="padding:7px 10px;border:1px solid #e0e0e0;border-radius:8px;font-size:12px;">
+        <button onclick="clearSpFilter()" style="padding:7px 12px;border:1px solid #e0e0e0;border-radius:8px;background:#fff;font-size:12px;cursor:pointer;color:#aaa;">✕ ล้าง</button>
+        <span id="sp-count" style="font-size:12px;color:#aaa;margin-left:auto;"></span>
+      </div>
+      <div style="overflow-x:auto;max-height:400px;overflow-y:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead style="position:sticky;top:0;background:#f5f5f0;z-index:1;">
+            <tr>
+              <th style="padding:10px 12px;text-align:left;font-family:'Kanit',sans-serif;font-weight:700;border-bottom:2px solid #e5e5e0;white-space:nowrap;">📂 ประเภท</th>
+              <th style="padding:10px 12px;text-align:left;font-family:'Kanit',sans-serif;font-weight:700;border-bottom:2px solid #e5e5e0;">📝 รายละเอียด</th>
+              <th style="padding:10px 12px;text-align:right;font-family:'Kanit',sans-serif;font-weight:700;border-bottom:2px solid #e5e5e0;white-space:nowrap;">🕐 เวลา</th>
+            </tr>
+          </thead>
+          <tbody id="sp-tbody"><tr><td colspan="3" style="text-align:center;padding:40px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
+        </table>
+      </div>
+      <div id="sp-empty" style="display:none;text-align:center;padding:40px;color:#aaa;"><div style="font-size:40px;margin-bottom:10px;">📭</div><div style="font-family:'Kanit',sans-serif;">ไม่พบประวัติครับ</div></div>
     </div>
   </div>
 </div>
@@ -1538,24 +1765,31 @@ let currentStaff = null; // null = super admin, object = staff
 
 // ปุ่มที่แต่ละ role "ทำได้" (กดได้)
 const STAFF_CAN_DO = {
-  financial: ['deposits','withdrawals'],
-  cs:        ['matches','verdict','activity','referral','news','bets','members'],
+  financial: ['deposits','withdrawals','worklog'],
+  cs:        ['matches','verdict','activity','referral','news','bets','members','worklog'],
+  all:       ['deposits','withdrawals','matches','verdict','activity','referral','news','bets','members','worklog'],
 };
 
 // panel ที่ต้องการ action guard — คือ panel ที่ role นั้น "ทำไม่ได้"
 // แต่ "เห็นได้" — แค่ปุ่มจะถูกบล็อก
 function _getRoleBlockedPanels(role) {
   const canDo = STAFF_CAN_DO[role] || [];
-  const all   = ['overview','members','matches','verdict','deposits','withdrawals','bets','referral','activity','news','settings'];
+  const all   = ['overview','members','matches','verdict','deposits','withdrawals','bets','referral','activity','news','settings','worklog'];
   return all.filter(p => !canDo.includes(p));
 }
 
 function applyStaffPermissions(role) {
   if (!currentStaff) return;
 
-  // เห็นทุกเมนู — แต่ซ่อนแค่ "พนักงาน" (เฉพาะ super admin จัดการได้)
-  const sbStaff = document.getElementById('sb-staff');
-  if (sbStaff) sbStaff.style.display = 'none';
+  // ซ่อน พนักงาน + ตั้งค่า สำหรับ staff ทุก role
+  const sbStaff    = document.getElementById('sb-staff');
+  const sbSettings = document.getElementById('sb-settings');
+  if (sbStaff)    sbStaff.style.display    = 'none';
+  if (sbSettings) sbSettings.style.display = 'none';
+  const pSettings = document.getElementById('panel-settings');
+  const pStaff    = document.getElementById('panel-staff');
+  if (pSettings) pSettings.style.display = 'none';
+  if (pStaff)    pStaff.style.display    = 'none';
 
   // เพิ่ม banner บอก role ที่ด้านบนของแต่ละ panel ที่ทำไม่ได้
   setTimeout(() => _applyActionBlocks(role), 800);
@@ -1564,7 +1798,7 @@ function applyStaffPermissions(role) {
 function _applyActionBlocks(role) {
   if (!currentStaff) return;
   const blockedPanels = _getRoleBlockedPanels(role);
-  const roleLabel = role === 'financial' ? '💰 เติม-ถอนเงิน' : '🎯 บริการลูกค้า';
+  const roleLabel = role === 'financial' ? '💰 เติม-ถอนเงิน' : role === 'cs' ? '🎯 บริการลูกค้า' : '⭐ พนักงานทั่วไป';
 
   document.querySelectorAll('.panel').forEach(panel => {
     const panelId = panel.id.replace('panel-','');
@@ -1619,7 +1853,7 @@ function showStaffBadge() {
   if (!currentStaff) {
     badge.innerHTML = '<span style="background:#8b5cf6;color:#fff;font-family:\'Kanit\',sans-serif;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;">👑 Super Admin</span>';
   } else {
-    const roleLabel = currentStaff.role === 'financial' ? '💰 Financial' : '🎯 CS';
+    const roleLabel = currentStaff.role === 'financial' ? '💰 Financial' : currentStaff.role === 'cs' ? '🎯 CS' : '⭐ All';
     badge.innerHTML = `<span style="background:#1B6B2F;color:#fff;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;">${roleLabel}: ${currentStaff.full_name||currentStaff.username}</span>`;
   }
 }
@@ -3395,6 +3629,7 @@ async function rejectDeposit(id, nick) {
     row.style.transform = 'translateX(30px)';
   }
   await sb.from('deposits').update({ status: 'rejected', reason: reason || '' }).eq('id', id);
+  if (currentStaff) await logStaffAction(currentStaff.username, 'reject_deposit', `ปฏิเสธคำขอเติมเงินของ ${nick}${reason ? ' เหตุผล: '+reason : ''}`);
   showToast(`❌ ปฏิเสธคำขอเติมเงินของ ${nick} แล้วครับ`);
   // รอ animation เสร็จแล้วค่อย reload
   setTimeout(() => { loadDeposits(); loadOverview(); }, 450);
@@ -3636,6 +3871,7 @@ async function rejectWithdrawal(id, nick, amount) {
   const {data:mem} = await sb.from('members').select('balance').eq('nick',nick).maybeSingle();
   if (mem) await sb.from('members').update({ balance: (mem.balance||0)+Number(amount) }).eq('nick',nick);
   await sb.from('withdrawals').update({ status:'rejected', reason: reason||'' }).eq('id',id);
+  if (currentStaff) await logStaffAction(currentStaff.username, 'reject_withdrawal', `ปฏิเสธถอนเงิน ${Number(amount).toLocaleString()} ₭ ของ ${nick}${reason ? ' เหตุผล: '+reason : ''}`);
   showToast(`❌ ปฏิเสธ + คืนเงิน ${Number(amount).toLocaleString()} ₭ ให้ ${nick} แล้วครับ`);
   setTimeout(() => { loadWithdrawals(); loadOverview(); loadMembers(); }, 450);
 }
@@ -4311,7 +4547,9 @@ function renderStaffTable() {
   }
   const roleLabel = r => r === 'financial'
     ? '<span style="background:#dcfce7;color:#15803d;font-family:\'Kanit\',sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;">💰 Financial</span>'
-    : '<span style="background:#eff6ff;color:#1d4ed8;font-family:\'Kanit\',sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;">🎯 CS</span>';
+    : r === 'cs'
+    ? '<span style="background:#eff6ff;color:#1d4ed8;font-family:\'Kanit\',sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;">🎯 CS</span>'
+    : '<span style="background:#fef9c3;color:#a16207;font-family:\'Kanit\',sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;">⭐ Financial+CS</span>';
 
   tb.innerHTML = _allStaff.map((s,i) => `
     <tr style="${i%2===1?'background:#fafaf8;':''}">
@@ -4328,6 +4566,7 @@ function renderStaffTable() {
       <td style="font-size:11px;color:#aaa;">${s.last_login ? fmtDate(s.last_login) : 'ยังไม่เคย'}</td>
       <td>
         <div style="display:flex;gap:4px;">
+          <button class="btn" onclick="openStaffProfile('${s.id}','${s.username}','${s.full_name||s.username}','${s.role}')" style="font-size:11px;padding:4px 9px;background:#1B6B2F;color:#fff;border-color:#1B6B2F;">👁 ดูประวัติ</button>
           <button class="btn btn-gold" onclick="editStaffPass('${s.id}','${s.username}')" style="font-size:11px;padding:4px 9px;">🔑 รีเซ็ต</button>
           <button class="btn btn-red" onclick="deleteStaff('${s.id}','${s.username}')" style="font-size:11px;padding:4px 9px;">🗑</button>
         </div>
@@ -4393,7 +4632,7 @@ function filterStaffLogs() {
   tb.innerHTML = logs.map((l,i) => `
     <tr style="${i%2===1?'background:#fafaf8;':''}">
       <td style="font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-weight:700;font-size:13px;">${l.staff_username}</td>
-      <td style="font-size:11px;color:#888;">${_allStaff.find(s=>s.username===l.staff_username)?.role==='financial'?'💰 Financial':l.staff_username==='admin'?'👑 Admin':'🎯 CS'}</td>
+      <td style="font-size:11px;color:#888;">${(()=>{const r=_allStaff.find(s=>s.username===l.staff_username)?.role;return l.staff_username==='admin'?'👑 Admin':r==='financial'?'💰 Financial':r==='cs'?'🎯 CS':'⭐ All';})()} </td>
       <td style="font-size:12px;">${actionIcon(l.action)} ${l.detail||l.action}</td>
       <td style="text-align:right;font-size:11px;color:#aaa;">${fmtDate(l.created_at)}</td>
     </tr>`).join('');
@@ -4409,6 +4648,261 @@ async function loadStaffLogs() {
   _allStaffLogs = data || [];
   filterStaffLogs();
 }
+
+
+// ════════════════════════════════════════
+// WORKLOG PANEL
+// ════════════════════════════════════════
+let _allWorkLogs  = [];
+let _wlActiveType = '';
+
+function _wlCategory(action) {
+  if (!action) return 'system';
+  if (action.includes('deposit'))                                   return 'deposit';
+  if (action.includes('withdrawal') || action.includes('withdraw')) return 'withdrawal';
+  if (action.includes('match'))   return 'match';
+  if (action.includes('verdict')) return 'verdict';
+  if (action.includes('member'))  return 'member';
+  if (action.includes('bet') || action.includes('p2p')) return 'p2p';
+  if (action.includes('activity')) return 'activity';
+  return 'system';
+}
+const _wlCatLabel = { deposit:'💰 เติมเงิน', withdrawal:'🏧 ถอนเงิน', match:'🏆 คู่แข่งขัน', verdict:'⚖️ ตัดสินผล', member:'👥 สมาชิก', p2p:'🎯 P2P', activity:'🎉 กิจกรรม', system:'🔑 ระบบ' };
+const _wlCatColor = { deposit:'#16a34a', withdrawal:'#dc2626', match:'#d97706', verdict:'#7c3aed', member:'#2563eb', p2p:'#0891b2', activity:'#db2777', system:'#6b7280' };
+
+async function loadWorklogPanel() {
+  const tb = document.getElementById('wl-tbody');
+  if (tb) tb.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px;color:#aaa;">⏳ กำลังโหลด...</td></tr>';
+  const [logsRes, staffRes] = await Promise.all([
+    sb.from('staff_logs').select('*').order('created_at',{ascending:false}).limit(500),
+    sb.from('staff').select('id,username,full_name,role'),
+  ]);
+  _allWorkLogs = logsRes.data || [];
+  const sel = document.getElementById('wl-staff');
+  if (sel) {
+    const staffList = staffRes.data || [];
+    sel.innerHTML = '<option value="">👤 พนักงานทุกคน</option>' +
+      ['admin',...staffList.map(s=>s.username)].map(u =>
+        `<option value="${u}">${u==='admin'?'👑 admin (Super Admin)':u}</option>`
+      ).join('');
+  }
+  renderWorklog();
+}
+
+function setWorklogTab(btn, type) {
+  _wlActiveType = type;
+  document.querySelectorAll('.wl-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const sel = document.getElementById('wl-type'); if(sel) sel.value = type;
+  renderWorklog();
+}
+
+function clearWorklogFilter() {
+  ['wl-search','wl-from','wl-to'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  const s=document.getElementById('wl-staff');if(s)s.value='';
+  const t=document.getElementById('wl-type');if(t)t.value='';
+  _wlActiveType='';
+  document.querySelectorAll('.wl-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.wl-tab[data-type=""]')?.classList.add('active');
+  renderWorklog();
+}
+
+function renderWorklog() {
+  const q    = (document.getElementById('wl-search')?.value||'').toLowerCase();
+  const staff= document.getElementById('wl-staff')?.value||'';
+  const type = document.getElementById('wl-type')?.value||_wlActiveType||'';
+  const from = document.getElementById('wl-from')?.value||'';
+  const to   = document.getElementById('wl-to')?.value||'';
+  const tb   = document.getElementById('wl-tbody');
+  const empty= document.getElementById('wl-empty');
+  const cnt  = document.getElementById('wl-count');
+  if (!tb) return;
+  let logs = _allWorkLogs.filter(l => {
+    const dt=l.created_at?.slice(0,10)||'';
+    const cat=_wlCategory(l.action);
+    if (staff && l.staff_username!==staff) return false;
+    if (type  && cat!==type)  return false;
+    if (from  && dt<from)     return false;
+    if (to    && dt>to)       return false;
+    if (q && !l.staff_username?.toLowerCase().includes(q) && !l.detail?.toLowerCase().includes(q) && !l.action?.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if (cnt) cnt.textContent = `${logs.length} รายการ`;
+  if (!logs.length) { tb.innerHTML=''; if(empty) empty.style.display='block'; return; }
+  if (empty) empty.style.display='none';
+  tb.innerHTML = logs.map((l,i) => {
+    const cat=_wlCategory(l.action);
+    const label=_wlCatLabel[cat]||cat;
+    const color=_wlCatColor[cat]||'#888';
+    const roleLabel=l.staff_username==='admin'?'👑 Super Admin':'👤 Staff';
+    return `<tr style="${i%2===1?'background:#fafaf8;':''}">
+      <td style="padding:10px 12px;font-family:'Kanit',sans-serif;font-weight:700;font-size:13px;white-space:nowrap;">${l.staff_username||'—'}</td>
+      <td style="padding:10px 12px;font-size:11px;color:#888;white-space:nowrap;">${roleLabel}</td>
+      <td style="padding:10px 12px;white-space:nowrap;"><span style="background:${color}18;color:${color};border:1px solid ${color}33;border-radius:999px;padding:2px 10px;font-size:11px;font-weight:700;">${label}</span></td>
+      <td style="padding:10px 12px;font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:13px;max-width:360px;">${l.detail||l.action||'—'}</td>
+      <td style="padding:10px 12px;text-align:right;font-size:11px;color:#aaa;white-space:nowrap;">${fmtDate(l.created_at)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════
+// STAFF PROFILE MODAL
+// ════════════════════════════════════════
+let _spLogs=[], _spTabType='', _spUsername='';
+
+function _spCat(action) {
+  if (!action) return 'system';
+  if (action.includes('deposit'))                                   return 'deposit';
+  if (action.includes('withdrawal') || action.includes('withdraw')) return 'withdrawal';
+  if (action.includes('match'))    return 'match';
+  if (action.includes('verdict'))  return 'verdict';
+  if (action.includes('member'))   return 'member';
+  if (action.includes('bet') || action.includes('p2p')) return 'p2p';
+  if (action.includes('activity')) return 'activity';
+  return 'system';
+}
+const _spCatLabel = { deposit:'💰 เติมเงิน', withdrawal:'🏧 ถอนเงิน', match:'🏆 คู่แข่งขัน', verdict:'⚖️ ตัดสินผล', member:'👥 สมาชิก', p2p:'🎯 P2P', activity:'🎉 กิจกรรม', system:'🔑 ระบบ' };
+const _spCatColor = { deposit:'#16a34a', withdrawal:'#dc2626', match:'#d97706', verdict:'#7c3aed', member:'#2563eb', p2p:'#0891b2', activity:'#db2777', system:'#6b7280' };
+
+async function openStaffProfile(id, username, fullname, role) {
+  _spUsername=username; _spTabType='';
+  const modal=document.getElementById('staff-profile-modal');
+  modal.style.display='block';
+  document.getElementById('sp-avatar').textContent=(fullname||username).slice(0,1).toUpperCase();
+  document.getElementById('sp-name').textContent=fullname||username;
+  document.getElementById('sp-role-badge').textContent=role==='financial'?'💰 Financial Staff':role==='cs'?'🎯 Customer Service':role==='all'?'⭐ Financial + CS':'👑 Super Admin';
+  const staffObj=_allStaff?.find(s=>s.id===id||s.username===username);
+  document.getElementById('sp-status-badge').textContent=staffObj?.is_active?'✅ ใช้งานอยู่':'⏸ ปิดใช้งาน';
+  document.querySelectorAll('.sp-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.sp-tab[data-tab="all"]')?.classList.add('active');
+  ['sp-search','sp-from','sp-to'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  const tb=document.getElementById('sp-tbody');
+  if(tb) tb.innerHTML='<tr><td colspan="3" style="text-align:center;padding:40px;color:#aaa;">⏳ กำลังโหลด...</td></tr>';
+  const {data}=await sb.from('staff_logs').select('*').eq('staff_username',username).order('created_at',{ascending:false}).limit(500);
+  _spLogs=data||[];
+  document.getElementById('sp-stat-total').textContent=_spLogs.length;
+  document.getElementById('sp-stat-dep').textContent=_spLogs.filter(l=>l.action==='approve_deposit').length;
+  document.getElementById('sp-stat-with').textContent=_spLogs.filter(l=>l.action==='approve_withdrawal').length;
+  document.getElementById('sp-stat-last').textContent=_spLogs[0]?.created_at?fmtDate(_spLogs[0].created_at):'—';
+  renderSpLogs();
+}
+
+function closeStaffProfile() {
+  document.getElementById('staff-profile-modal').style.display='none';
+  _spLogs=[]; _spUsername=''; _spTabType='';
+}
+
+function switchSpTab(btn,type) {
+  _spTabType=type;
+  document.querySelectorAll('.sp-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSpLogs();
+}
+
+function clearSpFilter() {
+  ['sp-search','sp-from','sp-to'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  renderSpLogs();
+}
+
+function renderSpLogs() {
+  const q   =(document.getElementById('sp-search')?.value||'').toLowerCase();
+  const from=document.getElementById('sp-from')?.value||'';
+  const to  =document.getElementById('sp-to')?.value||'';
+  const tb  =document.getElementById('sp-tbody');
+  const empty=document.getElementById('sp-empty');
+  const cnt =document.getElementById('sp-count');
+  if(!tb) return;
+  let logs=_spLogs.filter(l=>{
+    const dt=l.created_at?.slice(0,10)||'';
+    const cat=_spCat(l.action);
+    if(_spTabType && cat!==_spTabType) return false;
+    if(from && dt<from) return false;
+    if(to   && dt>to)   return false;
+    if(q && !l.detail?.toLowerCase().includes(q) && !l.action?.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if(cnt) cnt.textContent=`${logs.length} รายการ`;
+  if(!logs.length){tb.innerHTML='';if(empty)empty.style.display='block';return;}
+  if(empty) empty.style.display='none';
+  tb.innerHTML=logs.map((l,i)=>{
+    const cat=_spCat(l.action);
+    const label=_spCatLabel[cat]||cat;
+    const color=_spCatColor[cat]||'#888';
+    return `<tr style="${i%2===1?'background:#fafaf8;':''}">
+      <td style="padding:10px 12px;white-space:nowrap;"><span style="background:${color}18;color:${color};border:1px solid ${color}33;border-radius:999px;padding:2px 10px;font-size:11px;font-weight:700;">${label}</span></td>
+      <td style="padding:10px 12px;font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:13px;max-width:400px;">${l.detail||l.action||'—'}</td>
+      <td style="padding:10px 12px;text-align:right;font-size:11px;color:#aaa;white-space:nowrap;">${fmtDate(l.created_at)}</td>
+    </tr>`;
+  }).join('');
+}
+
+document.addEventListener('click',function(e){
+  const modal=document.getElementById('staff-profile-modal');
+  if(modal && e.target===modal) closeStaffProfile();
+});
+
+
+// ════════════════════════════════════════
+// TX LIMITS — วงเงินเติม/ถอน
+// ════════════════════════════════════════
+async function loadTxLimits() {
+  const { data } = await sb.from('settings').select('value').eq('key','txLimits').maybeSingle();
+  const lim = data?.value || {};
+  const setVal = (id, val, def) => {
+    const el = document.getElementById(id);
+    if (el) el.value = (val !== undefined && val !== null) ? val : def;
+  };
+  setVal('txl-dep-min',  lim.depMin,  100);
+  setVal('txl-dep-max',  lim.depMax,  0);
+  setVal('txl-with-min', lim.withMin, 100);
+  setVal('txl-with-max', lim.withMax, 0);
+  updateTxPreview();
+}
+
+function updateTxPreview() {
+  const depMin  = parseInt(document.getElementById('txl-dep-min')?.value)  || 0;
+  const depMax  = parseInt(document.getElementById('txl-dep-max')?.value)  || 0;
+  const withMin = parseInt(document.getElementById('txl-with-min')?.value) || 0;
+  const withMax = parseInt(document.getElementById('txl-with-max')?.value) || 0;
+  const el = document.getElementById('txl-preview');
+  if (!el) return;
+  const fmt = n => n ? n.toLocaleString() + ' ₭' : 'ไม่จำกัด';
+  el.style.display = 'block';
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div>💰 เติมเงิน: <b>${depMin.toLocaleString()} ₭</b> – <b>${fmt(depMax)}</b></div>
+      <div>🏧 ถอนเงิน: <b>${withMin.toLocaleString()} ₭</b> – <b>${fmt(withMax)}</b></div>
+    </div>`;
+}
+
+async function saveTxLimits() {
+  const depMin  = parseInt(document.getElementById('txl-dep-min')?.value)  || 100;
+  const depMax  = parseInt(document.getElementById('txl-dep-max')?.value)  || 0;
+  const withMin = parseInt(document.getElementById('txl-with-min')?.value) || 100;
+  const withMax = parseInt(document.getElementById('txl-with-max')?.value) || 0;
+
+  if (depMin < 1)               { showToast('⚠️ เติมเงินขั้นต่ำต้องมากกว่า 0 ครับ'); return; }
+  if (depMax && depMax < depMin) { showToast('⚠️ เติมเงินสูงสุดต้องมากกว่าขั้นต่ำครับ'); return; }
+  if (withMin < 1)               { showToast('⚠️ ถอนเงินขั้นต่ำต้องมากกว่า 0 ครับ'); return; }
+  if (withMax && withMax < withMin) { showToast('⚠️ ถอนเงินสูงสุดต้องมากกว่าขั้นต่ำครับ'); return; }
+
+  const value = { depMin, depMax, withMin, withMax };
+  const { error } = await sb.from('settings')
+    .upsert({ key: 'txLimits', value }, { onConflict: 'key' });
+
+  if (error) { showToast('❌ บันทึกไม่สำเร็จ: ' + error.message); return; }
+  showToast('✅ บันทึกวงเงินเรียบร้อยแล้วครับ');
+  updateTxPreview();
+  await logStaffAction('admin', 'update_tx_limits',
+    `ตั้งค่าวงเงิน เติม ${depMin.toLocaleString()}-${depMax||'∞'} ₭ / ถอน ${withMin.toLocaleString()}-${withMax||'∞'} ₭`);
+}
+
+// โหลดค่าเมื่อเปิด tab bank
+const _origSwitchCfgTab = window.switchCfgTab;
+window.switchCfgTab = function(tabId) {
+  _origSwitchCfgTab(tabId);
+  if (tabId === 'bank') { loadBankAccounts(); loadTxLimits(); }
+};
 
 async function logStaffAction(username, action, detail='') {
   try { await sb.from('staff_logs').insert({ staff_username: username, action, detail }); } catch(_) {}
@@ -4503,6 +4997,16 @@ function updateRefRatePreview(rate) {
   el.innerHTML = `<div>ตัวอย่างเติมเงิน <b>1,000 ₭</b></div>
     <div style="color:#60a5fa;margin-top:3px;">คอมฯ ผู้แนะนำ = <b>+${com.toLocaleString()} ₭</b></div>
     <div style="font-size:11px;color:#aaa;margin-top:2px;">จ่ายทันทีตอน Admin อนุมัติ</div>`;
+}
+
+
+function switchCfgTab(tabId) {
+  document.querySelectorAll('.cfg-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.cfg-pane').forEach(p => p.classList.remove('active'));
+  const tab  = document.getElementById('cfg-tab-' + tabId);
+  const pane = document.getElementById('cfg-pane-' + tabId);
+  if (tab)  tab.classList.add('active');
+  if (pane) pane.classList.add('active');
 }
 
 async function saveSettings(type) {
