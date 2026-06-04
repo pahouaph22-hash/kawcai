@@ -2011,18 +2011,19 @@ fns.forEach(function(fn){
 
   /* MODAL bull photo */
   .modal-bull-photo {
-    width: 90px;
-    height: 90px;
-    border-radius: 12px;
+    width: 100px;
+    height: 100px;
+    border-radius: 14px;
     overflow: hidden;
-    border: 2px solid rgba(245,168,0,0.3);
-    background: rgba(255,255,255,0.04);
+    border: 2px solid rgba(245,168,0,0.4);
+    background: linear-gradient(135deg,rgba(245,168,0,0.08),rgba(0,0,0,0.3));
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 10px;
     cursor: pointer;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
   }
   .modal-bull-photo:hover { border-color: var(--gold); }
   .modal-bull-photo img { width: 100%; height: 100%; object-fit: cover; }
@@ -2723,7 +2724,7 @@ input, textarea, select, button {
         <div class="modal-bull">
           <div class="modal-bull-photo" onclick="document.getElementById('modal-img-a').click()">
             <img id="modal-photo-a" src="" style="display:none">
-            <div class="modal-bull-photo-placeholder" id="modal-placeholder-a">🐂</div>
+            <div class="modal-bull-photo-placeholder" id="modal-placeholder-a" style="display:none;"></div>
           </div>
           <input type="file" id="modal-img-a" accept="image/*" style="display:none" onchange="loadModalPhoto(this,'modal-photo-a','modal-placeholder-a')">
           <div class="modal-bull-name" id="m-bull-a">เจ้าพายุ</div>
@@ -2734,7 +2735,7 @@ input, textarea, select, button {
         <div class="modal-bull">
           <div class="modal-bull-photo" onclick="document.getElementById('modal-img-b').click()">
             <img id="modal-photo-b" src="" style="display:none">
-            <div class="modal-bull-photo-placeholder" id="modal-placeholder-b">🐃</div>
+            <div class="modal-bull-photo-placeholder" id="modal-placeholder-b" style="display:none;"></div>
           </div>
           <input type="file" id="modal-img-b" accept="image/*" style="display:none" onchange="loadModalPhoto(this,'modal-photo-b','modal-placeholder-b')">
           <div class="modal-bull-name" id="m-bull-b">ดำมหากาฬ</div>
@@ -3680,7 +3681,7 @@ input, textarea, select, button {
         </div>
 
         <label style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;color:rgba(240,255,232,0.45);letter-spacing:.5px;margin-bottom:6px;display:block;">ระบุจำนวนเงินที่ต้องการเติม</label>
-        <input class="acc-input" type="number" id="dep-amount" placeholder="ขั้นต่ำ 100 ₭" min="1" oninput="updateDepAmount()">
+        <input class="acc-input" type="number" id="dep-amount" placeholder="ขั้นต่ำ 100 ₭" min="100" oninput="updateDepAmount()">
 
         <!-- Quick amount -->
         <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
@@ -3744,13 +3745,12 @@ input, textarea, select, button {
                     <div style="font-size:11px;color:rgba(240,255,232,0.4);font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;margin-top:6px;">
                       ชื่อบัญชี: <span style="color:var(--cream);font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-weight:500;" id="dep-acc-name">—</span>
                     </div>
-                    <div id="dep-bank-note-wrap" style="display:none;font-size:11px;color:rgba(240,255,232,0.35);margin-top:4px;"><span id="dep-acc-note"></span></div>
+                    <div id="dep-bank-note-wrap" style="display:none;font-size:11px;color:rgba(240,255,232,0.35);margin-top:4px;"></div>
                   </div>
                 </div>
               </div>
             </div>
           </div><!-- /dep-bank-info-wrap -->
-        </div><!-- /bank-wrapper margin-bottom:16px -->
 
         <!-- คำแนะนำ -->
         <div class="acc-notice" style="margin-bottom:14px;">
@@ -3844,22 +3844,15 @@ input, textarea, select, button {
           <div style="text-align:left;">
             <div style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;color:rgba(240,255,232,0.45);margin-bottom:6px;letter-spacing:.5px;">ผูกบัญชีธนาคาร</div>
             <select class="acc-input" id="bind-bank-name" style="margin-bottom:8px;">
-              <option value="">ເລືອກທະນາຄານ / เลือกธนาคาร</option>
-              <optgroup label="🇱🇦 ທະນາຄານລາວ">
-                <option value="BCEL">ທະນາຄານການຄ້າຕ່າງປະເທດລາວ (BCEL)</option>
-                <option value="LDB">ທະນາຄານພັດທະນາລາວ (LDB)</option>
-                <option value="LVB">ທະນາຄານລາວ-ຫວຽດ (LVB)</option>
-                <option value="APB">ທະນາຄານສົ່ງເສີມກະສິກຳ (APB)</option>
-                <option value="JCBL">ທະນາຄານຮ່ວມທຸລະກິດລາວ-ຈີນ (JCBL)</option>
-                <option value="BIC">ທະນາຄານລົງທຶນ ແລະ ການຄ້າ (BIC)</option>
-                <option value="LaoVietBank">ທະນາຄານລາວ ຫວຽດ (Lao Viet Bank)</option>
-                <option value="MARUHAN">ທະນາຄານມາຣູຮານ ຈາປັນ ລາວ (MARUHAN)</option>
-                <option value="ACLEDA">ທະນາຄານ ACLEDA ລາວ</option>
-                <option value="PHONGSAVANH">ທະນາຄານໂພນສະຫວັນ (Phongsavanh Bank)</option>
-              </optgroup>
-              <optgroup label="💳 ອື່ນໆ / อื่นๆ">
-                <option value="other">ອື່ນໆ / อื่นๆ / Other</option>
-              </optgroup>
+              <option value="">เลือกธนาคาร</option>
+              <option>กสิกรไทย (KBank)</option>
+              <option>ไทยพาณิชย์ (SCB)</option>
+              <option>กรุงเทพ (BBL)</option>
+              <option>กรุงศรีอยุธยา (BAY)</option>
+              <option>กรุงไทย (KTB)</option>
+              <option>ทหารไทยธนชาต (TTB)</option>
+              <option>PromptPay / พร้อมเพย์</option>
+              <option>อื่นๆ</option>
             </select>
             <input class="acc-input" type="text" id="bind-bank-accno" placeholder="เลขบัญชี เช่น 123-4-56789-0" style="margin-bottom:8px;">
             <input class="acc-input" type="text" id="bind-bank-accname" placeholder="ชื่อเจ้าของบัญชี (ตรงกับสมุดบัญชี)" style="margin-bottom:12px;">
@@ -3890,7 +3883,7 @@ input, textarea, select, button {
         <!-- ฟอร์มถอนเงิน -->
         <div class="money-form" style="background:transparent;padding:0;">
           <label style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;color:rgba(240,255,232,0.45);letter-spacing:.5px;margin-bottom:6px;display:block;">จำนวนเงินที่ต้องการถอน</label>
-          <input class="acc-input" type="number" id="with-amount" placeholder="ขั้นต่ำ 100 ₭" min="1">
+          <input class="acc-input" type="number" id="with-amount" placeholder="ขั้นต่ำ 100 ₭" min="100">
           <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
             <button onclick="setWithAmount(100)" style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:12px;font-weight:700;padding:6px 14px;border-radius:7px;border:1px solid rgba(248,113,113,0.3);background:transparent;color:rgba(240,255,232,0.6);cursor:pointer;">100</button>
             <button onclick="setWithAmount(500)" style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:12px;font-weight:700;padding:6px 14px;border-radius:7px;border:1px solid rgba(248,113,113,0.3);background:transparent;color:rgba(240,255,232,0.6);cursor:pointer;">500</button>
@@ -5442,36 +5435,103 @@ function applyLang() {
   window.openHistoryDetail = window._real_openHistoryDetail = function openHistoryDetail(m) {
     const isWinA = m.winner === m.name_a;
     const isWinB = m.winner === m.name_b;
+    const winnerName  = m.winner || '—';
+    const winnerOwner = isWinA ? (m.owner_a||'') : isWinB ? (m.owner_b||'') : '';
+    const winnerPhoto = isWinA ? m.photo_a : isWinB ? m.photo_b : '';
+    const loserPhoto  = isWinA ? m.photo_b : isWinB ? m.photo_a : '';
+    const loserName   = isWinA ? (m.name_b||'—') : (m.name_a||'—');
+    const loserOwner  = isWinA ? (m.owner_b||'') : (m.owner_a||'');
+
+    // ── winner photo HTML ──
+    const winPhotoHtml = winnerPhoto
+      ? `<img src="${winnerPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+      : `<span style="font-size:80px;line-height:1;">🐂</span>`;
+    const losPhotoHtml = loserPhoto
+      ? `<img src="${loserPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;filter:grayscale(60%) brightness(0.7);">`
+      : `<span style="font-size:36px;line-height:1;filter:grayscale(60%);">🐂</span>`;
+
     const ov = document.createElement('div');
-    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;display:flex;align-items:center;justify-content:center;padding:16px;';
-    ov.onclick=e=>{if(e.target===ov)ov.remove();};
-    ov.innerHTML=`<div style="background:#0d2b14;border:1px solid rgba(245,200,66,0.3);border-radius:16px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:24px;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:16px;">
-        <div><div style="font-family:Kanit,sans-serif;font-weight:900;font-size:16px;color:var(--gold);">${m.round||'—'}</div>${m.code?`<div style="font-size:11px;color:rgba(240,255,232,0.4);letter-spacing:2px;">#${m.code}</div>`:''}</div>
-        <button onclick="this.closest('[style]').remove()" style="background:none;border:none;color:rgba(240,255,232,0.4);font-size:22px;cursor:pointer;">×</button>
-      </div>
-      <div style="background:linear-gradient(135deg,rgba(39,148,63,0.25),rgba(245,200,66,0.1));border:1px solid rgba(245,200,66,0.3);border-radius:10px;padding:14px;margin-bottom:16px;text-align:center;">
-        <div style="font-size:28px;margin-bottom:4px;">🏆</div>
-        <div style="font-family:Kanit,sans-serif;font-size:12px;color:rgba(240,255,232,0.5);">ผู้ชนะ</div>
-        <div style="font-family:Kanit,sans-serif;font-weight:900;font-size:22px;color:var(--gold);">${m.winner||'—'}</div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-        <div style="background:${isWinA?'rgba(39,148,63,0.15)':'rgba(0,0,0,0.2)'};border:1px solid ${isWinA?'rgba(245,200,66,0.4)':'rgba(255,255,255,0.06)'};border-radius:10px;padding:12px;text-align:center;">
-          <div style="font-size:20px;">🔴</div><div style="font-family:Kanit,sans-serif;font-weight:900;font-size:14px;color:${isWinA?'var(--gold)':'var(--cream)'};">${m.name_a||'—'} ${isWinA?'🏆':''}</div>
-          <div style="font-size:11px;color:rgba(240,255,232,0.4);">${m.owner_a||''}</div>
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);';
+    ov.onclick = e => { if (e.target === ov) ov.remove(); };
+
+    ov.innerHTML = `
+      <div style="background:linear-gradient(175deg,#0a1f0e 0%,#071409 60%,#030d04 100%);border:1px solid rgba(245,200,66,0.35);border-radius:20px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;position:relative;overflow-x:hidden;">
+
+        <!-- ── shimmer top border ── -->
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#F5A800,#FFD700,#F5A800,transparent);border-radius:20px 20px 0 0;"></div>
+
+        <!-- ── header: round + code ── -->
+        <div style="padding:22px 24px 0;display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div style="font-family:Kanit,sans-serif;font-size:11px;font-weight:700;color:rgba(245,200,66,0.55);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">GRAND CHAMPION</div>
+            <div style="font-family:Kanit,sans-serif;font-weight:900;font-size:18px;color:var(--gold);line-height:1.2;">${m.round||'—'}</div>
+            ${m.code ? `<div style="font-size:10px;color:rgba(240,255,232,0.3);letter-spacing:2px;margin-top:2px;">#${m.code}</div>` : ''}
+          </div>
+          <button onclick="this.closest('[style*=fixed]').remove()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(240,255,232,0.5);font-size:18px;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
         </div>
-        <div style="background:${isWinB?'rgba(39,148,63,0.15)':'rgba(0,0,0,0.2)'};border:1px solid ${isWinB?'rgba(245,200,66,0.4)':'rgba(255,255,255,0.06)'};border-radius:10px;padding:12px;text-align:center;">
-          <div style="font-size:20px;">🔵</div><div style="font-family:Kanit,sans-serif;font-weight:900;font-size:14px;color:${isWinB?'var(--gold)':'var(--cream)'};">${m.name_b||'—'} ${isWinB?'🏆':''}</div>
-          <div style="font-size:11px;color:rgba(240,255,232,0.4);">${m.owner_b||''}</div>
+
+        <!-- ── VICTORY banner ── -->
+        <div style="text-align:center;padding:18px 24px 0;">
+          <div style="font-family:Kanit,sans-serif;font-size:11px;font-weight:700;color:rgba(245,200,66,0.6);letter-spacing:4px;margin-bottom:6px;">✦ VICTORY ✦</div>
+
+          <!-- Winner photo BIG -->
+          <div style="position:relative;display:inline-block;margin-bottom:14px;">
+            <div style="width:160px;height:160px;border-radius:50%;border:4px solid #F5A800;box-shadow:0 0 40px rgba(245,200,66,0.5),0 0 80px rgba(245,200,66,0.2);background:rgba(245,200,66,0.08);display:flex;align-items:center;justify-content:center;overflow:hidden;margin:0 auto;">
+              ${winPhotoHtml}
+            </div>
+            <!-- crown -->
+            <div style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:36px;filter:drop-shadow(0 0 8px rgba(245,200,66,0.8));">👑</div>
+            <!-- glow ring -->
+            <div style="position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(245,200,66,0.2);animation:none;"></div>
+          </div>
+
+          <!-- winner name -->
+          <div style="font-family:Kanit,sans-serif;font-weight:900;font-size:28px;color:#FFD700;text-shadow:0 0 20px rgba(245,200,66,0.7),0 2px 4px rgba(0,0,0,0.8);letter-spacing:1px;line-height:1.1;margin-bottom:4px;">${winnerName}</div>
+          <div style="font-family:'Phetsarath','Noto Sans Lao',Kanit,sans-serif;font-size:13px;color:rgba(240,255,232,0.5);margin-bottom:6px;">OWNER: ${winnerOwner||'—'}</div>
+
+          <!-- prize badge -->
+          <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(245,200,66,0.15),rgba(245,200,66,0.05));border:1px solid rgba(245,200,66,0.4);border-radius:999px;padding:8px 20px;margin-bottom:18px;">
+            <span style="font-size:16px;">💰</span>
+            <span style="font-family:Kanit,sans-serif;font-weight:900;font-size:20px;color:var(--gold);">${Number(m.prize||0).toLocaleString()} ₭</span>
+          </div>
         </div>
-      </div>
-      ${[['📅 วันที่',m.date||'—'],['🕐 เวลา',m.time||'—'],['📍 สถานที่',m.location||'—'],['💰 รางวัล',Number(m.prize||0).toLocaleString()+' ₭']].map(([k,v])=>`
-        <div style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(0,0,0,0.2);border-radius:8px;margin-bottom:6px;">
-          <span style="font-size:12px;color:rgba(240,255,232,0.5);">${k}</span>
-          <span style="font-family:Kanit,sans-serif;font-weight:700;color:var(--cream);">${v}</span>
-        </div>`).join('')}
-      <button onclick="this.closest('[style]').remove()" style="width:100%;margin-top:14px;font-family:Kanit,sans-serif;font-weight:700;font-size:13px;padding:12px;border-radius:10px;border:1px solid rgba(39,148,63,0.4);background:transparent;color:rgba(240,255,232,0.6);cursor:pointer;">ปิด</button>
-    </div>`;
+
+        <!-- ── VS divider ── -->
+        <div style="display:flex;align-items:center;gap:12px;padding:0 24px;margin-bottom:14px;">
+          <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(245,200,66,0.3));"></div>
+          <div style="font-family:Kanit,sans-serif;font-size:11px;font-weight:700;color:rgba(245,200,66,0.4);letter-spacing:3px;">VS</div>
+          <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(245,200,66,0.3),transparent);"></div>
+        </div>
+
+        <!-- ── loser card ── -->
+        <div style="margin:0 24px 18px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:14px;">
+          <div style="width:62px;height:62px;border-radius:50%;border:2px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+            ${losPhotoHtml}
+          </div>
+          <div>
+            <div style="font-size:10px;font-family:Kanit,sans-serif;color:rgba(240,255,232,0.3);letter-spacing:2px;margin-bottom:2px;">❌ DEFEATED</div>
+            <div style="font-family:Kanit,sans-serif;font-weight:700;font-size:15px;color:rgba(240,255,232,0.45);">${loserName}</div>
+            <div style="font-size:11px;color:rgba(240,255,232,0.25);">owner: ${loserOwner||'—'}</div>
+          </div>
+        </div>
+
+        <!-- ── match info ── -->
+        <div style="margin:0 24px 20px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          ${[['📅','วันที่',m.date||'—'],['⏰','เวลา',m.time||'—'],['📍','สถานที่',m.location||'—'],['🏷️','รุ่น',m.round||'—']].map(([ico,k,v])=>`
+          <div style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;">
+            <div style="font-size:10px;color:rgba(240,255,232,0.35);font-family:Kanit,sans-serif;margin-bottom:3px;">${ico} ${k}</div>
+            <div style="font-family:Kanit,sans-serif;font-weight:700;font-size:13px;color:rgba(240,255,232,0.8);">${v}</div>
+          </div>`).join('')}
+        </div>
+
+        <!-- ── close button ── -->
+        <div style="padding:0 24px 24px;">
+          <button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;font-family:'Phetsarath','Noto Sans Lao',Kanit,sans-serif;font-weight:700;font-size:14px;padding:13px;border-radius:12px;border:1px solid rgba(245,200,66,0.3);background:rgba(245,200,66,0.08);color:rgba(245,200,66,0.8);cursor:pointer;transition:all .15s;">
+            ✕ ปิด
+          </button>
+        </div>
+
+      </div>`;
     document.body.appendChild(ov);
   }
   window.hideHistory = window._real_hideHistory = function hideHistory() {
@@ -6229,24 +6289,6 @@ function applyLang() {
   let notifications  = [];
   let _depBanks      = [];   // บัญชีรับเงินที่ active
   let _depBankIdx    = 0;    // index ที่เลือกอยู่
-
-  // ── TX LIMITS ──
-  let _txLimits = { depMin:100, depMax:0, withMin:100, withMax:0 };
-
-  async function _loadTxLimits() {
-    try {
-      const { data } = await sb.from('settings').select('value').eq('key','txLimits').maybeSingle();
-      if (data?.value) {
-        _txLimits = { depMin:100, depMax:0, withMin:100, withMax:0, ...data.value };
-        // อัปเดต placeholder
-        const dEl = document.getElementById('dep-amount');
-        const wEl = document.getElementById('with-amount');
-        if (dEl) dEl.placeholder = `ขั้นต่ำ ${(_txLimits.depMin||100).toLocaleString()} ₭`;
-        if (wEl) wEl.placeholder = `ขั้นต่ำ ${(_txLimits.withMin||100).toLocaleString()} ₭`;
-      }
-    } catch(_) {}
-  }
-
   let _notifFilter   = '';
 
   window.toggleNotifCenter = window._real_toggleNotifCenter = function toggleNotifCenter() {
@@ -7093,7 +7135,6 @@ setInterval(() => {
 
     loadDashboard();
     loadDepBanks();
-    _loadTxLimits();
 
     // ── โหลดข้อมูลล่าสุดจาก Supabase ใน background ──
     try {
@@ -7160,12 +7201,7 @@ setInterval(() => {
   async function loadDepBanks() {
     try {
       const { data, error } = await sb.from('settings').select('value').eq('key','bankAccounts').maybeSingle();
-      if (error || !data) {
-        console.warn('[loadDepBanks]', error?.message || 'no data');
-        const wrapNoData = document.getElementById('dep-bank-info-wrap');
-        if (wrapNoData) wrapNoData.innerHTML = '<div style="text-align:center;padding:20px;background:rgba(248,113,113,0.08);border-radius:12px;border:1px solid rgba(248,113,113,0.2);"><div style="font-size:24px;margin-bottom:8px;">⚠️</div><div style="font-family:Kanit,sans-serif;font-size:13px;color:rgba(240,255,232,0.6);">ไม่สามารถโหลดบัญชีรับเงินได้<br>กรุณารีเฟรชหรือติดต่อ Admin ครับ</div></div>';
-        return;
-      }
+      if (error || !data) return;
 
       const banksData   = data.value?.accounts || [];
       const activeBanks = banksData.filter(b => b.active === true);
@@ -7186,11 +7222,7 @@ setInterval(() => {
             </div>`;
         }
       }
-    } catch(err) {
-      console.error('[loadDepBanks]', err);
-      const wrapErr = document.getElementById('dep-bank-info-wrap');
-      if (wrapErr) wrapErr.innerHTML = '<div style="text-align:center;padding:20px;background:rgba(248,113,113,0.08);border-radius:12px;border:1px solid rgba(248,113,113,0.2);"><div style="font-size:24px;margin-bottom:8px;">⚠️</div><div style="font-family:Kanit,sans-serif;font-size:13px;color:rgba(240,255,232,0.6);">โหลดบัญชีไม่สำเร็จ กรุณารีเฟรชหรือติดต่อ Admin ครับ</div></div>';
-    }
+    } catch(_) {}
     // ── ยืนยันว่า step1 ยังแสดงอยู่เสมอหลัง loadDepBanks ──
     const s1 = document.getElementById('dep-step1');
     if (s1 && s1.style.display === 'none') s1.style.display = 'block';
@@ -7203,12 +7235,8 @@ setInterval(() => {
   }
 
   function goDepStep2() {
-    const amt    = parseInt(document.getElementById('dep-amount').value) || 0;
-    const dMin   = _txLimits.depMin  || 100;
-    const dMax   = _txLimits.depMax  || 0;
-    if (amt < dMin) { showFEToast(`⚠️ จำนวนเงินขั้นต่ำสำหรับเติมเงินคือ ${dMin.toLocaleString()} ₭ ครับ`); return; }
-    if (dMax && amt > dMax) { showFEToast(`⚠️ จำนวนเงินสูงสุดสำหรับเติมเงินคือ ${dMax.toLocaleString()} ₭ ครับ`); return; }
-    if (!_depBanks || _depBanks.length === 0) { showFEToast('⚠️ ยังไม่มีบัญชีรับเงิน กรุณาติดต่อ Admin ครับ'); return; }
+    const amt = parseInt(document.getElementById('dep-amount').value) || 0;
+    if (amt < 100) { showFEToast('⚠️ กรุณาระบุจำนวนเงินขั้นต่ำ 100 ₭ครับ'); return; }
     const fmt = amt.toLocaleString() + ' ₭';
     document.getElementById('dep-confirm-amount').textContent  = fmt;
     document.getElementById('dep-notice-amount').textContent   = amt.toLocaleString() + ' ₭';
@@ -7292,20 +7320,6 @@ setInterval(() => {
     if (noteWrap && noteEl) {
       if (b.note) { noteEl.textContent = `📌 ${b.note}`; noteWrap.style.display = 'block'; }
       else         { noteWrap.style.display = 'none'; }
-    }
-
-    // QR Code
-    const qrImg = document.getElementById('dep-qr-img');
-    const qrPh  = document.getElementById('dep-qr-placeholder');
-    if (qrImg && qrPh) {
-      if (b.qrUrl) {
-        qrImg.src = b.qrUrl;
-        qrImg.style.display = 'block';
-        qrPh.style.display  = 'none';
-      } else {
-        qrImg.style.display = 'none';
-        qrPh.style.display  = 'block';
-      }
     }
   }
 
@@ -7463,10 +7477,7 @@ setInterval(() => {
       return;
     }
     if (!currentUser.bank_accno) { showFEToast('⚠️ กรุณาผูกบัญชีธนาคารก่อนครับ'); return; }
-    const wMin = _txLimits.withMin || 100;
-    const wMax = _txLimits.withMax || 0;
-    if (!amount || amount < wMin) { showFEToast(`⚠️ จำนวนเงินขั้นต่ำสำหรับถอนเงินคือ ${wMin.toLocaleString()} ₭ ครับ`); return; }
-    if (wMax && amount > wMax) { showFEToast(`⚠️ จำนวนเงินสูงสุดสำหรับถอนเงินคือ ${wMax.toLocaleString()} ₭ ครับ`); return; }
+    if (!amount || amount < 100) { showFEToast('⚠️ กรุณาใส่จำนวนเงินขั้นต่ำ 100 ₭ครับ'); return; }
     if (amount > balance) { showFEToast(`❌ ยอดเงินไม่เพียงพอครับ (คงเหลือ: ${balance.toLocaleString()} ₭)`); return; }
 
     const txn  = genTxnFE(9);
@@ -7818,8 +7829,8 @@ setInterval(() => {
   window.submitDeposit = window._real_submitDeposit = async function submitDeposit() {
     const amount  = parseInt(document.getElementById('dep-amount').value);
     const bank    = document.getElementById('dep-bank-from').value;
-    const slipFile = document.getElementById('dep-slip-file')?.files?.[0];
-    const hasSlip = !!(slipFile && slipFile.size > 0);
+    const slipImg = document.getElementById('dep-slip-preview');
+    const hasSlip = slipImg && slipImg.src && slipImg.src !== window.location.href && slipImg.style.display !== 'none' && slipImg.src.length > 10;
     if (!amount || amount < 100) { showFEToast('⚠️ กรุณาระบุจำนวนเงินขั้นต่ำ 100 ₭ครับ'); return; }
     if (!bank)    { showFEToast('⚠️ กรุณาเลือกธนาคารที่โอนจากครับ'); return; }
     if (!hasSlip) { showFEToast('⚠️ กรุณาแนบสลิปการโอนเงินครับ'); return; }
@@ -7836,6 +7847,7 @@ setInterval(() => {
 
     // ── Upload สลิปขึ้น Supabase Storage ──
     let slip_url = '';
+    const slipFile = document.getElementById('dep-slip-file')?.files?.[0];
     if (slipFile) {
       // ตรวจขนาดไฟล์ไม่เกิน 5MB
       if (slipFile.size > 5 * 1024 * 1024) {
@@ -8561,18 +8573,52 @@ setInterval(() => {
   };
 
   window.openModal = window._real_openModal = function openModal(d) {
-    document.getElementById('m-round').textContent = d.round;
-    document.getElementById('m-bull-a').textContent = d.bullA;
-    document.getElementById('m-owner-a').textContent = 'เจ้าของ: ' + d.ownerA;
+    document.getElementById('m-round').textContent    = d.round;
+    document.getElementById('m-bull-a').textContent   = d.bullA;
+    document.getElementById('m-owner-a').textContent  = 'เจ้าของ: ' + d.ownerA;
     document.getElementById('m-weight-a').textContent = d.weightA;
-    document.getElementById('m-bull-b').textContent = d.bullB;
-    document.getElementById('m-owner-b').textContent = 'เจ้าของ: ' + d.ownerB;
+    document.getElementById('m-bull-b').textContent   = d.bullB;
+    document.getElementById('m-owner-b').textContent  = 'เจ้าของ: ' + d.ownerB;
     document.getElementById('m-weight-b').textContent = d.weightB;
-    document.getElementById('m-date').textContent = d.date;
-    document.getElementById('m-time').textContent = d.time;
-    document.getElementById('m-loc').textContent = d.loc;
-    document.getElementById('m-prize').textContent = d.prize;
+    document.getElementById('m-date').textContent     = d.date;
+    document.getElementById('m-time').textContent     = d.time;
+    document.getElementById('m-loc').textContent      = d.loc;
+    document.getElementById('m-prize').textContent    = d.prize;
+
+    // ── แสดงรูปวัวจากฐานข้อมูล ──
+    const imgA = document.getElementById('modal-photo-a');
+    const phA  = document.getElementById('modal-placeholder-a');
+    const imgB = document.getElementById('modal-photo-b');
+    const phB  = document.getElementById('modal-placeholder-b');
+
+    function _setPhoto(img, ph, url) {
+      if (url && url.trim() && url !== '🐂' && url !== '🐃') {
+        img.src = url;
+        img.style.display = 'block';
+        if (ph) ph.style.display = 'none';
+        // ถ้าโหลดรูปไม่ได้ fallback
+        img.onerror = () => { img.style.display = 'none'; if(ph) ph.style.display = 'flex'; };
+      } else {
+        img.src = '';
+        img.style.display = 'none';
+        if (ph) ph.style.display = 'none'; // ซ่อน emoji ด้วย
+      }
+    }
+    _setPhoto(imgA, phA, d.photoA);
+    _setPhoto(imgB, phB, d.photoB);
+
+    // ปิด onclick file picker เมื่อมีรูปจาก DB แล้ว
+    const wrapA = imgA.closest('.modal-bull-photo');
+    const wrapB = imgB.closest('.modal-bull-photo');
+    if (wrapA) wrapA.onclick = d.photoA ? null : () => document.getElementById('modal-img-a').click();
+    if (wrapB) wrapB.onclick = d.photoB ? null : () => document.getElementById('modal-img-b').click();
+
+    // ── winner highlight ──
     const wb = document.getElementById('m-winner-bar');
+    const bullNameA = document.getElementById('m-bull-a');
+    const bullNameB = document.getElementById('m-bull-b');
+    if (bullNameA) bullNameA.classList.toggle('winner', d.winner && d.winner === d.bullA);
+    if (bullNameB) bullNameB.classList.toggle('winner', d.winner && d.winner === d.bullB);
     if (d.winner) {
       wb.style.display = 'block';
       document.getElementById('m-winner-name').textContent = d.winner;
