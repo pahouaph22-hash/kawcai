@@ -38,12 +38,20 @@ body{font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Sarabun',sans-serif;
 #notif-badge{display:none;position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:9px;font-weight:900;padding:1px 5px;border-radius:999px;min-width:16px;text-align:center;}
 .logout-btn{background:rgba(255,255,255,.08);color:rgba(255,248,236,.6);font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:12px;padding:6px 14px;border:1px solid rgba(255,255,255,.15);border-radius:6px;cursor:pointer;}
 .main-layout{display:flex;flex-direction:column;flex:1;overflow:hidden;}
+/* ── Top Navbar (เมนูหลัก) ── */
 .navbar{background:#fff;border-bottom:2px solid #e5e5e0;padding:0 20px;display:flex;align-items:center;gap:2px;overflow-x:auto;flex-shrink:0;-webkit-overflow-scrolling:touch;}
 .navbar::-webkit-scrollbar{display:none;}
-.sb-section{font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:10px;font-weight:700;color:#ccc;letter-spacing:1px;padding:0 10px;white-space:nowrap;align-self:center;}
-.sb-item{display:flex;align-items:center;gap:6px;padding:14px 14px;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:13px;font-weight:500;color:#666;cursor:pointer;transition:all .15s;border-bottom:3px solid transparent;white-space:nowrap;flex-shrink:0;}
+.sb-section{font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:10px;font-weight:700;color:#ccc;letter-spacing:1px;padding:0 10px;white-space:nowrap;align-self:center;}
+.sb-item{display:flex;align-items:center;gap:6px;padding:14px 14px;font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:13px;font-weight:500;color:#666;cursor:pointer;transition:all .15s;border-bottom:3px solid transparent;white-space:nowrap;flex-shrink:0;}
 .sb-item:hover{color:#333;background:#f9f9f9;}
 .sb-item.active{color:var(--green);border-bottom-color:var(--green);font-weight:700;background:#f0faf4;}
+/* ── Sidebar (เมนูรอง) ── */
+.sidebar{width:200px;flex-shrink:0;background:#f7f7f5;border-right:1px solid #e5e5e0;overflow-y:auto;display:flex;flex-direction:column;}
+.sidebar-section{font-family:'Kanit',sans-serif;font-size:10px;font-weight:700;color:#bbb;letter-spacing:.08em;padding:14px 16px 6px;text-transform:uppercase;}
+.side-item{display:flex;align-items:center;gap:9px;padding:11px 16px;font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:13px;font-weight:600;color:#555;cursor:pointer;transition:all .15s;border-left:3px solid transparent;white-space:nowrap;}
+.side-item:hover{background:#efefed;color:#222;}
+.side-item.active{background:#fff;color:#1B6B2F;border-left-color:#1B6B2F;font-weight:700;}
+/* ── Content ── */
 .content-area{flex:1;overflow-y:auto;padding:24px;}
 .panel{display:none;}
 .panel.active{display:block;}
@@ -204,6 +212,30 @@ tr:hover td{background:#fafafa;}
   }
   .sb-item.active{ border-bottom:3px solid var(--green) !important; }
   .sb-section{ display:none; }
+  /* sidebar → horizontal scroll strip on mobile */
+  .sidebar{
+    width:100% !important;
+    flex-direction:row !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    border-right:none !important;
+    border-bottom:2px solid #e5e5e0;
+    padding:0 4px;
+    flex-shrink:0;
+    max-height:46px;
+  }
+  .sidebar-section{ display:none; }
+  .side-item{
+    padding:10px 14px;
+    font-size:11px;
+    white-space:nowrap;
+    flex-shrink:0;
+    border-left:none !important;
+    border-bottom:3px solid transparent;
+  }
+  .side-item.active{ border-bottom:3px solid #1B6B2F !important; color:#1B6B2F; background:#f0faf4; }
+  /* main-layout กลับเป็น column บน mobile */
+  .main-layout{ flex-direction:column !important; }
 
   /* ── Content ── */
   .content{ padding:12px 10px; min-width:0; }
@@ -300,6 +332,26 @@ input, textarea, select, button {
   .cfg-tab.active { background: #fff; color: #1B6B2F; border-left-color: #1B6B2F; }
   .cfg-pane { display: none; }
   .cfg-pane.active { display: block; }
+
+  /* ── Match Sub-nav ── */
+  .match-nav-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 11px 16px;
+    font-family: 'Phetsarath','Noto Sans Lao','Kanit',sans-serif;
+    font-size: 13px; font-weight: 600; color: #555;
+    cursor: pointer; transition: all .15s;
+    border-left: 3px solid transparent;
+  }
+  .match-nav-item:hover { background: #ededeb; color: #222; }
+  .match-nav-item.active { background: #fff; color: #1B6B2F; border-left-color: #1B6B2F; font-weight: 700; }
+  .match-sec { display: none; }
+  .match-sec.active { display: block; }
+  @media(max-width:700px) {
+    #panel-matches .panel-layout-inner { flex-direction: column; }
+    #panel-matches .match-subnav { width:100%;flex-direction:row;border-right:none;border-bottom:1px solid #e5e5e0;overflow-x:auto;display:flex; }
+    .match-nav-item { border-left:none;border-bottom:3px solid transparent;white-space:nowrap;flex-shrink:0; }
+    .match-nav-item.active { border-bottom-color:#1B6B2F;border-left-color:transparent;background:#f0faf4; }
+  }
 </style>
 </head>
 <body>
@@ -337,6 +389,7 @@ input, textarea, select, button {
   </div>
 
   <div class="main-layout">
+    <!-- ── Top Navbar: เมนูหลัก ── -->
     <div class="navbar">
       <div class="sb-item active" data-panel="overview" onclick="switchPanel('overview')">📊 ภาพรวม</div>
       <div class="sb-item" data-panel="members" onclick="switchPanel('members')">👥 สมาชิก</div>
@@ -352,9 +405,10 @@ input, textarea, select, button {
       <div class="sb-item" data-panel="news" onclick="switchPanel('news')">📰 ข่าวสาร</div>
       <div class="sb-item" id="sb-worklog" data-panel="worklog" onclick="switchPanel('worklog');loadWorklogPanel();">📋 ประวัติการดำเนินงาน</div>
       <div class="sb-item" data-panel="settings" id="sb-settings" onclick="switchPanel('settings')">⚙️ ตั้งค่า</div>
-      <!-- เมนูพนักงาน — เฉพาะ Super Admin -->
       <div class="sb-item" id="sb-staff" data-panel="staff" onclick="switchPanel('staff');loadStaffPanel();" style="display:none;border-left:3px solid #8b5cf6;">👨‍💼 พนักงาน</div>
     </div>
+
+    <div class="content-area">
 
     <div class="content-area">
 
@@ -605,6 +659,27 @@ input, textarea, select, button {
 
       <!-- MATCHES -->
       <div class="panel" id="panel-matches">
+        <div class="panel-layout-inner" style="display:flex;gap:0;background:#fff;border-radius:12px;border:1px solid #e5e5e0;overflow:hidden;min-height:560px;">
+
+          <!-- ── Sub-nav ซ้าย ── -->
+          <div class="match-subnav" style="width:185px;flex-shrink:0;background:#f7f7f5;border-right:1px solid #e5e5e0;padding:8px 0;">
+            <div style="font-family:'Kanit',sans-serif;font-size:10px;font-weight:700;color:#bbb;letter-spacing:.08em;padding:10px 16px 6px;text-transform:uppercase;">คู่แข่งขัน</div>
+            <div class="match-nav-item active" onclick="switchMatchSec('add')" id="mnav-add">➕ เพิ่มคู่แข่งขัน</div>
+            <div class="match-nav-item" onclick="switchMatchSec('active')" id="mnav-active" style="justify-content:space-between;">
+              <span>🏆 รายการแข่งขัน</span>
+              <span id="mtab-active-count" style="font-size:10px;color:#aaa;"></span>
+            </div>
+            <div class="match-nav-item" onclick="switchMatchSec('done')" id="mnav-done" style="justify-content:space-between;">
+              <span>✅ จบการแข่งขัน</span>
+              <span id="mtab-done-count" style="font-size:10px;color:#aaa;"></span>
+            </div>
+          </div>
+
+          <!-- ── Content ── -->
+          <div style="flex:1;padding:20px 24px;overflow-y:auto;min-width:0;max-height:80vh;">
+
+            <!-- Pane 1: เพิ่มคู่แข่งขัน -->
+            <div id="match-sec-add" class="match-sec active">
         <div class="card">
           <div class="card-title">➕ เพิ่มคู่แข่งขัน</div>
           <div class="form-row">
@@ -666,191 +741,266 @@ input, textarea, select, button {
           </div>
           <button class="save-btn" onclick="addMatch()">➕ เพิ่มคู่แข่งขัน</button>
         </div>
-
-        <div class="card">
-          <!-- Tab header -->
-          <div style="display:flex;border-bottom:2px solid #e5e5e0;margin-bottom:0;gap:0;">
-            <button id="mtab-active" onclick="switchMatchTab('active')"
-              style="flex:1;padding:11px 16px;border:none;border-bottom:3px solid #1B6B2F;background:#fff;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-weight:700;font-size:13px;color:#1B6B2F;cursor:pointer;">
-              🏆 รายการแข่งขัน
-              <span id="mtab-active-count" style="font-size:11px;color:#aaa;font-weight:400;margin-left:4px;"></span>
-            </button>
-            <button id="mtab-done" onclick="switchMatchTab('done')"
-              style="flex:1;padding:11px 16px;border:none;border-bottom:3px solid transparent;background:#fff;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-weight:700;font-size:13px;color:#888;cursor:pointer;">
-              ✅ จบการแข่งขัน
-              <span id="mtab-done-count" style="font-size:11px;color:#aaa;font-weight:400;margin-left:4px;"></span>
-            </button>
-          </div>
-
-          <!-- Search + filter bar (shared) -->
-          <div style="padding:12px 0 8px;">
-            <div class="search-bar" style="margin:0 0 8px;">
-              <input class="search-input" id="match-search" placeholder="ค้นหาวัว / รุ่น / รหัส..." oninput="filterMatches_()">
             </div>
-            <div class="date-filter">
-              <label>📅 วันที่แข่ง</label>
-              <input type="date" class="date-input" id="match-date-from" onchange="filterMatches_()">
-              <label>ถึง</label>
-              <input type="date" class="date-input" id="match-date-to" onchange="filterMatches_()">
-              <button class="btn-date-today" onclick="setDateToday('match')">วันนี้</button>
-              <button class="btn-date-clear" onclick="clearDate('match')">✕ ล้าง</button>
-              <span class="date-tag" id="match-date-tag" style="display:none;"></span>
+
+            <!-- Pane 2: รายการแข่งขัน -->
+            <div id="match-sec-active" class="match-sec">
+              
+              <div id="matches-tab-active"></div>
             </div>
-          </div>
 
-          <!-- Tab: รายการแข่งขัน (upcoming + live) -->
-          <div id="matches-tab-active" style="overflow-x:auto;">
-            <div style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</div>
-          </div>
+            <!-- Pane 3: จบการแข่งขัน -->
+            <div id="match-sec-done" class="match-sec">
+              
+              <div id="matches-tab-done"></div>
+            </div>
 
-          <!-- Tab: จบการแข่งขัน (done) -->
-          <div id="matches-tab-done" style="display:none;overflow-x:auto;">
-            <div style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</div>
           </div>
         </div>
       </div>
+
+
 
       <!-- VERDICT -->
       <div class="panel" id="panel-verdict">
-        <div class="card">
-          <div class="card-title">⚖️ รอตัดสินผล
-            <button onclick="loadVerdict()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
-            <button onclick="loadVerdict()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button></div>
-          <div id="verdict-pending"><div style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</div></div>
-        </div>
-        <div class="card">
-          <div class="card-title">✅ ตัดสินแล้ว
-            <button onclick="loadVerdict()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
+        <div class="panel-layout-inner" style="display:flex;gap:0;background:#fff;border-radius:12px;border:1px solid #e5e5e0;overflow:hidden;min-height:500px;">
+
+          <!-- ── Sub-nav ซ้าย ── -->
+          <div class="match-subnav" style="width:185px;flex-shrink:0;background:#f7f7f5;border-right:1px solid #e5e5e0;padding:8px 0;">
+            <div style="font-family:'Kanit',sans-serif;font-size:10px;font-weight:700;color:#bbb;letter-spacing:.08em;padding:10px 16px 6px;text-transform:uppercase;">ตัดสินผล</div>
+            <div class="match-nav-item active" onclick="switchVerdictSec('pending')" id="vnav-pending">⏳ รอตัดสินผล</div>
+            <div class="match-nav-item" onclick="switchVerdictSec('done')" id="vnav-done">✅ ตัดสินแล้ว</div>
           </div>
-          <div id="verdict-done"><div style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</div></div>
+
+          <!-- ── Content ── -->
+          <div style="flex:1;padding:20px 24px;overflow-y:auto;min-width:0;max-height:80vh;">
+
+            <!-- Pane: รอตัดสิน -->
+            <div id="verdict-sec-pending" class="match-sec active">
+              <div class="card">
+                <div class="card-title">⚖️ รอตัดสินผล
+                  <button onclick="loadVerdict()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">🔄 รีเฟรช</button>
+                </div>
+                <div id="verdict-pending"><div style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</div></div>
+              </div>
+            </div>
+
+            <!-- Pane: ตัดสินแล้ว -->
+            <div id="verdict-sec-done" class="match-sec">
+              <div class="card">
+                <div class="card-title">✅ ตัดสินแล้ว
+                  <button onclick="loadVerdict()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">🔄 รีเฟรช</button>
+                </div>
+                <div id="verdict-done"><div style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</div></div>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
+
 
       <!-- DEPOSITS -->
       <div class="panel" id="panel-deposits">
-        <!-- รอดำเนินการ -->
-        <div class="card">
-          <div class="card-title">💰 คำขอเติมเงิน (รอดำเนินการ)
-            <button onclick="loadDeposits()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
-            <button onclick="filterDeposits()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
-            <span style="font-size:12px;color:#aaa;font-weight:400;" id="dep-pending-count"></span>
-          </div>
-          <div class="date-filter">
-            <label>📅 ตั้งแต่</label>
-            <input type="date" class="date-input" id="dep-date-from" onchange="filterDeposits()">
-            <label>ถึง</label>
-            <input type="date" class="date-input" id="dep-date-to" onchange="filterDeposits()">
-            <button class="btn-date-today" onclick="setDateToday('dep')">วันนี้</button>
-            <button class="btn-date-clear" onclick="clearDate('dep')">✕ ล้าง</button>
-            <span class="date-tag" id="dep-date-tag" style="display:none;"></span>
-          </div>
-          <div style="overflow-x:auto;">
-            <table>
-              <thead><tr><th>Nick</th><th style="text-align:right;">จำนวน (₭)</th><th>ธนาคาร</th><th>TXN</th><th style="text-align:center;">🧾 สลิป</th><th>เวลา</th><th>จัดการ</th></tr></thead>
-              <tbody id="dep-tbody"><tr><td colspan="7" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
-            </table>
-          </div>
-        </div>
+        <div class="panel-layout-inner" style="display:flex;gap:0;background:#fff;border-radius:12px;border:1px solid #e5e5e0;overflow:hidden;min-height:500px;">
 
-        <!-- เติมเงินสำเร็จ -->
-        <div class="card">
-          <div class="card-title" style="color:var(--green);">
-            ✅ เติมเงินสำเร็จ
-            <button onclick="filterDepDone()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
-            <span style="font-size:12px;color:#aaa;font-weight:400;" id="dep-done-count"></span>
+          <!-- ── Sub-nav ซ้าย ── -->
+          <div class="match-subnav" style="width:185px;flex-shrink:0;background:#f7f7f5;border-right:1px solid #e5e5e0;padding:8px 0;">
+            <div style="font-family:'Kanit',sans-serif;font-size:10px;font-weight:700;color:#bbb;letter-spacing:.08em;padding:10px 16px 6px;text-transform:uppercase;">เติมเงิน</div>
+            <div class="match-nav-item active" onclick="switchDepSec('pending')" id="dnav-pending" style="justify-content:space-between;">
+              <span>⏳ รอดำเนินการ</span>
+              <span id="dep-pending-count" style="font-size:10px;color:#aaa;"></span>
+            </div>
+            <div class="match-nav-item" onclick="switchDepSec('done')" id="dnav-done" style="justify-content:space-between;">
+              <span>✅ เติมเงินสำเร็จ</span>
+              <span id="dep-done-count" style="font-size:10px;color:#aaa;"></span>
+            </div>
+            <div class="match-nav-item" onclick="switchDepSec('reject')" id="dnav-reject" style="justify-content:space-between;">
+              <span>❌ ถูกปฏิเสธ</span>
+              <span id="dep-reject-count" style="font-size:10px;color:#aaa;"></span>
+            </div>
           </div>
-          <div class="date-filter">
-            <label>📅 ตั้งแต่</label>
-            <input type="date" class="date-input" id="dep-done-from" onchange="filterDepDone()">
-            <label>ถึง</label>
-            <input type="date" class="date-input" id="dep-done-to" onchange="filterDepDone()">
-            <button class="btn-date-today" onclick="setDateSection('dep-done')">วันนี้</button>
-            <button class="btn-date-today" style="background:#f0f4ff;border-color:#3b82f6;color:#3b82f6;" onclick="setMonthSection('dep-done')">เดือนนี้</button>
-            <button class="btn-date-clear" onclick="clearDateSection('dep-done')">✕ ล้าง</button>
-          </div>
-          <div style="overflow-x:auto;">
-            <table>
-              <thead><tr><th>Nick</th><th>จำนวน</th><th>ธนาคาร</th><th>TXN</th><th>อนุมัติเมื่อ</th></tr></thead>
-              <tbody id="dep-done-tbody"><tr><td colspan="5" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
-            </table>
-          </div>
-        </div>
 
-        <!-- ถูกปฏิเสธ -->
-        <div class="card">
-          <div class="card-title" style="color:#f87171;">
-            ❌ ถูกปฏิเสธ
-            <button onclick="filterDepReject()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
-            <span style="font-size:12px;color:#aaa;font-weight:400;" id="dep-reject-count"></span>
-          </div>
-          <div class="date-filter">
-            <label>📅 ตั้งแต่</label>
-            <input type="date" class="date-input" id="dep-reject-from" onchange="filterDepReject()">
-            <label>ถึง</label>
-            <input type="date" class="date-input" id="dep-reject-to" onchange="filterDepReject()">
-            <button class="btn-date-today" onclick="setDateSection('dep-reject')">วันนี้</button>
-            <button class="btn-date-today" style="background:#f0f4ff;border-color:#3b82f6;color:#3b82f6;" onclick="setMonthSection('dep-reject')">เดือนนี้</button>
-            <button class="btn-date-clear" onclick="clearDateSection('dep-reject')">✕ ล้าง</button>
-          </div>
-          <div style="overflow-x:auto;">
-            <table>
-              <thead><tr><th>Nick</th><th>จำนวน</th><th>เหตุผล</th><th>เวลา</th></tr></thead>
-              <tbody id="dep-reject-tbody"><tr><td colspan="4" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
-            </table>
+          <!-- ── Content ── -->
+          <div style="flex:1;padding:20px 24px;overflow-y:auto;min-width:0;max-height:80vh;">
+
+            <!-- Pane 1: รอดำเนินการ -->
+            <div id="dep-sec-pending" class="match-sec active">
+              <div class="card">
+                <div class="card-title">💰 คำขอเติมเงิน (รอดำเนินการ)
+                  <button onclick="loadDeposits()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
+                </div>
+                <div class="date-filter">
+                  <label>📅 ตั้งแต่</label>
+                  <input type="date" class="date-input" id="dep-date-from" onchange="filterDeposits()">
+                  <label>ถึง</label>
+                  <input type="date" class="date-input" id="dep-date-to" onchange="filterDeposits()">
+                  <button class="btn-date-today" onclick="setDateToday('dep')">วันนี้</button>
+                  <button class="btn-date-clear" onclick="clearDate('dep')">✕ ล้าง</button>
+                  <span class="date-tag" id="dep-date-tag" style="display:none;"></span>
+                </div>
+                <div style="overflow-x:auto;">
+                  <table>
+                    <thead><tr><th>Nick</th><th style="text-align:right;">จำนวน (₭)</th><th>ธนาคาร</th><th>TXN</th><th style="text-align:center;">🧾 สลิป</th><th>เวลา</th><th>จัดการ</th></tr></thead>
+                    <tbody id="dep-tbody"><tr><td colspan="7" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pane 2: เติมเงินสำเร็จ -->
+            <div id="dep-sec-done" class="match-sec">
+              <div class="card">
+                <div class="card-title" style="color:var(--green);">✅ เติมเงินสำเร็จ
+                  <button onclick="filterDepDone()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
+                </div>
+                <div class="date-filter">
+                  <label>📅 ตั้งแต่</label>
+                  <input type="date" class="date-input" id="dep-done-from" onchange="filterDepDone()">
+                  <label>ถึง</label>
+                  <input type="date" class="date-input" id="dep-done-to" onchange="filterDepDone()">
+                  <button class="btn-date-today" onclick="setDateSection('dep-done')">วันนี้</button>
+                  <button class="btn-date-today" style="background:#f0f4ff;border-color:#3b82f6;color:#3b82f6;" onclick="setMonthSection('dep-done')">เดือนนี้</button>
+                  <button class="btn-date-clear" onclick="clearDateSection('dep-done')">✕ ล้าง</button>
+                </div>
+                <div style="overflow-x:auto;">
+                  <table>
+                    <thead><tr><th>Nick</th><th>จำนวน</th><th>ธนาคาร</th><th>TXN</th><th>อนุมัติเมื่อ</th></tr></thead>
+                    <tbody id="dep-done-tbody"><tr><td colspan="5" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pane 3: ถูกปฏิเสธ -->
+            <div id="dep-sec-reject" class="match-sec">
+              <div class="card">
+                <div class="card-title" style="color:#f87171;">❌ ถูกปฏิเสธ
+                  <button onclick="filterDepReject()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
+                </div>
+                <div class="date-filter">
+                  <label>📅 ตั้งแต่</label>
+                  <input type="date" class="date-input" id="dep-reject-from" onchange="filterDepReject()">
+                  <label>ถึง</label>
+                  <input type="date" class="date-input" id="dep-reject-to" onchange="filterDepReject()">
+                  <button class="btn-date-today" onclick="setDateSection('dep-reject')">วันนี้</button>
+                  <button class="btn-date-today" style="background:#f0f4ff;border-color:#3b82f6;color:#3b82f6;" onclick="setMonthSection('dep-reject')">เดือนนี้</button>
+                  <button class="btn-date-clear" onclick="clearDateSection('dep-reject')">✕ ล้าง</button>
+                </div>
+                <div style="overflow-x:auto;">
+                  <table>
+                    <thead><tr><th>Nick</th><th>จำนวน</th><th>เหตุผล</th><th>เวลา</th></tr></thead>
+                    <tbody id="dep-reject-tbody"><tr><td colspan="4" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
+
 
       <!-- WITHDRAWALS -->
       <div class="panel" id="panel-withdrawals">
-        <!-- คำขอรอดำเนินการ -->
-        <div class="card">
-          <div class="card-title">🏧 คำขอถอนเงิน (รอดำเนินการ)
-            <button onclick="loadWithdrawals()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
-            <button onclick="filterWithdrawals()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
-            <span style="font-size:12px;color:#aaa;font-weight:400;" id="with-pending-count"></span>
-          </div>
-          <div class="date-filter">
-            <label>📅 ตั้งแต่</label>
-            <input type="date" class="date-input" id="with-date-from" onchange="filterWithdrawals()">
-            <label>ถึง</label>
-            <input type="date" class="date-input" id="with-date-to" onchange="filterWithdrawals()">
-            <button class="btn-date-today" onclick="setDateToday('with')">วันนี้</button>
-            <button class="btn-date-clear" onclick="clearDate('with')">✕ ล้าง</button>
-            <span class="date-tag" id="with-date-tag" style="display:none;"></span>
-          </div>
-          <div style="overflow-x:auto;">
-            <table>
-              <thead><tr><th>Nick</th><th>จำนวน</th><th>ธนาคาร</th><th>เลขบัญชี / ชื่อ</th><th>เวลา</th><th>จัดการ</th></tr></thead>
-              <tbody id="with-tbody"><tr><td colspan="6" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
-            </table>
-          </div>
-        </div>
+        <div class="panel-layout-inner" style="display:flex;gap:0;background:#fff;border-radius:12px;border:1px solid #e5e5e0;overflow:hidden;min-height:500px;">
 
-        <!-- ถอนเงินสำเร็จ -->
-        <div class="card">
-          <div class="card-title" style="color:var(--green);">
-            ✅ ถอนเงินสำเร็จ
-            <button onclick="filterWithDone()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
-            <span style="font-size:12px;color:#aaa;font-weight:400;" id="with-done-count"></span>
+          <!-- ── Sub-nav ซ้าย ── -->
+          <div class="match-subnav" style="width:185px;flex-shrink:0;background:#f7f7f5;border-right:1px solid #e5e5e0;padding:8px 0;">
+            <div style="font-family:'Kanit',sans-serif;font-size:10px;font-weight:700;color:#bbb;letter-spacing:.08em;padding:10px 16px 6px;text-transform:uppercase;">ถอนเงิน</div>
+            <div class="match-nav-item active" onclick="switchWithSec('pending')" id="wnav-pending" style="justify-content:space-between;">
+              <span>⏳ รอดำเนินการ</span>
+              <span id="with-pending-count" style="font-size:10px;color:#aaa;"></span>
+            </div>
+            <div class="match-nav-item" onclick="switchWithSec('done')" id="wnav-done" style="justify-content:space-between;">
+              <span>✅ ถอนเงินสำเร็จ</span>
+              <span id="with-done-count" style="font-size:10px;color:#aaa;"></span>
+            </div>
+            <div class="match-nav-item" onclick="switchWithSec('reject')" id="wnav-reject" style="justify-content:space-between;">
+              <span>❌ ถูกปฏิเสธ</span>
+              <span id="with-reject-count" style="font-size:10px;color:#aaa;"></span>
+            </div>
           </div>
-          <div class="date-filter">
-            <label>📅 ตั้งแต่</label>
-            <input type="date" class="date-input" id="with-done-from" onchange="filterWithDone()">
-            <label>ถึง</label>
-            <input type="date" class="date-input" id="with-done-to" onchange="filterWithDone()">
-            <button class="btn-date-today" onclick="setDateSection('with-done')">วันนี้</button>
-            <button class="btn-date-today" style="background:#f0f4ff;border-color:#3b82f6;color:#3b82f6;" onclick="setMonthSection('with-done')">เดือนนี้</button>
-            <button class="btn-date-clear" onclick="clearDateSection('with-done')">✕ ล้าง</button>
-          </div>
-          <div style="overflow-x:auto;">
-            <table>
-              <thead><tr><th>Nick</th><th>จำนวน</th><th>ธนาคาร</th><th>เลขบัญชี</th><th>สลิป</th><th>โอนเมื่อ</th></tr></thead>
-              <tbody id="with-done-tbody"><tr><td colspan="6" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
-            </table>
+
+          <!-- ── Content ── -->
+          <div style="flex:1;padding:20px 24px;overflow-y:auto;min-width:0;max-height:80vh;">
+
+            <!-- Pane 1: รอดำเนินการ -->
+            <div id="with-sec-pending" class="match-sec active">
+              <div class="card">
+                <div class="card-title">🏧 คำขอถอนเงิน (รอดำเนินการ)
+                  <button onclick="loadWithdrawals()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
+                </div>
+                <div class="date-filter">
+                  <label>📅 ตั้งแต่</label>
+                  <input type="date" class="date-input" id="with-date-from" onchange="filterWithdrawals()">
+                  <label>ถึง</label>
+                  <input type="date" class="date-input" id="with-date-to" onchange="filterWithdrawals()">
+                  <button class="btn-date-today" onclick="setDateToday('with')">วันนี้</button>
+                  <button class="btn-date-clear" onclick="clearDate('with')">✕ ล้าง</button>
+                  <span class="date-tag" id="with-date-tag" style="display:none;"></span>
+                </div>
+                <div style="overflow-x:auto;">
+                  <table>
+                    <thead><tr><th>Nick</th><th>จำนวน</th><th>ธนาคาร</th><th>เลขบัญชี / ชื่อ</th><th>เวลา</th><th>จัดการ</th></tr></thead>
+                    <tbody id="with-tbody"><tr><td colspan="6" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pane 2: ถอนเงินสำเร็จ -->
+            <div id="with-sec-done" class="match-sec">
+              <div class="card">
+                <div class="card-title" style="color:var(--green);">✅ ถอนเงินสำเร็จ
+                  <button onclick="filterWithDone()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
+                </div>
+                <div class="date-filter">
+                  <label>📅 ตั้งแต่</label>
+                  <input type="date" class="date-input" id="with-done-from" onchange="filterWithDone()">
+                  <label>ถึง</label>
+                  <input type="date" class="date-input" id="with-done-to" onchange="filterWithDone()">
+                  <button class="btn-date-today" onclick="setDateSection('with-done')">วันนี้</button>
+                  <button class="btn-date-today" style="background:#f0f4ff;border-color:#3b82f6;color:#3b82f6;" onclick="setMonthSection('with-done')">เดือนนี้</button>
+                  <button class="btn-date-clear" onclick="clearDateSection('with-done')">✕ ล้าง</button>
+                </div>
+                <div style="overflow-x:auto;">
+                  <table>
+                    <thead><tr><th>Nick</th><th>จำนวน</th><th>ธนาคาร</th><th>เลขบัญชี</th><th>สลิป</th><th>โอนเมื่อ</th></tr></thead>
+                    <tbody id="with-done-tbody"><tr><td colspan="6" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pane 3: ถูกปฏิเสธ -->
+            <div id="with-sec-reject" class="match-sec">
+              <div class="card">
+                <div class="card-title" style="color:#f87171;">❌ ถูกปฏิเสธ
+                  <button onclick="filterWithReject()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
+                </div>
+                <div class="date-filter">
+                  <label>📅 ตั้งแต่</label>
+                  <input type="date" class="date-input" id="with-reject-from" onchange="filterWithReject()">
+                  <label>ถึง</label>
+                  <input type="date" class="date-input" id="with-reject-to" onchange="filterWithReject()">
+                  <button class="btn-date-today" onclick="setDateSection('with-reject')">วันนี้</button>
+                  <button class="btn-date-today" style="background:#f0f4ff;border-color:#3b82f6;color:#3b82f6;" onclick="setMonthSection('with-reject')">เดือนนี้</button>
+                  <button class="btn-date-clear" onclick="clearDateSection('with-reject')">✕ ล้าง</button>
+                </div>
+                <div style="overflow-x:auto;">
+                  <table>
+                    <thead><tr><th>Nick</th><th>จำนวน</th><th>ธนาคาร</th><th>เหตุผล</th><th>เวลา</th></tr></thead>
+                    <tbody id="with-reject-tbody"><tr><td colspan="5" style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
+
 
       <!-- BETS -->
       <div class="panel" id="panel-bets">
@@ -883,17 +1033,37 @@ input, textarea, select, button {
 
       <!-- REFERRAL -->
       <div class="panel" id="panel-referral">
+        <div class="panel-layout-inner" style="display:flex;gap:0;background:#fff;border-radius:12px;border:1px solid #e5e5e0;overflow:hidden;min-height:500px;">
 
-        <!-- ── stat cards ── -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:0;">
+          <!-- ── Sub-nav ซ้าย ── -->
+          <div class="match-subnav" style="width:185px;flex-shrink:0;background:#f7f7f5;border-right:1px solid #e5e5e0;padding:8px 0;">
+            <div style="font-family:'Kanit',sans-serif;font-size:10px;font-weight:700;color:#bbb;letter-spacing:.08em;padding:10px 16px 6px;text-transform:uppercase;">แนะนำสมาชิก</div>
+            <div class="match-nav-item active" onclick="switchRefSec('stats')" id="rnav-stats">📊 ภาพรวมสถิติ</div>
+            <div class="match-nav-item" onclick="switchRefSec('summary')" id="rnav-summary">🏆 สรุปผู้แนะนำ</div>
+            <div class="match-nav-item" onclick="switchRefSec('logs')" id="rnav-logs">📋 ประวัติคอมมิชชัน</div>
+          </div>
+
+          <!-- ── Content ── -->
+          <div style="flex:1;padding:20px 24px;overflow-y:auto;min-width:0;max-height:80vh;">
+
+            <!-- Pane 1: ภาพรวมสถิติ -->
+            <div id="ref-sec-stats" class="match-sec active">
+              <div class="card">
+                <div class="card-title">📊 ภาพรวมระบบแนะนำสมาชิก
+                  <button onclick="loadReferralPanel()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">🔄 รีเฟรช</button>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:0;">
           <div class="stat-card"><div class="ico">🤝</div><div class="val" id="ref-total-referrers">—</div><div class="lbl">ผู้แนะนำทั้งหมด</div></div>
           <div class="stat-card"><div class="ico">👥</div><div class="val" id="ref-total-members">—</div><div class="lbl">สมาชิกที่ถูกแนะนำ</div></div>
           <div class="stat-card"><div class="ico">💰</div><div class="val" id="ref-total-commission">—</div><div class="lbl">คอมฯ จ่ายรวม (₭)</div></div>
           <div class="stat-card"><div class="ico">📋</div><div class="val" id="ref-total-logs">—</div><div class="lbl">รายการทั้งหมด</div></div>
         </div>
+              </div>
+            </div>
 
-        <!-- ── ตาราง: สรุปต่อผู้แนะนำ (Referrer Summary) ── -->
-        <div class="card">
+            <!-- Pane 2: สรุปผู้แนะนำ -->
+            <div id="ref-sec-summary" class="match-sec">
+              <div class="card">
           <div class="card-title">🏆 สรุปผู้แนะนำ — จำนวนสมาชิกที่แนะนำมา
             <button onclick="loadReferralPanel()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">🔄 รีเฟรช</button>
           </div>
@@ -931,9 +1101,11 @@ input, textarea, select, button {
           </div>
           <div id="ref-summary-footer" style="padding:8px 12px;font-size:11px;color:#aaa;border-top:1px solid #f0f0ee;"></div>
         </div>
+            </div>
 
-        <!-- ── ตาราง: ประวัติรายการคอมฯ ── -->
-        <div class="card">
+            <!-- Pane 3: ประวัติคอมมิชชัน -->
+            <div id="ref-sec-logs" class="match-sec">
+              <div class="card">
           <div class="card-title" style="margin-bottom:12px;">📋 ประวัติรายการคอมมิชชัน
             <button onclick="loadReferralPanel()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">🔄 รีเฟรช</button>
           </div>
@@ -987,15 +1159,32 @@ input, textarea, select, button {
           </div>
           <div id="ref-logs-footer2" style="padding:8px 12px;font-size:11px;color:#aaa;border-top:1px solid #f0f0ee;"></div>
         </div>
+            </div>
 
+          </div>
+        </div>
       </div>
+
       </div>
 
       <!-- ACTIVITY -->
       <div class="panel" id="panel-activity">
+        <div class="panel-layout-inner" style="display:flex;gap:0;background:#fff;border-radius:12px;border:1px solid #e5e5e0;overflow:hidden;min-height:500px;">
 
-        <!-- สร้างกิจกรรมใหม่ -->
-        <div class="card" style="border-left:4px solid #f59e0b;">
+          <!-- ── Sub-nav ซ้าย ── -->
+          <div class="match-subnav" style="width:185px;flex-shrink:0;background:#f7f7f5;border-right:1px solid #e5e5e0;padding:8px 0;">
+            <div style="font-family:'Kanit',sans-serif;font-size:10px;font-weight:700;color:#bbb;letter-spacing:.08em;padding:10px 16px 6px;text-transform:uppercase;">กิจกรรม</div>
+            <div class="match-nav-item active" onclick="switchActSec('create')" id="anav-create">🎉 สร้างกิจกรรม</div>
+            <div class="match-nav-item" onclick="switchActSec('history')" id="anav-history">📋 ประวัติกิจกรรม</div>
+            <div class="match-nav-item" onclick="switchActSec('commission')" id="anav-commission">🎁 ประวัติค่าคอมฯ</div>
+          </div>
+
+          <!-- ── Content ── -->
+          <div style="flex:1;padding:20px 24px;overflow-y:auto;min-width:0;max-height:80vh;">
+
+            <!-- Pane 1: สร้างกิจกรรม -->
+            <div id="act-sec-create" class="match-sec active">
+              <div class="card" style="border-left:4px solid #f59e0b;">
           <div class="card-title">🎉 สร้างกิจกรรมแจกรางวัล</div>
           <div style="font-size:12px;color:#888;margin-bottom:18px;">ตั้งชื่อกิจกรรม กำหนดเงินรางวัลแต่ละระดับ VIP แล้วกดส่ง — ยอดเงินจะเข้าบัญชีสมาชิกทันที</div>
 
@@ -1044,9 +1233,11 @@ input, textarea, select, button {
             🚀 ส่งรางวัลให้สมาชิกทันที
           </button>
         </div>
+            </div>
 
-        <!-- ประวัติกิจกรรม -->
-        <div class="card">
+            <!-- Pane 2: ประวัติกิจกรรม -->
+            <div id="act-sec-history" class="match-sec">
+              <div class="card">
           <div class="card-title">📋 ประวัติกิจกรรมที่ผ่านมา
             <button class="btn btn-primary" onclick="loadActivityLogs()">🔄 รีเฟรช</button>
           </div>
@@ -1060,9 +1251,11 @@ input, textarea, select, button {
             <div style="text-align:center;padding:32px;color:#aaa;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;">กำลังโหลด...</div>
           </div>
         </div>
+            </div>
 
-        <!-- กิจกรรมแนะนำเพื่อน — ประวัติค่าคอมมิชชัน -->
-        <div class="card" style="border-left:4px solid #60a5fa;">
+            <!-- Pane 3: ประวัติค่าคอมมิชชัน -->
+            <div id="act-sec-commission" class="match-sec">
+              <div class="card" style="border-left:4px solid #60a5fa;">
           <div class="card-title" style="color:#2563eb;">🎁 ประวัติค่าคอมมิชชันแนะนำเพื่อน
             <button class="btn btn-primary" onclick="loadRefCommissionLogs()">🔄 รีเฟรช</button>
           </div>
@@ -1109,11 +1302,23 @@ input, textarea, select, button {
             </table>
           </div>
         </div>
+            </div>
 
+          </div>
+        </div>
       </div>
+
 
       <!-- NEWS -->
       <div class="panel" id="panel-news">
+        <div class="panel-layout">
+          <div class="panel-subnav">
+            <div class="panel-subnav-title">NEWS</div>
+          <div class="sub-nav-item active" data-sec="news-add" onclick="switchSubNav('news','news-add')">✏️ เพิ่มข้อความ</div>
+          <div class="sub-nav-item" data-sec="news-list" onclick="switchSubNav('news','news-list')">📋 รายการทั้งหมด</div>
+          </div>
+          <div class="panel-subcontent">
+          <div class="sub-pane active" id="news-add">
         <div class="card">
           <div class="card-title">✏️ เพิ่มข้อความ Ticker</div>
           <div class="fg">
@@ -1131,16 +1336,33 @@ input, textarea, select, button {
           </div>
           <button class="save-btn" onclick="addNews()" style="margin-top:16px;">📢 เพิ่มข้อความ</button>
         </div>
+          </div>
+          <div class="sub-pane" id="news-list">
         <div class="card">
           <div class="card-title">📋 ข้อความทั้งหมด
             <button onclick="loadNews()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button>
             <button onclick="loadNews()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;">🔄 รีเฟรช</button> <span id="news-count" style="font-size:12px;color:#888;font-weight:400;"></span></div>
           <div id="news-list"><div style="text-align:center;padding:24px;color:#aaa;">กำลังโหลด...</div></div>
         </div>
+          </div>
+          </div>
+        </div>
       </div>
 
       <!-- SETTINGS -->
       <div class="panel" id="panel-settings">
+        <div class="panel-layout">
+          <div class="panel-subnav">
+            <div class="panel-subnav-title">SETTINGS</div>
+          <div class="sub-nav-item active" data-sec="cfg-siteinfo" onclick="switchSubNav('settings','cfg-siteinfo')">🐂 ชื่อเว็บ & โลโก้</div>
+          <div class="sub-nav-item" data-sec="cfg-p2p" onclick="switchSubNav('settings','cfg-p2p')">💹 ค่าบริการ P2P</div>
+          <div class="sub-nav-item" data-sec="cfg-referral" onclick="switchSubNav('settings','cfg-referral')">🎁 ระบบแนะนำ</div>
+          <div class="sub-nav-item" data-sec="cfg-bank" onclick="switchSubNav('settings','cfg-bank')">🏦 บัญชีรับเงิน</div>
+          <div class="sub-nav-item" data-sec="cfg-contact" onclick="switchSubNav('settings','cfg-contact')">📞 ข้อมูลติดต่อ</div>
+          <div class="sub-nav-item" data-sec="cfg-vip" onclick="switchSubNav('settings','cfg-vip')">👑 VIP & รหัสผ่าน</div>
+          </div>
+          <div class="panel-subcontent">
+          <div class="sub-pane active" id="cfg-siteinfo">
         <div style="display:grid;grid-template-columns:200px 1fr;gap:0;min-height:600px;background:#fff;border-radius:12px;border:1px solid #e5e5e0;overflow:hidden;">
 
           <!-- ── Sidebar Tabs ── -->
@@ -1468,6 +1690,24 @@ input, textarea, select, button {
           </div>
 
         </div>
+          </div>
+          <div class="sub-pane" id="cfg-p2p">
+
+          </div>
+          <div class="sub-pane" id="cfg-referral">
+
+          </div>
+          <div class="sub-pane" id="cfg-bank">
+
+          </div>
+          <div class="sub-pane" id="cfg-contact">
+
+          </div>
+          <div class="sub-pane" id="cfg-vip">
+
+          </div>
+          </div>
+        </div>
       </div>
       <!-- Security Card -->
       <div class="card" style="border-left:4px solid #e24b4a;">
@@ -1482,7 +1722,7 @@ input, textarea, select, button {
 
       <!-- ═══════ PANEL: ประวัติการดำเนินงาน ═══════ -->
       <div class="panel" id="panel-worklog">
-        <div class="panel-header"><h2 class="panel-title">📋 ประวัติการดำเนินงาน</h2></div>
+<div class="panel-header"><h2 class="panel-title">📋 ประวัติการดำเนินงาน</h2></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px;background:#fafaf8;border:1px solid #e5e5e0;border-radius:10px;padding:12px 16px;">
           <input type="text" id="wl-search" placeholder="🔍 ค้นหาชื่อพนักงาน..." oninput="renderWorklog()" style="padding:7px 12px;border:1px solid #ddd;border-radius:7px;font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:13px;min-width:180px;">
           <select id="wl-staff" onchange="renderWorklog()" style="padding:7px 12px;border:1px solid #ddd;border-radius:7px;font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:13px;"><option value="">👤 พนักงานทุกคน</option></select>
@@ -1525,21 +1765,46 @@ input, textarea, select, button {
             <tbody id="wl-tbody"><tr><td colspan="5" style="text-align:center;padding:32px;color:#aaa;">กำลังโหลด...</td></tr></tbody>
           </table>
         </div>
-        <div id="wl-empty" style="display:none;text-align:center;padding:40px;color:#aaa;font-family:'Kanit',sans-serif;"><div style="font-size:40px;margin-bottom:12px;">📭</div><div>ไม่พบประวัติครับ</div></div>
       </div>
+
 
       <!-- STAFF PANEL -->
       <div class="panel" id="panel-staff">
+        <div class="panel-layout-inner" style="display:flex;gap:0;background:#fff;border-radius:12px;border:1px solid #e5e5e0;overflow:hidden;min-height:500px;">
 
-        <!-- stat cards -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:0;">
+          <!-- ── Sub-nav ซ้าย ── -->
+          <div class="match-subnav" style="width:185px;flex-shrink:0;background:#f7f7f5;border-right:1px solid #e5e5e0;padding:8px 0;">
+            <div style="font-family:'Kanit',sans-serif;font-size:10px;font-weight:700;color:#bbb;letter-spacing:.08em;padding:10px 16px 6px;text-transform:uppercase;">พนักงาน</div>
+            <div class="match-nav-item active" onclick="switchStaffSec('overview')" id="sfnav-overview">📊 ภาพรวม</div>
+            <div class="match-nav-item" onclick="switchStaffSec('add')" id="sfnav-add">➕ เพิ่มพนักงานใหม่</div>
+            <div class="match-nav-item" onclick="switchStaffSec('list')" id="sfnav-list" style="justify-content:space-between;">
+              <span>👥 รายชื่อพนักงาน</span>
+              <span id="staff-total-badge" style="font-size:10px;color:#aaa;"></span>
+            </div>
+            <div class="match-nav-item" onclick="switchStaffSec('logs')" id="sfnav-logs">📋 Activity Log</div>
+            
+          </div>
+
+          <!-- ── Content ── -->
+          <div style="flex:1;padding:20px 24px;overflow-y:auto;min-width:0;max-height:80vh;">
+
+            <!-- Pane 1: ภาพรวม -->
+            <div id="staff-sec-overview" class="match-sec active">
+              <div class="card">
+                <div class="card-title">📊 ภาพรวมพนักงาน
+                  <button onclick="loadStaffPanel()" style="margin-left:auto;font-family:'Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">🔄 รีเฟรช</button>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:0;">
           <div class="stat-card"><div class="ico">👨‍💼</div><div class="val" id="staff-total">—</div><div class="lbl">พนักงานทั้งหมด</div></div>
           <div class="stat-card"><div class="ico">✅</div><div class="val" id="staff-active">—</div><div class="lbl">ใช้งานอยู่</div></div>
           <div class="stat-card"><div class="ico">📋</div><div class="val" id="staff-logs-count">—</div><div class="lbl">Log ทั้งหมด</div></div>
         </div>
+              </div>
+            </div>
 
-        <!-- เพิ่มพนักงาน -->
-        <div class="card" style="border-left:4px solid #8b5cf6;">
+            <!-- Pane 2: เพิ่มพนักงานใหม่ -->
+            <div id="staff-sec-add" class="match-sec">
+              <div class="card" style="border-left:4px solid #8b5cf6;">
           <div class="card-title">➕ เพิ่มพนักงานใหม่
             <button onclick="loadStaffPanel()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">🔄 รีเฟรช</button>
           </div>
@@ -1558,9 +1823,11 @@ input, textarea, select, button {
           </div>
           <button class="save-btn" onclick="addStaff()">💾 เพิ่มพนักงาน</button>
         </div>
+            </div>
 
-        <!-- รายชื่อพนักงาน -->
-        <div class="card">
+            <!-- Pane 3: รายชื่อพนักงาน -->
+            <div id="staff-sec-list" class="match-sec">
+              <div class="card">
           <div class="card-title">👥 รายชื่อพนักงาน</div>
           <div style="overflow-x:auto;">
             <table>
@@ -1575,9 +1842,11 @@ input, textarea, select, button {
             </table>
           </div>
         </div>
+            </div>
 
-        <!-- Activity Log -->
-        <div class="card">
+            <!-- Pane 4: Activity Log -->
+            <div id="staff-sec-logs" class="match-sec">
+              <div class="card">
           <div class="card-title">📋 Activity Log — ประวัติการทำงาน
             <button onclick="loadStaffLogs()" style="margin-left:auto;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border:1px solid #e0e0e0;border-radius:7px;background:#fff;color:#555;cursor:pointer;">🔄 รีเฟรช</button>
           </div>
@@ -1598,8 +1867,14 @@ input, textarea, select, button {
             </table>
           </div>
         </div>
+            </div>
 
+            
+
+          </div>
+        </div>
       </div>
+
 
     </div>
   </div>
@@ -1953,8 +2228,9 @@ function switchPanel(name) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
   document.getElementById('panel-'+name)?.classList.add('active');
-  document.querySelector(`[data-panel="${name}"]`)?.classList.add('active');
-  currentPanel = name;
+  document.querySelectorAll(`[data-panel="${name}"]`).forEach(el => el.classList.add('active'));
+  // เก็บ panel ปัจจุบัน
+  _currentPanel = name;
 }
 
 // ===== TOAST =====
@@ -2037,6 +2313,7 @@ function _callSectionFilter(section) {
     'dep-done':    filterDepDone,
     'dep-reject':  filterDepReject,
     'with-done':   filterWithDone,
+    'with-reject':  filterWithReject,
   };
   if (map[section]) map[section]();
 }
@@ -3055,6 +3332,25 @@ async function deleteMember(id, nick) {
 }
 
 // ===== MATCHES =====
+
+function switchMatchSec(sec) {
+  // nav items
+  ['add','active','done'].forEach(s => {
+    const el = document.getElementById('mnav-' + s);
+    if (el) el.classList.toggle('active', s === sec);
+  });
+  // panes
+  ['match-sec-add','match-sec-active','match-sec-done'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('active', id === 'match-sec-' + sec);
+  });
+  // ถ้าเป็น active/done ให้ render ข้อมูล
+  if (sec === 'active' || sec === 'done') {
+    _matchTab = sec;
+    filterMatches_();
+  }
+}
+
 async function loadMatches() {
   const {data} = await sb.from('matches').select('*').order('date',{ascending:true}).order('created_at',{ascending:false});
   allMatches = data || [];
@@ -3282,6 +3578,16 @@ async function deleteMatch(id) {
 }
 
 // ===== VERDICT =====
+
+function switchVerdictSec(sec) {
+  ['pending','done'].forEach(s => {
+    const nav  = document.getElementById('vnav-' + s);
+    const pane = document.getElementById('verdict-sec-' + s);
+    if (nav)  nav.classList.toggle('active',  s === sec);
+    if (pane) pane.classList.toggle('active', s === sec);
+  });
+}
+
 async function loadVerdict() {
   const {data} = await sb.from('matches').select('*').in('status',['upcoming','live','done']).order('date',{ascending:true});
   const pending = (data||[]).filter(m => (m.status==='done') && !m.winner);
@@ -3403,6 +3709,19 @@ async function resetVerdict(matchId) {
 }
 
 // ===== DEPOSITS =====
+
+function switchDepSec(sec) {
+  ['pending','done','reject'].forEach(s => {
+    const nav  = document.getElementById('dnav-' + s);
+    const pane = document.getElementById('dep-sec-' + s);
+    if (nav)  nav.classList.toggle('active',  s === sec);
+    if (pane) pane.classList.toggle('active', s === sec);
+  });
+  // auto-load เมื่อเปิด pane ครั้งแรก
+  if (sec === 'done')   filterDepDone();
+  if (sec === 'reject') filterDepReject();
+}
+
 async function loadDeposits() {
   const {data} = await sb.from('deposits').select('*').order('created_at',{ascending:false});
   allDeposits = data || [];
@@ -3636,6 +3955,51 @@ async function rejectDeposit(id, nick) {
 }
 
 // ===== WITHDRAWALS =====
+
+function switchWithSec(sec) {
+  ['pending','done','reject'].forEach(s => {
+    const nav  = document.getElementById('wnav-' + s);
+    const pane = document.getElementById('with-sec-' + s);
+    if (nav)  nav.classList.toggle('active',  s === sec);
+    if (pane) pane.classList.toggle('active', s === sec);
+  });
+  if (sec === 'done')   filterWithDone();
+  if (sec === 'reject') filterWithReject();
+}
+
+function filterWithReject() {
+  const from = document.getElementById('with-reject-from')?.value || '';
+  const to   = document.getElementById('with-reject-to')?.value   || '';
+  let rows = allWithdrawals.filter(w => w.status === 'rejected');
+  if (from || to) {
+    rows = rows.filter(w => {
+      const dt = (w.created_at || '').slice(0,10);
+      if (from && dt < from) return false;
+      if (to   && dt > to)   return false;
+      return true;
+    });
+  }
+  const el = document.getElementById('with-reject-count');
+  if (el) el.textContent = `(${rows.length} รายการ)`;
+  renderWithdrawalsRejected(rows);
+}
+
+function renderWithdrawalsRejected(rows) {
+  const tb = document.getElementById('with-reject-tbody');
+  if (!tb) return;
+  if (!rows.length) {
+    tb.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#aaa;">ไม่มีรายการที่ถูกปฏิเสธครับ</td></tr>';
+    return;
+  }
+  tb.innerHTML = rows.map(w => `<tr>
+    <td><strong style="cursor:pointer;color:var(--green);text-decoration:underline;" onclick="openMember('${w.nick}')">${w.nick}</strong></td>
+    <td style="font-family:'Kanit',sans-serif;font-weight:700;color:#f87171;">${Number(w.amount).toLocaleString()} ₭</td>
+    <td>${w.bank||'—'}</td>
+    <td style="font-size:12px;color:#888;">${w.reason||'—'}</td>
+    <td style="font-size:12px;color:#aaa;">${fmtDate(w.created_at)}</td>
+  </tr>`).join('');
+}
+
 async function loadWithdrawals() {
   const {data} = await sb.from('withdrawals').select('*').order('created_at',{ascending:false});
   allWithdrawals = data || [];
@@ -4521,6 +4885,18 @@ function applyAdminLang() {
 })();
 let _allStaff = [], _allStaffLogs = [];
 
+
+function switchStaffSec(sec) {
+  ['overview','add','list','logs'].forEach(s => {
+    const nav  = document.getElementById('sfnav-' + s);
+    const pane = document.getElementById('staff-sec-' + s);
+    if (nav)  nav.classList.toggle('active',  s === sec);
+    if (pane) pane.classList.toggle('active', s === sec);
+  });
+  if (sec === 'list') loadStaffPanel();
+  if (sec === 'logs') loadStaffLogs();
+}
+
 async function loadStaffPanel() {
   const [staffRes, logRes] = await Promise.all([
     sb.from('staff').select('*').order('created_at',{ascending:false}),
@@ -4539,6 +4915,9 @@ async function loadStaffPanel() {
 }
 
 function renderStaffTable() {
+  // อัปเดต total badge ใน sub-nav
+  const badge = document.getElementById('staff-total-badge');
+  if (badge && _allStaff) badge.textContent = `(${_allStaff.length})`;
   const tb = document.getElementById('staff-tbody');
   if (!tb) return;
   if (!_allStaff.length) {
@@ -4904,6 +5283,7 @@ window.switchCfgTab = function(tabId) {
   if (tabId === 'bank') { loadBankAccounts(); loadTxLimits(); }
 };
 
+
 async function logStaffAction(username, action, detail='') {
   try { await sb.from('staff_logs').insert({ staff_username: username, action, detail }); } catch(_) {}
 }
@@ -5081,6 +5461,16 @@ async function saveSettings(type) {
 
 // ===== REFERRAL PANEL =====
 let _allRefLogs = []; // cache สำหรับ filter
+
+
+function switchRefSec(sec) {
+  ['stats','summary','logs'].forEach(s => {
+    const nav  = document.getElementById('rnav-' + s);
+    const pane = document.getElementById('ref-sec-' + s);
+    if (nav)  nav.classList.toggle('active',  s === sec);
+    if (pane) pane.classList.toggle('active', s === sec);
+  });
+}
 
 async function loadReferralPanel() {
   // reset tbody ให้แสดง loading
@@ -6811,6 +7201,18 @@ async function sendActivity() {
 }
 
 // โหลดประวัติกิจกรรม
+
+function switchActSec(sec) {
+  ['create','history','commission'].forEach(s => {
+    const nav  = document.getElementById('anav-' + s);
+    const pane = document.getElementById('act-sec-' + s);
+    if (nav)  nav.classList.toggle('active',  s === sec);
+    if (pane) pane.classList.toggle('active', s === sec);
+  });
+  if (sec === 'history')    loadActivityLogs();
+  if (sec === 'commission') loadRefCommissionLogs();
+}
+
 async function loadActivityLogs() {
   const listEl = document.getElementById('act-logs-list');
   if (listEl) listEl.innerHTML = '<div style="text-align:center;padding:28px;color:#aaa;font-family:\'Kanit\',sans-serif;">กำลังโหลด...</div>';
