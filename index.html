@@ -3133,7 +3133,7 @@ input, textarea, select, button {
           </div>
           <div class="sched-card-body">
             <div class="sched-side red-sched">
-              <div class="sched-photo red-glow">🐂</div>
+              <div class="sched-photo red-glow"></div>
               <div class="sched-name">เจ้าพายุ</div>
               <div class="sched-owner">นายสมชาย ใจดี</div>
               <div class="sched-tag">⚖️ 520 กก.</div>
@@ -3144,7 +3144,7 @@ input, textarea, select, button {
               <div class="sched-pool">🎯 22,300 ₭</div>
             </div>
             <div class="sched-side blue-sched">
-              <div class="sched-photo blue-glow">🐃</div>
+              <div class="sched-photo blue-glow"></div>
               <div class="sched-name">ดำมหากาฬ</div>
               <div class="sched-owner">นายวิชัย แก้วมณี</div>
               <div class="sched-tag">⚖️ 510 กก.</div>
@@ -3167,7 +3167,7 @@ input, textarea, select, button {
           </div>
           <div class="sched-card-body">
             <div class="sched-side red-sched">
-              <div class="sched-photo red-glow">🐂</div>
+              <div class="sched-photo red-glow"></div>
               <div class="sched-name">แดงอรหันต์</div>
               <div class="sched-owner">นายประสิทธิ์ ทองดี</div>
               <div class="sched-tag">⚖️ 498 กก.</div>
@@ -3178,7 +3178,7 @@ input, textarea, select, button {
               <div class="sched-pool">🎯 8,500 ₭</div>
             </div>
             <div class="sched-side blue-sched">
-              <div class="sched-photo blue-glow">🐃</div>
+              <div class="sched-photo blue-glow"></div>
               <div class="sched-name">ขาวมงคล</div>
               <div class="sched-owner">นายชาญ บุญมา</div>
               <div class="sched-tag">⚖️ 502 กก.</div>
@@ -5132,6 +5132,7 @@ function applyLang() {
           bullB: m.name_b, ownerB: m.owner_b, weightB: m.weight_b,
           date: m.date, time: m.time, loc: m.location,
           prize: `${prizeNum.toLocaleString()} ₭`,
+          photoA: m.photo_a||'', photoB: m.photo_b||'',
           winner: m.winner||'', photoA: m.photo_a||'', photoB: m.photo_b||''
         });
         const winA = isDone && m.winner === m.name_a;
@@ -5156,7 +5157,7 @@ function applyLang() {
             <div class="team-side red-side">
               ${winA?'<div class="winner-crown">🏆</div>':''}
               <div class="team-photo red-photo">
-                ${m.photo_a?`<img src="${m.photo_a}" alt="${m.name_a||''}">`:'🐂'}
+                ${m.photo_a?`<img src="${m.photo_a}" alt="${m.name_a||''}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`:''}
               </div>
               <div class="team-info">
                 <div class="team-name${winA?' winner-name':''}">${m.name_a||'—'}</div>
@@ -5175,7 +5176,7 @@ function applyLang() {
             <div class="team-side blue-side">
               ${winB?'<div class="winner-crown">🏆</div>':''}
               <div class="team-photo blue-photo">
-                ${m.photo_b?`<img src="${m.photo_b}" alt="${m.name_b||''}">`:'🐃'}
+                ${m.photo_b?`<img src="${m.photo_b}" alt="${m.name_b||''}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`:''}
               </div>
               <div class="team-info">
                 <div class="team-name${winB?' winner-name':''}">${m.name_b||'—'}</div>
@@ -5410,7 +5411,7 @@ function applyLang() {
       card.innerHTML = `
         <div class="history-card-inner">
           <div class="history-bull ${isWinA?'winner-side':''}">
-            <div class="history-bull-photo">${m.photo_a?`<img src="${m.photo_a}">`:'🐂'}</div>
+            <div class="history-bull-photo">${m.photo_a?`<img src="${m.photo_a}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`:''}</div>
             <div class="history-bull-info">
               <div class="history-bull-name ${isWinA?'winner':''}">${m.name_a||'—'} ${isWinA?'🏆':''}</div>
               <div class="history-bull-owner">${m.owner_a||''}</div>
@@ -5424,7 +5425,7 @@ function applyLang() {
             ${m.code?`<div style="font-size:9px;color:rgba(245,200,66,0.5);letter-spacing:2px;font-family:Kanit,sans-serif;">#${m.code}</div>`:''}
           </div>
           <div class="history-bull right ${isWinB?'winner-side':''}">
-            <div class="history-bull-photo">${m.photo_b?`<img src="${m.photo_b}">`:'🐂'}</div>
+            <div class="history-bull-photo">${m.photo_b?`<img src="${m.photo_b}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`:''}</div>
             <div class="history-bull-info">
               <div class="history-bull-name ${isWinB?'winner':''}">${m.name_b||'—'} ${isWinB?'🏆':''}</div>
               <div class="history-bull-owner">${m.owner_b||''}</div>
@@ -5453,10 +5454,10 @@ function applyLang() {
     // ── winner photo HTML ──
     const winPhotoHtml = winnerPhoto
       ? `<img src="${winnerPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
-      : `<span style="font-size:80px;line-height:1;">🐂</span>`;
+      : `''`;
     const losPhotoHtml = loserPhoto
       ? `<img src="${loserPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;filter:grayscale(60%) brightness(0.7);">`
-      : `<span style="font-size:36px;line-height:1;filter:grayscale(60%);">🐂</span>`;
+      : `''`;
 
     const ov = document.createElement('div');
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);';
@@ -8453,11 +8454,11 @@ setInterval(() => {
 
   // ── MATCH DETAIL NAVIGATION ──
   const matchData = {
-    'match-1': { nameA:'เจ้าพายุ', ownerA:'นายสมชาย ใจดี', weightA:'520 กก.', photoA:'🐂',
-                 nameB:'ดำมหากาฬ', ownerB:'นายวิชัย แก้วมณี', weightB:'510 กก.', photoB:'🐃',
+    'match-1': { nameA:'เจ้าพายุ', ownerA:'นายสมชาย ใจดี', weightA:'520 กก.', photoA:'',
+                 nameB:'ดำมหากาฬ', ownerB:'นายวิชัย แก้วมณี', weightB:'510 กก.', photoB:'',
                  round:'รุ่นแชมเปียน', date:'28 พ.ค. 68', time:'13:30 น.', loc:'สนามหลัก นครศรีธรรมราช', prize:'500,000' },
-    'match-2': { nameA:'แดงอรหันต์', ownerA:'นายประสิทธิ์ ทองดี', weightA:'498 กก.', photoA:'🐂',
-                 nameB:'ขาวมงคล', ownerB:'นายชาญ บุญมา', weightB:'502 กก.', photoB:'🐃',
+    'match-2': { nameA:'แดงอรหันต์', ownerA:'นายประสิทธิ์ ทองดี', weightA:'498 กก.', photoA:'',
+                 nameB:'ขาวมงคล', ownerB:'นายชาญ บุญมา', weightB:'502 กก.', photoB:'',
                  round:'รุ่นน้ำหนัก 500 กก.', date:'29 พ.ค. 68', time:'09:00 น.', loc:'สนาม A พัทลุง', prize:'200,000' },
   };
 
@@ -8471,7 +8472,7 @@ setInterval(() => {
     // อัปเดต arena
     document.getElementById('detail-arena').innerHTML = `
       <div class="bet-team red-team">
-        <div class="bet-team-photo red-glow">${m.photoA||'🐂'}</div>
+        <div class="bet-team-photo red-glow">${m.photoA ? `<img src="${m.photoA}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display='none'">` : ''}</div>
         <div class="bet-team-name">${m.nameA||'—'}</div>
         <div class="bet-team-owner">${m.ownerA||''}</div>
         <div class="bet-team-tags"><span class="team-stat-tag">⚖️ ${m.weightA||''}</span></div>
@@ -8482,7 +8483,7 @@ setInterval(() => {
         <div class="bet-prize-box"><div style="font-size:10px;opacity:.6;">รางวัล</div><div style="font-weight:900;font-size:15px;color:var(--gold);">${m.prize||'—'} ₭</div></div>
       </div>
       <div class="bet-team blue-team">
-        <div class="bet-team-photo blue-glow">${m.photoB||'🐃'}</div>
+        <div class="bet-team-photo blue-glow">${m.photoB ? `<img src="${m.photoB}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display='none'">` : ''}</div>
         <div class="bet-team-name">${m.nameB||'—'}</div>
         <div class="bet-team-owner">${m.ownerB||''}</div>
         <div class="bet-team-tags"><span class="team-stat-tag">⚖️ ${m.weightB||''}</span></div>
@@ -8582,7 +8583,7 @@ setInterval(() => {
         </div>
         <div class="sched-card-body">
           <div class="sched-side red-sched">
-            <div class="sched-photo red-glow">${m.photo_a?`<img src="${m.photo_a}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`:'🐂'}</div>
+            <div class="sched-photo red-glow">${m.photo_a?`<img src="${m.photo_a}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display='none'">`:''}</div>
             <div class="sched-name${isDone&&m.winner===m.name_a?' winner-name':''}">${m.name_a||'—'}${isDone&&m.winner===m.name_a?' 🏆':''}</div>
             ${m.owner_a?`<div style="font-size:11px;color:rgba(255,248,236,0.5);">${m.owner_a}</div>`:''}
           </div>
@@ -8592,7 +8593,7 @@ setInterval(() => {
             ${m.code?`<div style="font-size:10px;color:rgba(245,200,66,0.4);letter-spacing:2px;font-family:Kanit,sans-serif;">#${m.code}</div>`:''}
           </div>
           <div class="sched-side blue-sched">
-            <div class="sched-photo blue-glow">${m.photo_b?`<img src="${m.photo_b}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`:'🐃'}</div>
+            <div class="sched-photo blue-glow">${m.photo_b?`<img src="${m.photo_b}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display='none'">`:''}</div>
             <div class="sched-name${isDone&&m.winner===m.name_b?' winner-name':''}">${m.name_b||'—'}${isDone&&m.winner===m.name_b?' 🏆':''}</div>
             ${m.owner_b?`<div style="font-size:11px;color:rgba(255,248,236,0.5);">${m.owner_b}</div>`:''}
           </div>

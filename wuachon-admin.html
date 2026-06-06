@@ -732,6 +732,24 @@ input, textarea, select, button {
             </div>
           </div>
 
+          <!-- ── POSTER ── -->
+          <div class="form-row full">
+            <div class="fg">
+              <label>🖼️ รูปโปสเตอร์การแข่งขัน (Poster)</label>
+              <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;">
+                <div id="prev-poster" style="width:200px;height:120px;border-radius:10px;background:rgba(245,200,66,0.06);border:2px dashed rgba(245,200,66,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+                  <span style="font-size:11px;color:rgba(245,200,66,0.4);">ยังไม่มีโปสเตอร์</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:140px;">
+                  <input type="file" id="m-poster" accept="image/*" style="display:none;" onchange="previewMatchPhoto(this,'prev-poster')">
+                  <button type="button" onclick="document.getElementById('m-poster').click()" style="font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:12px;font-weight:700;padding:8px 16px;border-radius:8px;border:1px solid rgba(245,200,66,0.4);background:rgba(245,200,66,0.08);color:#F5A800;cursor:pointer;width:100%;">🖼️ เลือกรูปโปสเตอร์</button>
+                  <button type="button" onclick="clearMatchPoster()" style="font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:11px;padding:5px 12px;border-radius:6px;border:1px solid #e5e5e0;background:#f9f9f9;color:#888;cursor:pointer;width:100%;">✕ ลบโปสเตอร์</button>
+                  <div style="font-size:11px;color:#aaa;">แนะนำ: 1:1.4 (เช่น 700×980px) ขนาดไม่เกิน 2MB</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="form-row full">
             <div class="fg">
               <label>🔴 Live Stream URL (YouTube / Facebook)</label>
@@ -3435,6 +3453,21 @@ function renderMatchTable(rows, isDone) {
 }
 
 // Helper: อ่านไฟล์เป็น base64
+// ── Upload ไฟล์ไปที่ Supabase Storage ──
+async function uploadToStorage(file, folder) {
+  if (!file) return null;
+  try {
+    const ext  = file.name.split('.').pop().toLowerCase() || 'jpg';
+    const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+    const { data, error } = await sb.storage
+      .from('match-images')
+      .upload(path, file, { upsert: true, contentType: file.type });
+    if (error) { console.error('Storage upload error:', error); return null; }
+    const { data: urlData } = sb.storage.from('match-images').getPublicUrl(path);
+    return urlData?.publicUrl || null;
+  } catch(e) { console.error('Upload failed:', e); return null; }
+}
+
 function readFileAsBase64(file) {
   return new Promise((resolve, reject) => {
     if (!file) { resolve(null); return; }
@@ -3465,6 +3498,13 @@ function previewMatchPhoto(input, previewId) {
 }
 
 // ลบรูป
+function clearMatchPoster() {
+  const input = document.getElementById('m-poster');
+  const prev  = document.getElementById('prev-poster');
+  if (input) input.value = '';
+  if (prev)  prev.innerHTML = '<span style="font-size:11px;color:rgba(245,200,66,0.4);">ยังไม่มีโปสเตอร์</span>';
+}
+
 function clearMatchPhoto(inputId, previewId, defaultEmoji) {
   const input = document.getElementById(inputId);
   if (input) input.value = '';
@@ -3481,11 +3521,17 @@ async function addMatch() {
   const btn = document.querySelector('[onclick="addMatch()"]');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ กำลังบันทึก...'; }
 
-  // อ่านรูป base64
+  // อัปโหลดรูปไปที่ Supabase Storage
   const fileA = document.getElementById('m-photo-a')?.files[0] || null;
   const fileB = document.getElementById('m-photo-b')?.files[0] || null;
-  const photo_a = await readFileAsBase64(fileA);
-  const photo_b = await readFileAsBase64(fileB);
+  const filePoster = document.getElementById('m-poster')?.files[0] || null;
+
+  if (btn) btn.textContent = '⏳ กำลังอัปโหลดรูป...';
+  const [photo_a, photo_b, poster_url] = await Promise.all([
+    uploadToStorage(fileA,     'bulls'),
+    uploadToStorage(fileB,     'bulls'),
+    uploadToStorage(filePoster,'posters'),
+  ]);
 
   const code = String(Math.floor(1000 + Math.random() * 9000));
   const stream_url = document.getElementById('m-stream-url')?.value.trim() || null;
@@ -3502,6 +3548,7 @@ async function addMatch() {
     status: 'upcoming', code, stream_url,
     photo_a: photo_a || null,
     photo_b: photo_b || null,
+    poster_url: poster_url || null,
   });
 
   if (btn) { btn.disabled = false; btn.textContent = '➕ เพิ่มคู่แข่งขัน'; }
@@ -3514,6 +3561,7 @@ async function addMatch() {
   });
   clearMatchPhoto('m-photo-a','prev-photo-a','🐂');
   clearMatchPhoto('m-photo-b','prev-photo-b','🐃');
+  clearMatchPoster();
   loadMatches(); loadOverview();
 }
 
