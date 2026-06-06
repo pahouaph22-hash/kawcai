@@ -5952,35 +5952,136 @@ async function payReferralCommission(nick, depositAmount, isFirstDeposit) {
   showToast(`🎁 คอมฯ เติมเงินครั้งแรก ${commission.toLocaleString()} ₭ → ${mem.referred_by}`);
 }
 
-// ===== REALTIME NOTIFICATIONS =====
+// ===== REALTIME — Auto-refresh ทุก event =====
+let _rtChannel = null;
+
 function subscribeNotifications() {
-  sb.channel('admin-notifications')
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'deposits'}, payload => {
+  // ถ้ามี channel เก่าอยู่ ลบก่อน
+  if (_rtChannel) {
+    try { _rtChannel.unsubscribe(); sb.removeChannel(_rtChannel); } catch(_) {}
+  }
+
+  _rtChannel = sb.channel('admin-realtime-v2')
+
+    // ── DEPOSITS ──────────────────────────────────────────
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'deposits' }, payload => {
       const d = payload.new;
-      notifCount++;
-      const badge = document.getElementById('notif-badge');
-      badge.textContent = notifCount;
-      badge.style.display = 'inline';
+      _bumpNotif();
       showToast(`🔔 ${d.nick} ขอเติมเงิน ${Number(d.amount).toLocaleString()} ₭`);
-      loadDeposits(); loadOverview();
+      _reloadIfActive(['deposits']);
+      loadOverview();
     })
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'withdrawals'}, payload => {
+    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'deposits' }, payload => {
+      const d = payload.new;
+      const statusLabel = d.status === 'approved' ? '✅ อนุมัติแล้ว' : d.status === 'rejected' ? '❌ ปฏิเสธแล้ว' : '🔄 อัปเดต';
+      showToast(`💰 เติมเงิน ${d.nick}: ${statusLabel}`);
+      _reloadIfActive(['deposits']);
+      loadOverview();
+    })
+
+    // ── WITHDRAWALS ────────────────────────────────────────
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'withdrawals' }, payload => {
       const w = payload.new;
+      _bumpNotif();
       showToast(`🏧 ${w.nick} ขอถอนเงิน ${Number(w.amount).toLocaleString()} ₭`);
-      loadWithdrawals(); loadOverview();
+      _reloadIfActive(['withdrawals']);
+      loadOverview();
     })
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'members'}, payload => {
+    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'withdrawals' }, payload => {
+      const w = payload.new;
+      const statusLabel = w.status === 'approved' ? '✅ อนุมัติแล้ว' : w.status === 'rejected' ? '❌ ปฏิเสธแล้ว' : '🔄 อัปเดต';
+      showToast(`🏧 ถอนเงิน ${w.nick}: ${statusLabel}`);
+      _reloadIfActive(['withdrawals']);
+      loadOverview();
+    })
+
+    // ── MEMBERS ────────────────────────────────────────────
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'members' }, payload => {
       showToast(`👤 สมาชิกใหม่: ${payload.new.nick}`);
-      loadMembers(); loadOverview();
+      _reloadIfActive(['members']);
+      loadOverview();
     })
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'members'}, () => {
-      loadMembers();
+    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'members' }, () => {
+      _reloadIfActive(['members']);
     })
+
+    // ── MATCHES ────────────────────────────────────────────
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'matches' }, payload => {
+      showToast(`🏆 เพิ่มคู่แข่งขันใหม่: ${payload.new.round || ''}`);
+      _reloadIfActive(['matches', 'verdict']);
+    })
+    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'matches' }, payload => {
+      const m = payload.new;
+      if (m.status === 'done' && m.winner) {
+        showToast(`🏆 ผลการแข่งขัน: ${m.winner} ชนะ!`);
+      }
+      _reloadIfActive(['matches', 'verdict', 'bets']);
+    })
+
+    // ── BETS ───────────────────────────────────────────────
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'bets' }, () => {
+      _reloadIfActive(['bets']);
+    })
+    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'bets' }, () => {
+      _reloadIfActive(['bets']);
+    })
+
+    // ── REFERRAL ───────────────────────────────────────────
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'referral_logs' }, payload => {
+      showToast(`🎁 คอมมิชชันใหม่: ${payload.new.referrer_nick} +${Number(payload.new.commission||0).toLocaleString()} ₭`);
+      _reloadIfActive(['referral']);
+    })
+
+    // ── ACTIVITY ───────────────────────────────────────────
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'activity_logs' }, payload => {
+      showToast(`🎉 กิจกรรมใหม่: ${payload.new.name || ''}`);
+      _reloadIfActive(['activity']);
+    })
+
     .subscribe(status => {
-      console.log('Admin Realtime:', status);
+      console.log('[Realtime]', status);
       const dot = document.getElementById('realtime-dot');
-      if (dot) dot.style.background = status==='SUBSCRIBED' ? '#639922' : '#C8102E';
+      if (!dot) return;
+      if (status === 'SUBSCRIBED') {
+        dot.style.background = '#22c55e';
+        dot.title = '🟢 Realtime connected';
+      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        dot.style.background = '#ef4444';
+        dot.title = '🔴 Realtime disconnected — กำลังเชื่อมต่อใหม่...';
+        // reconnect อัตโนมัติหลัง 5 วินาที
+        setTimeout(subscribeNotifications, 5000);
+      } else {
+        dot.style.background = '#f59e0b';
+        dot.title = '🟡 Realtime connecting...';
+      }
     });
+}
+
+// ── bump notification badge ──
+function _bumpNotif() {
+  notifCount++;
+  const badge = document.getElementById('notif-badge');
+  if (badge) { badge.textContent = notifCount; badge.style.display = 'inline'; }
+}
+
+// ── reload เฉพาะ panel ที่กำลังแสดงอยู่ ──
+function _reloadIfActive(panels) {
+  const activePanelEl = document.querySelector('.panel.active');
+  if (!activePanelEl) return;
+  const activeId = activePanelEl.id.replace('panel-', '');
+  if (!panels.includes(activeId)) return;
+
+  const reloadMap = {
+    deposits:   () => loadDeposits(),
+    withdrawals:() => loadWithdrawals(),
+    members:    () => loadMembers(),
+    matches:    () => loadMatches?.(),
+    verdict:    () => loadVerdict?.(),
+    bets:       () => loadBets?.(),
+    referral:   () => loadReferralPanel?.(),
+    activity:   () => loadActivityPanel?.(),
+  };
+  if (reloadMap[activeId]) reloadMap[activeId]();
 }
 
 // ===== MEMBER DETAIL MODAL =====
