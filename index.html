@@ -2773,6 +2773,7 @@ input, textarea, select, button {
 <div id="main-content">
 <nav>
   <div class="nav-logo" style="display:flex;align-items:center;gap:10px;">
+    <span id="nav-logo-img-wrap" style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;">
     <svg id="nav-logo-svg" viewBox="0 0 60 60" width="40" height="40" xmlns="http://www.w3.org/2000/svg">
       <circle cx="30" cy="30" r="28" fill="#1A0A00" stroke="#F5A800" stroke-width="2.5"/>
       <circle cx="30" cy="30" r="24" fill="none" stroke="#C8102E" stroke-width="1"/>
@@ -2791,6 +2792,7 @@ input, textarea, select, button {
         <ellipse cx="26" cy="35" rx="3" ry="2.5" fill="#1A0A00"/>
       </g>
     </svg>
+    </span>
     <span id="nav-site-name" style="font-family:'Phetsarath OT','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-weight:900;font-size:20px;color:#F5A800;">วัวชน<span style="color:#C8102E;">ไทย</span></span>
   </div>
   <div class="nav-links">
@@ -2808,6 +2810,7 @@ input, textarea, select, button {
     <option value="la">🇱🇦 ລາວ</option>
     <option value="en">🇬🇧 EN</option>
   </select>
+  <span id="nav-logo-big-wrap" style="display:inline-flex;width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;">
   <svg id="nav-logo-big" viewBox="0 0 240 240" width="44" height="44" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
     <circle cx="120" cy="120" r="116" fill="#1A0A00" stroke="#F5A800" stroke-width="8"/>
     <circle cx="120" cy="120" r="100" fill="none" stroke="#C8102E" stroke-width="4"/>
@@ -2841,6 +2844,7 @@ input, textarea, select, button {
     <text x="28" y="127" text-anchor="middle" font-size="16" fill="#F5A800">★</text>
     <text x="212" y="127" text-anchor="middle" font-size="16" fill="#F5A800">★</text>
   </svg>
+</span>
 </nav>
 
 <!-- NEWS TICKER -->
@@ -3008,7 +3012,17 @@ input, textarea, select, button {
             <div class="reg-section-label">ข้อมูลติดต่อ</div>
             <div class="reg-group">
               <label class="reg-label">เบอร์โทรศัพท์ <em>ใช้เป็น Username Login</em></label>
-              <input class="reg-input" type="tel" id="r-phone" placeholder="0xx-xxx-xxxx" maxlength="10">
+              <div style="display:flex;align-items:center;gap:0;position:relative;">
+                <span style="position:absolute;left:12px;font-family:'Kanit',sans-serif;font-size:14px;font-weight:700;color:rgba(240,255,232,0.6);pointer-events:none;z-index:1;">020</span>
+                <input class="reg-input" type="tel" id="r-phone"
+                  placeholder="XXXXXXXX"
+                  maxlength="8"
+                  pattern="[0-9]{8}"
+                  style="padding-left:46px;"
+                  oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,8)"
+                  onkeydown="if(this.selectionStart===0&&(event.key==='Backspace'||event.key==='Delete'))event.preventDefault()">
+              </div>
+              <div style="font-size:11px;color:rgba(240,255,232,0.4);font-family:'Kanit',sans-serif;margin-top:4px;">รูปแบบ: 020-XXXXXXXX (สปป.ลาว)</div>
             </div>
             <div class="reg-group">
               <label class="reg-label">รหัสผ่าน</label>
@@ -5039,6 +5053,22 @@ function applyLang() {
           wrap.innerHTML = `<img src="${heroBullImg}" alt="hero bull" id="hero-bull-img" style="width:120px;height:120px;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(245,200,66,0.4));">`;
         }
       }
+      // ── Logo ซ้าย + ขวา Navbar ──
+      if (siteInfo.logoUrl) {
+        const imgHtmlSm = `<img src="${siteInfo.logoUrl}" alt="logo"
+          style="width:40px;height:40px;object-fit:cover;border-radius:50%;"
+          onerror="this.style.display='none'">`;
+        const imgHtmlBig = `<img src="${siteInfo.logoUrl}" alt="logo"
+          style="width:44px;height:44px;object-fit:cover;border-radius:50%;"
+          onerror="this.style.display='none'">`;
+        // โลโก้ซ้าย
+        const wrapSm = document.getElementById('nav-logo-img-wrap');
+        if (wrapSm) wrapSm.innerHTML = imgHtmlSm;
+        // โลโก้ขวา
+        const wrapBig = document.getElementById('nav-logo-big-wrap');
+        if (wrapBig) wrapBig.innerHTML = imgHtmlBig;
+      }
+
       if (siteInfo.name1 || siteInfo.name2) {
         const n1 = siteInfo.name1 || 'วัวชน';
         const n2 = siteInfo.name2 || 'ไทย';
@@ -6728,11 +6758,15 @@ function applyLang() {
       errEl.textContent = '⚠️ กรุณากรอกข้อมูลให้ครบถ้วนทุกช่องครับ';
       return;
     }
-    if (!/^[0-9]{9,10}$/.test(phone.replace(/-/g,''))) {
+    // เบอร์โทรลาว: input เก็บแค่ 8 หลักหลัง 020
+    const phoneDigits = phone.replace(/[^0-9]/g,'');
+    if (!/^[0-9]{8}$/.test(phoneDigits)) {
       errEl.style.display = 'block';
-      errEl.textContent = '⚠️ เบอร์โทรศัพท์ไม่ถูกต้องครับ';
+      errEl.textContent = '⚠️ เบอร์โทรต้องเป็น 8 หลักหลังจาก 020 ครับ (เช่น 020-XXXXXXXX)';
       return;
     }
+    // เก็บเบอร์เต็มรูปแบบ 020XXXXXXXX
+    const phoneFullLao = '020' + phoneDigits;
     // ตรวจรหัสผ่านแข็งแรง
     const pwErr = _validatePassword(password);
     if (pwErr) {
@@ -6759,7 +6793,7 @@ function applyLang() {
     }
 
     // เช็คเบอร์ซ้ำ
-    const { data: existPhone } = await sb.from('members').select('phone').eq('phone', phone).maybeSingle();
+    const { data: existPhone } = await sb.from('members').select('phone').eq('phone', phoneFullLao).maybeSingle();
     if (existPhone) {
       errEl.style.display = 'block';
       errEl.textContent = '⚠️ เบอร์โทรนี้สมัครไปแล้วครับ กรุณา Login';
@@ -6768,7 +6802,7 @@ function applyLang() {
     }
 
     // Hash password (consistent กับ login)
-    const pwHash = btoa(unescape(encodeURIComponent(phone + ':' + password)));
+    const pwHash = btoa(unescape(encodeURIComponent(phoneFullLao + ':' + password)));
 
     // ตรวจรหัสผู้แนะนำ
     const refCode = (document.getElementById('r-refcode')?.value || '').trim().toUpperCase();
@@ -6793,7 +6827,7 @@ function applyLang() {
 
     // บันทึกลง Supabase
     const insertData = {
-      fname, lname, nick, phone,
+      fname, lname, nick, phone: phoneFullLao,
       password: pwHash, balance: 0,
       referral_code: myRefCode,
       referred_by: referredBy,

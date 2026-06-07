@@ -750,14 +750,22 @@ input, textarea, select, button {
             </div>
           </div>
 
-          <div class="form-row full">
+          <!-- ── Live Stream (แสดงเมื่อกด Go Live) ── -->
+          <div class="form-row full" id="stream-url-row" style="display:none;">
             <div class="fg">
               <label>🔴 Live Stream URL (YouTube / Facebook)</label>
               <input id="m-stream-url" placeholder="https://youtube.com/watch?v=xxxx หรือ https://fb.gg/v/xxxx">
-              <div style="font-size:11px;color:#aaa;margin-top:3px;">วางได้เมื่อเริ่มไลฟ์สด — Admin สามารถแก้ไขทีหลังได้ครับ</div>
+              <div style="font-size:11px;color:#aaa;margin-top:3px;">วาง URL ที่ได้จาก YouTube Studio หรือ Facebook Live ครับ</div>
             </div>
           </div>
-          <button class="save-btn" onclick="addMatch()">➕ เพิ่มคู่แข่งขัน</button>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="save-btn" onclick="addMatch()">➕ เพิ่มคู่แข่งขัน</button>
+            <button class="save-btn" id="go-live-toggle-btn"
+              style="background:linear-gradient(135deg,#C8102E,#a00d24);display:flex;align-items:center;gap:6px;"
+              onclick="toggleStreamField()">
+              🔴 Go Live
+            </button>
+          </div>
         </div>
             </div>
 
@@ -1427,9 +1435,39 @@ input, textarea, select, button {
             </div>
           </div>
 
-          <!-- ① โลโก้ซ้าย (SVG วัวเล็ก) + ② ชื่อเว็บ -->
+          <!-- ① โลโก้ซ้าย + Upload -->
           <div style="background:#f8f9fa;border:1px solid #e5e5e0;border-radius:10px;padding:14px;margin-bottom:12px;">
-            <div style="font-weight:700;font-size:13px;margin-bottom:10px;">① + ② ชื่อและโลโก้ฝั่งซ้าย Navbar</div>
+            <div style="font-weight:700;font-size:13px;margin-bottom:10px;">① รูปโลโก้ซ้าย Navbar</div>
+
+            <!-- Upload / URL logo -->
+            <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;">
+              <!-- Preview -->
+              <div id="sf-logo-preview-wrap" style="width:64px;height:64px;border-radius:50%;border:2px solid #F5A800;background:#2a1200;display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;flex-shrink:0;">🐂</div>
+              <!-- Controls -->
+              <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                <div style="font-size:11px;color:#888;font-weight:700;">วิธีที่ 1 — อัปโหลดรูป</div>
+                <input type="file" id="sf-logo-file" accept="image/*" style="display:none;" onchange="previewLogoUpload(this)">
+                <button type="button" onclick="document.getElementById('sf-logo-file').click()"
+                  style="font-family:'Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-size:12px;font-weight:700;padding:8px 12px;border-radius:8px;border:2px solid #F5A800;background:#F5A800;color:#1a0a00;cursor:pointer;">
+                  📁 เลือกรูปโลโก้
+                </button>
+
+                <div style="font-size:11px;color:#888;font-weight:700;margin-top:4px;">วิธีที่ 2 — ใส่ URL รูป</div>
+                <input id="sf-logo-url" type="url" placeholder="https://example.com/logo.png"
+                  style="font-size:12px;"
+                  oninput="previewLogoUrl(this.value)">
+
+                <div style="display:flex;gap:6px;">
+                  <button type="button" onclick="clearLogoUpload()"
+                    style="font-size:11px;padding:5px 10px;border-radius:6px;border:1px solid #ddd;background:#fff;color:#888;cursor:pointer;">
+                    ✕ รีเซ็ต Emoji 🐂
+                  </button>
+                </div>
+                <div style="font-size:10px;color:#aaa;">PNG โปร่งใส หรือ JPG · แนะนำ 64×64px</div>
+              </div>
+            </div>
+
+            <div style="font-weight:700;font-size:13px;margin-bottom:10px;">② ชื่อเว็บ Navbar</div>
             <div class="form-row" style="margin:0;">
               <div class="fg">
                 <label>ชื่อส่วนแรก <span style="color:#F5A800;font-weight:700;">■</span> สีทอง</label>
@@ -3512,6 +3550,24 @@ function clearMatchPhoto(inputId, previewId, defaultEmoji) {
   if (prev) prev.innerHTML = defaultEmoji;
 }
 
+
+// ── Toggle stream URL field ──
+function toggleStreamField() {
+  const row = document.getElementById('stream-url-row');
+  const btn = document.getElementById('go-live-toggle-btn');
+  if (!row || !btn) return;
+  const isOpen = row.style.display !== 'none';
+  if (isOpen) {
+    row.style.display = 'none';
+    btn.innerHTML = '🔴 Go Live';
+    btn.style.background = 'linear-gradient(135deg,#C8102E,#a00d24)';
+  } else {
+    row.style.display = 'block';
+    btn.innerHTML = '✖️ ซ่อน URL';
+    btn.style.background = 'linear-gradient(135deg,#555,#333)';
+    document.getElementById('m-stream-url')?.focus();
+  }
+}
 async function addMatch() {
   const round   = document.getElementById('m-round').value.trim();
   const name_a  = document.getElementById('m-name-a').value.trim();
@@ -3566,12 +3622,44 @@ async function addMatch() {
 }
 
 async function updateMatchStatus(id, status) {
-  await sb.from('matches').update({ status }).eq('id', id);
-  showToast(status === 'done' ? '✅ ย้ายไปแท็บ "จบการแข่งขัน" แล้วครับ' : '✅ อัปเดตสถานะแล้วครับ');
-  // อัปเดต cache ทันที
+  let updateObj = { status };
+
+  // ── เมื่อกด Live → popup ถาม Stream URL ก่อน ──
+  if (status === 'live') {
+    const match   = allMatches.find(m => m.id === id);
+    const current = match?.stream_url || '';
+    const url = prompt(
+      '🔴 กรอก Live Stream URL ก่อนเริ่มไลฟ์สดครับ\n\n' +
+      'ตัวอย่าง:\n' +
+      '• YouTube: https://youtube.com/watch?v=xxxxx\n' +
+      '• Facebook: https://fb.gg/v/xxxxx\n\n' +
+      '(กด Cancel เพื่อยกเลิกการเปลี่ยนสถานะ)',
+      current
+    );
+    // กด Cancel → ยกเลิก ไม่เปลี่ยนสถานะ
+    if (url === null) {
+      // reset select กลับเป็นค่าเดิม
+      filterMatches_();
+      return;
+    }
+    // บันทึก URL พร้อมกับ status
+    updateObj.stream_url = url.trim() || null;
+  }
+
+  const { error } = await sb.from('matches').update(updateObj).eq('id', id);
+  if (error) { showToast('❌ บันทึกไม่สำเร็จ: ' + error.message, 'error'); return; }
+
+  const msg = status === 'done'
+    ? '✅ ย้ายไปแท็บ "จบการแข่งขัน" แล้วครับ'
+    : status === 'live'
+    ? '🔴 เริ่มไลฟ์สดแล้วครับ!'
+    : '✅ อัปเดตสถานะแล้วครับ';
+  showToast(msg);
+
+  // อัปเดต cache
   const idx = allMatches.findIndex(m => m.id === id);
-  if (idx !== -1) allMatches[idx] = { ...allMatches[idx], status };
-  // ถ้าเปลี่ยนเป็น done ให้สลับ tab ไปเลย
+  if (idx !== -1) allMatches[idx] = { ...allMatches[idx], ...updateObj };
+
   if (status === 'done') {
     switchMatchTab('done');
   } else {
@@ -5430,7 +5518,30 @@ async function saveSettings(type) {
     const siteBtn = document.getElementById('btn-save-siteInfo');
     if (siteBtn) { siteBtn.disabled = true; siteBtn.textContent = '⏳ กำลังบันทึก...'; }
     // บันทึก siteInfo — ใช้ upsert เสมอ
-    const newVal = { name1, name2, logoTop, logoBottom, pageTitle, heroBull };
+    // logo ซ้าย Navbar (upload file หรือ URL)
+    let logoUrl = null;
+    if (_logoDataUrl) {
+      // อัปโหลดขึ้น Supabase Storage
+      try {
+        const isBase64 = _logoDataUrl.startsWith('data:');
+        if (isBase64) {
+          const res  = await fetch(_logoDataUrl);
+          const blob = await res.blob();
+          const ext  = blob.type.split('/')[1] || 'png';
+          const path = `logos/navbar-logo-${Date.now()}.${ext}`;
+          const { error: upErr } = await sb.storage.from('match-images').upload(path, blob, { upsert:true, contentType:blob.type });
+          if (!upErr) {
+            const { data: urlData } = sb.storage.from('match-images').getPublicUrl(path);
+            logoUrl = urlData?.publicUrl || _logoDataUrl;
+          } else {
+            logoUrl = _logoDataUrl; // fallback base64
+          }
+        } else {
+          logoUrl = _logoDataUrl; // เป็น URL อยู่แล้ว
+        }
+      } catch { logoUrl = _logoDataUrl; }
+    }
+    const newVal = { name1, name2, logoTop, logoBottom, pageTitle, heroBull, logoUrl };
     const saveErr = await safeUpsertSettings('siteInfo', newVal);
 
     if (siteBtn) { siteBtn.disabled = false; siteBtn.textContent = '💾 ยืนยันการเปลี่ยนแปลง'; }
@@ -5440,7 +5551,11 @@ async function saveSettings(type) {
       window._heroBullBase64 = heroBull;
       // อัปเดต topbar admin ทันที
       const adminLogo = document.querySelector('.topbar-logo');
-      if (adminLogo) adminLogo.innerHTML = `🐂 <em>${name1}${name2}</em> <small style="font-size:11px;font-weight:400;color:rgba(255,248,236,.35);margin-left:6px;">Admin</small>`;
+      if (adminLogo) {
+        const logoImg = logoUrl ? `<img src="${logoUrl}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px;">` : '🐂 ';
+        adminLogo.innerHTML = `${logoImg}<em>${name1}${name2}</em> <small style="font-size:11px;font-weight:400;color:rgba(255,248,236,.35);margin-left:6px;">Admin</small>`;
+      }
+      if (logoUrl) { window._logoDataUrl = logoUrl; _logoDataUrl = logoUrl; }
       showToast(`✅ บันทึกชื่อ "${name1}${name2}" แล้วครับ! หน้าบ้านจะอัปเดตทันที`);
     }
     return;
@@ -7649,6 +7764,45 @@ async function loadFinanceTable() {
     <td style="padding:12px 14px;text-align:right;font-family:'Phetsarath','Phetsarath','Noto Sans Lao','Kanit',sans-serif;font-weight:900;font-size:13px;color:#dc2626;">${totals.rewardAmt>0?'−':''}${fmtFull(totals.rewardAmt)}</td>
   </tr>`;
 }
+
+// ── Logo Upload/URL Preview ──
+function previewLogoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2*1024*1024) { alert('รูปใหญ่เกิน 2MB ครับ'); input.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    _logoDataUrl = e.target.result;
+    _updateLogoPreview(_logoDataUrl);
+    const urlEl = document.getElementById('sf-logo-url');
+    if (urlEl) urlEl.value = '';
+  };
+  reader.readAsDataURL(file);
+}
+function previewLogoUrl(url) {
+  if (!url) { _logoDataUrl = null; _updateLogoPreview(null); return; }
+  const img = new Image();
+  img.onload  = () => { _logoDataUrl = url; _updateLogoPreview(url); };
+  img.onerror = () => showToast('⚠️ โหลดรูปจาก URL ไม่ได้ครับ');
+  img.src = url;
+  const fi = document.getElementById('sf-logo-file');
+  if (fi) fi.value = '';
+}
+function _updateLogoPreview(src) {
+  const wrap  = document.getElementById('sf-logo-preview-wrap');
+  const small = document.getElementById('sf-prev-logo-small');
+  const html  = src ? `<img src="${src}" style="width:100%;height:100%;object-fit:cover;">` : '🐂';
+  if (wrap)  wrap.innerHTML  = html;
+  if (small) small.innerHTML = html;
+}
+function clearLogoUpload() {
+  _logoDataUrl = null;
+  _updateLogoPreview(null);
+  const fi = document.getElementById('sf-logo-file'); if(fi) fi.value='';
+  const fu = document.getElementById('sf-logo-url');  if(fu) fu.value='';
+}
+let _logoDataUrl = null;
+
 </script>
 
 <!-- MEMBER DETAIL MODAL -->
